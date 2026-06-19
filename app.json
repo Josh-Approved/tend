@@ -30,7 +30,14 @@
       "expo-sharing",
       "expo-splash-screen",
       "expo-status-bar",
-      "expo-font"
+      "expo-font",
+      "expo-notifications",
+      [
+        "expo-contacts",
+        {
+          "contactsPermission": "Tend uses your contacts only to let you add the people you choose. Nothing leaves your device."
+        }
+      ]
     ]
   }
 }

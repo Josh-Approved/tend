@@ -1,6 +1,6 @@
 /**
- * Settings / About. App-specific settings (here: the "Your data" export/import
- * rows) sit ABOVE the canonical About block, which is the shared
+ * Settings / About. App-specific settings (import from contacts + the "Your data"
+ * export/import rows) sit ABOVE the canonical About block, which is the shared
  * <SettingsAbout/> component — the canonical entries are the floor, not the
  * ceiling (canon § Settings / About).
  */
@@ -8,11 +8,12 @@
 import React, { useCallback, useState } from 'react';
 import { Text, ScrollView, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Upload, Download } from 'lucide-react-native';
+import { Upload, Download, UserPlus } from 'lucide-react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../../App';
 import { usePeopleStore } from '../store/people';
 import { exportPeople, pickAndParsePeople } from '../lib/transfer';
+import { importFromContacts } from '../lib/contacts';
 import { AboutRow } from '../components/AboutRow';
 import { SettingsAbout } from '../components/SettingsAbout';
 import { ScreenHeader } from '../components/ScreenHeader';
@@ -35,6 +36,16 @@ export default function SettingsScreen({ navigation }: Props) {
   const people = usePeopleStore((st) => st.people);
   const importPeople = usePeopleStore((st) => st.importPeople);
   const [status, setStatus] = useState<string | null>(null);
+
+  const onImportContacts = useCallback(async () => {
+    const res = await importFromContacts();
+    if (res && 'denied' in res) {
+      setStatus(t('data.importDenied'));
+      return;
+    }
+    const n = res && 'people' in res ? importPeople(res.people) : 0;
+    setStatus(n > 0 ? t('data.imported', { count: n }) : t('data.importNone'));
+  }, [importPeople]);
 
   const onExport = useCallback(() => {
     exportPeople(people).catch(() => setStatus(t('settings.couldntExport')));
@@ -69,6 +80,7 @@ export default function SettingsScreen({ navigation }: Props) {
         />
 
         <Text style={s.sectionLabel}>{t('settings.yourData')}</Text>
+        <AboutRow label={t('home.importContacts')} icon={UserPlus} onPress={onImportContacts} />
         <AboutRow label={t('settings.export')} icon={Upload} onPress={onExport} />
         <AboutRow label={t('settings.import')} icon={Download} onPress={onImport} />
         {status ? <Text style={s.status}>{status}</Text> : null}

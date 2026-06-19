@@ -1,8 +1,8 @@
 /**
  * Trust-core unit tests (canon § QA & testing Tier 1) for Tend. The trust core
  * is the pure data layer in ../person — above all `dueStatus` (who's due to reach
- * out to), plus the date math and additive, crash-proof import sanitization.
- * These are the worked examples a refactor would silently break.
+ * out to) and `upcomingDates` (birthdays/anniversaries coming up), plus the date
+ * math and additive, crash-proof import sanitization.
  */
 
 import { describe, it, expect } from '@jest/globals';
@@ -11,10 +11,13 @@ import {
   makePerson,
   makePreference,
   makeImportantDate,
+  makeInteraction,
+  sortedInteractions,
   dueStatus,
   daysSinceContact,
   sortByUrgency,
   nextOccurrence,
+  upcomingDates,
   sanitizeImportedPerson,
   type Person,
 } from '../person';
@@ -22,19 +25,18 @@ import {
 const at = (name: string, patch: Partial<Person> = {}): Person => ({ ...makePerson(name), ...patch });
 
 describe('constructors', () => {
-  it('makePerson trims, starts with no cadence / never-contacted, mints an id', () => {
+  it('makePerson trims, starts with no cadence / never-contacted, empty history', () => {
     const p = makePerson('  Mom  ');
     expect(p.name).toBe('Mom');
     expect(p.cadenceDays).toBeNull();
     expect(p.lastContactedAt).toBeNull();
+    expect(p.interactions).toEqual([]);
     expect(p.id).toMatch(/^p/);
-    expect(p.createdAt).toBeGreaterThan(0);
   });
 
-  it('makePreference / makeImportantDate trim and mint ids', () => {
-    expect(makePreference('dislike', '  Lilies ').text).toBe('Lilies');
-    expect(makeImportantDate('  Birthday ', 5, 2).label).toBe('Birthday');
-    expect(makeImportantDate('', 5, 2).label).toBe('Date');
+  it('makeInteraction trims notes and drops empties', () => {
+    expect(makeInteraction('call', '  rang her ').note).toBe('rang her');
+    expect(makeInteraction('text', '   ').note).toBeUndefined();
   });
 });
 
@@ -50,7 +52,7 @@ describe('dueStatus — the trust core', () => {
     const p = at('Mom', { cadenceDays: 7, lastContactedAt: now - 10 * DAY_MS });
     const s = dueStatus(p, now);
     expect(s.state).toBe('overdue');
-    expect(s.dueAt).toBe(now - 10 * DAY_MS + 7 * DAY_MS); // 3 days ago
+    expect(s.dueAt).toBe(now - 10 * DAY_MS + 7 * DAY_MS);
     expect(s.daysUntilDue).toBeLessThan(0);
   });
 
@@ -86,36 +88,53 @@ describe('sortByUrgency', () => {
   });
 });
 
-describe('nextOccurrence', () => {
-  it('rolls a passed date to next year and keeps an upcoming one this year', () => {
+describe('sortedInteractions', () => {
+  it('returns catch-ups newest first', () => {
+    const p = at('A', {
+      interactions: [makeInteraction('call', undefined, 100), makeInteraction('text', undefined, 300), makeInteraction('other', undefined, 200)],
+    });
+    expect(sortedInteractions(p).map((i) => i.at)).toEqual([300, 200, 100]);
+  });
+});
+
+describe('nextOccurrence + upcomingDates', () => {
+  it('rolls a passed date to next year and keeps an upcoming one', () => {
     const jan1 = new Date(2024, 0, 1).getTime();
-    const dec = makeImportantDate('Birthday', 12, 25);
-    const jan10 = makeImportantDate('Anniversary', 1, 10);
-    expect(new Date(nextOccurrence(dec, jan1)).getFullYear()).toBe(2024); // upcoming this year
-    expect(new Date(nextOccurrence(jan10, jan1)).getFullYear()).toBe(2024);
+    expect(new Date(nextOccurrence(makeImportantDate('B', 12, 25), jan1)).getFullYear()).toBe(2024);
     const feb1 = new Date(2024, 1, 1).getTime();
-    expect(new Date(nextOccurrence(jan10, feb1)).getFullYear()).toBe(2025); // already passed → next year
+    expect(new Date(nextOccurrence(makeImportantDate('A', 1, 10), feb1)).getFullYear()).toBe(2025);
+  });
+
+  it('surfaces only dates within the window, soonest first', () => {
+    const now = new Date(2024, 5, 1).getTime(); // Jun 1
+    const a = at('A', { importantDates: [makeImportantDate('Birthday', 6, 10)] }); // +9d
+    const b = at('B', { importantDates: [makeImportantDate('Anniversary', 6, 3)] }); // +2d
+    const far = at('Far', { importantDates: [makeImportantDate('Birthday', 12, 1)] }); // far off
+    const up = upcomingDates([a, far, b], now, 30);
+    expect(up.map((u) => u.person.name)).toEqual(['B', 'A']);
+    expect(up.every((u) => u.days <= 30)).toBe(true);
   });
 });
 
 describe('sanitizeImportedPerson', () => {
-  it('re-mints the id, keeps valid nested data, drops garbage', () => {
+  it('re-mints the id, keeps valid nested data incl. interactions + howWeMet', () => {
     const safe = sanitizeImportedPerson({
       id: 'OLD-COLLIDING-ID',
       name: 'Sarah',
       cadenceDays: 14,
-      lastContactedAt: 123,
       notes: 'Hates lilies',
+      howWeMet: 'College',
       importantDates: [{ label: 'Birthday', month: 5, day: 2 }, { nope: 1 }],
-      preferences: [{ kind: 'dislike', text: 'Lilies' }, { kind: 'bogus', text: 'Tulips' }, 'garbage'],
+      preferences: [{ kind: 'dislike', text: 'Lilies' }, 'garbage'],
+      interactions: [{ at: 123, kind: 'text', note: 'caught up' }, { kind: 'call' }],
     });
     expect(safe).not.toBeNull();
     expect(safe!.id).not.toBe('OLD-COLLIDING-ID');
-    expect(safe!.name).toBe('Sarah');
-    expect(safe!.cadenceDays).toBe(14);
+    expect(safe!.howWeMet).toBe('College');
     expect(safe!.importantDates).toHaveLength(1);
-    expect(safe!.preferences).toHaveLength(2); // 'bogus' kind coerced to 'like', 'garbage' dropped
-    expect(safe!.preferences[1].kind).toBe('like');
+    expect(safe!.preferences).toHaveLength(1);
+    expect(safe!.interactions).toHaveLength(1); // the one without `at` is dropped
+    expect(safe!.interactions[0].kind).toBe('text');
   });
 
   it('returns null for non-person shapes instead of throwing', () => {

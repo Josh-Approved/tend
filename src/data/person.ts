@@ -1,13 +1,13 @@
 /**
- * Domain model for Tend: a person you want to keep up with, plus the practical
- * memory you keep about them. THIS IS THE APP'S OWN CODE (the trust core) — kept
- * pure (no expo / RN imports) so jest-expo tests it directly
- * (src/data/__tests__/person.test.ts), and lib/transfer.ts reuses
+ * Domain model for Tend: a person you want to keep up with, the practical memory
+ * you keep about them, and the history of your catch-ups. THIS IS THE APP'S OWN
+ * CODE (the trust core) — kept pure (no expo / RN imports) so jest-expo tests it
+ * directly (src/data/__tests__/person.test.ts), and lib/transfer.ts reuses
  * `sanitizeImportedPerson` for additive import.
  *
- * The load-bearing logic is `dueStatus` — "who should I reach out to, and how
- * does that read?" Get it wrong and the whole app is wrong, so it's pure and
- * heavily tested.
+ * The load-bearing logic is `dueStatus` ("who should I reach out to, and how does
+ * that read?") and `upcomingDates` (birthdays/anniversaries coming up). Both pure
+ * and heavily tested.
  */
 
 import { makeId } from '../lib/id';
@@ -15,6 +15,8 @@ import { makeId } from '../lib/id';
 export const DAY_MS = 24 * 60 * 60 * 1000;
 /** Within this many days of due, a person reads as "soon" rather than "ok". */
 export const SOON_WINDOW_DAYS = 2;
+/** How far ahead the home "Coming up" section looks for important dates. */
+export const UPCOMING_WINDOW_DAYS = 30;
 
 export type PreferenceKind = 'like' | 'dislike' | 'gift';
 
@@ -33,6 +35,15 @@ export interface ImportantDate {
   year?: number; // optional
 }
 
+export type InteractionKind = 'call' | 'text' | 'inPerson' | 'other';
+
+export interface Interaction {
+  id: string;
+  at: number; // ms epoch
+  kind: InteractionKind;
+  note?: string;
+}
+
 export interface Person {
   id: string;
   name: string;
@@ -41,8 +52,12 @@ export interface Person {
   /** When you last reached out, ms epoch. null = never. */
   lastContactedAt: number | null;
   notes: string;
+  /** How you met / where it started. */
+  howWeMet?: string;
   importantDates: ImportantDate[];
   preferences: Preference[];
+  /** Catch-up history, newest first is not guaranteed — sort on read. */
+  interactions: Interaction[];
   createdAt: number;
   updatedAt: number;
   /** Soft-delete tombstone (canon § Backup #5) — null/undefined = active. */
@@ -53,9 +68,7 @@ export type DueState = 'overdue' | 'soon' | 'ok' | 'none';
 
 export interface DueStatus {
   state: DueState;
-  /** ms epoch the next check-in is due, or null when no cadence is set. */
   dueAt: number | null;
-  /** Whole days until due (negative = overdue), or null when no cadence. */
   daysUntilDue: number | null;
 }
 
@@ -68,6 +81,8 @@ export const CADENCE_PRESETS: ReadonlyArray<{ key: string; days: number | null }
   { key: 'quarterly', days: 90 },
 ];
 
+export const INTERACTION_KINDS: readonly InteractionKind[] = ['call', 'text', 'inPerson', 'other'];
+
 export function makePerson(name = ''): Person {
   const now = Date.now();
   return {
@@ -76,8 +91,10 @@ export function makePerson(name = ''): Person {
     cadenceDays: null,
     lastContactedAt: null,
     notes: '',
+    howWeMet: undefined,
     importantDates: [],
     preferences: [],
+    interactions: [],
     createdAt: now,
     updatedAt: now,
   };
@@ -87,30 +104,31 @@ export function makePreference(kind: PreferenceKind, text: string): Preference {
   return { id: makeId('pref'), kind, text: text.trim() };
 }
 
-export function makeImportantDate(
-  label: string,
-  month: number,
-  day: number,
-  year?: number
-): ImportantDate {
+export function makeImportantDate(label: string, month: number, day: number, year?: number): ImportantDate {
   return { id: makeId('date'), label: label.trim() || 'Date', month, day, year };
+}
+
+export function makeInteraction(kind: InteractionKind, note?: string, at = Date.now()): Interaction {
+  const trimmed = note?.trim();
+  return { id: makeId('int'), at, kind, note: trimmed ? trimmed : undefined };
 }
 
 export function activePeople(people: Person[]): Person[] {
   return people.filter((p) => p.deletedAt == null);
 }
 
+/** Catch-ups newest first. */
+export function sortedInteractions(person: Person): Interaction[] {
+  return person.interactions.slice().sort((a, b) => b.at - a.at);
+}
+
 /**
  * The trust core: when is this person due for a check-in, and how does it read?
  * Pure + deterministic (now is passed in). The clock starts from the last time
  * you reached out — or, if you never have, from when you added them. No cadence
- * means no due state at all (the app never nags about someone you didn't ask it to).
+ * means no due state (the app never nags about someone you didn't ask it to).
  */
-export function dueStatus(
-  person: Person,
-  now: number,
-  soonWindowDays = SOON_WINDOW_DAYS
-): DueStatus {
+export function dueStatus(person: Person, now: number, soonWindowDays = SOON_WINDOW_DAYS): DueStatus {
   if (person.cadenceDays == null || person.cadenceDays <= 0) {
     return { state: 'none', dueAt: null, daysUntilDue: null };
   }
@@ -164,6 +182,26 @@ export function daysUntil(ms: number, now: number): number {
   return Math.round((ms - startOfToday) / DAY_MS);
 }
 
+export interface UpcomingDate {
+  person: Person;
+  date: ImportantDate;
+  at: number;
+  days: number;
+}
+
+/** Important dates across all active people landing within `withinDays`, soonest first. Pure. */
+export function upcomingDates(people: Person[], now: number, withinDays = UPCOMING_WINDOW_DAYS): UpcomingDate[] {
+  const out: UpcomingDate[] = [];
+  for (const p of activePeople(people)) {
+    for (const date of p.importantDates) {
+      const at = nextOccurrence(date, now);
+      const days = daysUntil(at, now);
+      if (days >= 0 && days <= withinDays) out.push({ person: p, date, at, days });
+    }
+  }
+  return out.sort((a, b) => a.days - b.days);
+}
+
 /**
  * Coerce one untrusted parsed object into a safe Person for additive import
  * (canon § Backup Layer 3). Fresh ids so an import never clobbers existing data;
@@ -203,12 +241,26 @@ export function sanitizeImportedPerson(raw: unknown): Person | null {
     }
   }
 
+  const interactions: Interaction[] = [];
+  if (Array.isArray(r.interactions)) {
+    for (const i of r.interactions as unknown[]) {
+      if (!i || typeof i !== 'object') continue;
+      const o = i as Record<string, unknown>;
+      if (typeof o.at !== 'number') continue;
+      const kind: InteractionKind =
+        o.kind === 'text' || o.kind === 'inPerson' || o.kind === 'other' ? o.kind : 'call';
+      interactions.push(makeInteraction(kind, typeof o.note === 'string' ? o.note : undefined, o.at));
+    }
+  }
+
   return {
     ...base,
     cadenceDays: typeof r.cadenceDays === 'number' ? r.cadenceDays : null,
     lastContactedAt: typeof r.lastContactedAt === 'number' ? r.lastContactedAt : null,
     notes: typeof r.notes === 'string' ? r.notes : '',
+    howWeMet: typeof r.howWeMet === 'string' && r.howWeMet.trim() ? r.howWeMet : undefined,
     importantDates,
     preferences,
+    interactions,
   };
 }

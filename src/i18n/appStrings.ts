@@ -1,35 +1,46 @@
 /**
  * App-specific copy for Tend. APP-OWNED — every user-facing string in the domain
- * screens lives here (canon § Translations); reference it via t('home.…') /
- * t('person.…') from ../i18n. Shell chrome (Settings/About, common actions) is
- * translated by the shell's own strings.
+ * screens (and the local-reminder copy) lives here (canon § Translations);
+ * reference it via t('home.…') / t('person.…') / t('notify.…') from ../i18n.
  */
 
 export const APP_STRINGS = {
   home: {
     title: 'People',
-    empty: 'No one here yet. Tap + to add someone you want to keep up with.',
+    empty: 'No one here yet. Add someone you want to keep up with — or bring people in from your contacts.',
     add: 'Add person',
+    importContacts: 'Import from contacts',
     overdueBy: 'Overdue by {days}d',
     dueToday: 'Reach out today',
     dueInDays: 'Due in {days}d',
     okInDays: 'Next check-in in {days}d',
     noReminder: 'No reminder set',
     markReached: 'Mark reached out to {name}',
+    comingUp: 'Coming up',
+    comingUpToday: "{name}'s {label} · today",
+    comingUpDays: "{name}'s {label} · in {days}d",
   },
   person: {
     newPerson: 'New person',
     namePlaceholder: 'Their name',
     reachedOut: 'I reached out',
+    logKindCall: 'Call',
+    logKindText: 'Text',
+    logKindInPerson: 'In person',
+    logKindOther: 'Other',
+    logNotePlaceholder: 'What did you talk about? (optional)',
     lastReachedToday: 'Reached out today',
     lastReachedDays: 'Last reached out {days}d ago',
     lastReachedNever: "You haven't logged reaching out yet",
+    historyLabel: 'Recent catch-ups',
     cadenceLabel: 'How often do you want to reach out?',
     cadenceNone: 'No reminder',
     cadenceWeekly: 'Weekly',
     cadenceBiweekly: 'Every 2 weeks',
     cadenceMonthly: 'Monthly',
     cadenceQuarterly: 'Every 3 months',
+    howWeMetLabel: 'How you met',
+    howWeMetPlaceholder: 'Where it started, how you know each other…',
     notesLabel: 'Notes',
     notesPlaceholder: "What do you want to remember? Their favorites, what's going on, what to ask about next time…",
     datesLabel: 'Important dates',
@@ -53,7 +64,15 @@ export const APP_STRINGS = {
     confirmRemove: 'Remove',
     untitled: 'this person',
   },
+  notify: {
+    reachOutTitle: 'Time to reach out to {name}',
+    reachOutBody: "It's been a while — a quick hello goes a long way.",
+    dateTitle: "{name}'s {label} is coming up",
+    dateBody: 'A good moment to reach out.',
+  },
   data: {
     imported: '{count} added',
+    importDenied: 'Contacts access was declined.',
+    importNone: 'No contacts found to add.',
   },
 } as const;

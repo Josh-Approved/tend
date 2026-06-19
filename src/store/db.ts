@@ -3,13 +3,13 @@
  * storage/kv.ts owns (one file, one backup unit — canon § Backup Layer 1: the DB
  * lives in Documents and rides OS auto-backup) and adds the one domain table.
  *
- * Nested collections (importantDates, preferences) are stored as JSON columns —
- * a person is one row, one backup unit. Writes are fire-and-forget (the in-memory
- * store is the source of truth); hydrate() is awaited once at app start.
+ * Nested collections (importantDates, preferences, interactions) are stored as
+ * JSON columns — a person is one row, one backup unit. Writes are fire-and-forget
+ * (the in-memory store is the source of truth); hydrate() is awaited once at start.
  */
 
 import { getDb } from '../storage/kv';
-import type { Person, ImportantDate, Preference } from '../data/person';
+import type { Person, ImportantDate, Preference, Interaction } from '../data/person';
 
 let _ready: Promise<void> | null = null;
 
@@ -24,12 +24,25 @@ async function ensureTable(): Promise<void> {
         cadenceDays     INTEGER,
         lastContactedAt INTEGER,
         notes           TEXT NOT NULL,
+        howWeMet        TEXT,
         importantDates  TEXT NOT NULL,
         preferences     TEXT NOT NULL,
+        interactions    TEXT NOT NULL DEFAULT '[]',
         createdAt       INTEGER NOT NULL,
         updatedAt       INTEGER NOT NULL
       );
     `);
+    // Migrate installs created before howWeMet / interactions existed.
+    for (const stmt of [
+      `ALTER TABLE people ADD COLUMN howWeMet TEXT`,
+      `ALTER TABLE people ADD COLUMN interactions TEXT NOT NULL DEFAULT '[]'`,
+    ]) {
+      try {
+        await db.execAsync(stmt);
+      } catch {
+        // column already exists — expected on a current schema
+      }
+    }
   })();
   return _ready;
 }
@@ -40,8 +53,10 @@ interface PersonRow {
   cadenceDays: number | null;
   lastContactedAt: number | null;
   notes: string;
+  howWeMet: string | null;
   importantDates: string;
   preferences: string;
+  interactions: string | null;
   createdAt: number;
   updatedAt: number;
 }
@@ -53,8 +68,10 @@ function rowToPerson(row: PersonRow): Person {
     cadenceDays: row.cadenceDays ?? null,
     lastContactedAt: row.lastContactedAt ?? null,
     notes: row.notes,
+    howWeMet: row.howWeMet ?? undefined,
     importantDates: JSON.parse(row.importantDates) as ImportantDate[],
     preferences: JSON.parse(row.preferences) as Preference[],
+    interactions: row.interactions ? (JSON.parse(row.interactions) as Interaction[]) : [],
     createdAt: row.createdAt,
     updatedAt: row.updatedAt,
   };
@@ -72,16 +89,18 @@ export async function savePerson(person: Person): Promise<void> {
   const db = await getDb();
   await db.runAsync(
     `INSERT OR REPLACE INTO people
-      (id, name, cadenceDays, lastContactedAt, notes, importantDates, preferences, createdAt, updatedAt)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      (id, name, cadenceDays, lastContactedAt, notes, howWeMet, importantDates, preferences, interactions, createdAt, updatedAt)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     [
       person.id,
       person.name,
       person.cadenceDays,
       person.lastContactedAt,
       person.notes,
+      person.howWeMet ?? null,
       JSON.stringify(person.importantDates),
       JSON.stringify(person.preferences),
+      JSON.stringify(person.interactions),
       person.createdAt,
       person.updatedAt,
     ]

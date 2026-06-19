@@ -1,8 +1,9 @@
 /**
- * Person detail — the practical memory you keep about one person. The core loop:
- * "I reached out" resets their clock; the cadence chips say how often you want to;
- * notes, important dates, and likes/dislikes/gift ideas are the things worth
- * remembering. Depth accretes here a little at a time — nothing is required.
+ * Person detail — the practical memory you keep about one person, plus your
+ * catch-up history. Core loop: pick how you connected (call / text / in person),
+ * optionally note what you talked about, tap "I reached out" — it logs the
+ * catch-up and resets their clock. Below: cadence, how you met, notes, important
+ * dates, and likes/dislikes/gift ideas. Depth accretes a little at a time.
  */
 
 import React, { useState } from 'react';
@@ -13,12 +14,14 @@ import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../../App';
 import { usePeopleStore } from '../store/people';
 import {
-  dueStatus,
   daysSinceContact,
   nextOccurrence,
   daysUntil,
+  sortedInteractions,
   CADENCE_PRESETS,
+  INTERACTION_KINDS,
   type PreferenceKind,
+  type InteractionKind,
 } from '../data/person';
 import { ScreenHeader } from '../components/ScreenHeader';
 import { t } from '../i18n';
@@ -50,12 +53,15 @@ export default function PersonDetailScreen({ route, navigation }: Props) {
   const setCadence = usePeopleStore((st) => st.setCadence);
   const logContact = usePeopleStore((st) => st.logContact);
   const setNotes = usePeopleStore((st) => st.setNotes);
+  const setHowWeMet = usePeopleStore((st) => st.setHowWeMet);
   const addImportantDate = usePeopleStore((st) => st.addImportantDate);
   const removeImportantDate = usePeopleStore((st) => st.removeImportantDate);
   const addPreference = usePeopleStore((st) => st.addPreference);
   const removePreference = usePeopleStore((st) => st.removePreference);
   const deletePerson = usePeopleStore((st) => st.deletePerson);
 
+  const [logKind, setLogKind] = useState<InteractionKind>('call');
+  const [logNote, setLogNote] = useState('');
   const [dateLabel, setDateLabel] = useState('');
   const [dateMonth, setDateMonth] = useState('');
   const [dateDay, setDateDay] = useState('');
@@ -85,8 +91,23 @@ export default function PersonDetailScreen({ route, navigation }: Props) {
     quarterly: t('person.cadenceQuarterly'),
   };
 
+  const kindLabel = (k: InteractionKind): string =>
+    k === 'call'
+      ? t('person.logKindCall')
+      : k === 'text'
+        ? t('person.logKindText')
+        : k === 'inPerson'
+          ? t('person.logKindInPerson')
+          : t('person.logKindOther');
+
   const prefKinds: PreferenceKind[] = ['like', 'dislike', 'gift'];
   const prefKindLabel = (k: PreferenceKind) => t(`person.${k}`);
+  const history = sortedInteractions(person).slice(0, 6);
+
+  const onLog = () => {
+    logContact(person.id, logKind, logNote);
+    setLogNote('');
+  };
 
   const onAddDate = () => {
     const month = parseInt(dateMonth, 10);
@@ -105,21 +126,17 @@ export default function PersonDetailScreen({ route, navigation }: Props) {
   };
 
   const onDelete = () => {
-    Alert.alert(
-      t('person.deleteConfirmTitle', { name: displayName }),
-      t('person.deleteConfirmBody'),
-      [
-        { text: t('person.cancel'), style: 'cancel' },
-        {
-          text: t('person.confirmRemove'),
-          style: 'destructive',
-          onPress: () => {
-            deletePerson(person.id);
-            navigation.goBack();
-          },
+    Alert.alert(t('person.deleteConfirmTitle', { name: displayName }), t('person.deleteConfirmBody'), [
+      { text: t('person.cancel'), style: 'cancel' },
+      {
+        text: t('person.confirmRemove'),
+        style: 'destructive',
+        onPress: () => {
+          deletePerson(person.id);
+          navigation.goBack();
         },
-      ]
-    );
+      },
+    ]);
   };
 
   return (
@@ -136,9 +153,34 @@ export default function PersonDetailScreen({ route, navigation }: Props) {
           accessibilityLabel={t('person.namePlaceholder')}
         />
 
-        {/* Stay in touch */}
+        {/* Log a catch-up */}
+        <View style={s.chips}>
+          {INTERACTION_KINDS.map((k) => {
+            const selected = logKind === k;
+            return (
+              <Pressable
+                key={k}
+                onPress={() => setLogKind(k)}
+                accessibilityRole="button"
+                accessibilityState={{ selected }}
+                accessibilityLabel={kindLabel(k)}
+                style={({ pressed }) => [s.chip, selected && s.chipOn, pressed && s.pressed]}
+              >
+                <Text style={[s.chipText, selected && s.chipTextOn]}>{kindLabel(k)}</Text>
+              </Pressable>
+            );
+          })}
+        </View>
+        <TextInput
+          style={[s.input, s.logNote]}
+          value={logNote}
+          onChangeText={setLogNote}
+          placeholder={t('person.logNotePlaceholder')}
+          placeholderTextColor={c.fgSubtle}
+          accessibilityLabel={t('person.logNotePlaceholder')}
+        />
         <Pressable
-          onPress={() => logContact(person.id)}
+          onPress={onLog}
           accessibilityRole="button"
           accessibilityLabel={t('person.reachedOut')}
           style={({ pressed }) => [s.primaryBtn, pressed && s.pressed]}
@@ -148,6 +190,25 @@ export default function PersonDetailScreen({ route, navigation }: Props) {
         </Pressable>
         <Text style={s.status}>{statusText}</Text>
 
+        {/* History */}
+        {history.length > 0 && (
+          <>
+            <Text style={s.sectionLabel}>{t('person.historyLabel')}</Text>
+            {history.map((i) => (
+              <View key={i.id} style={s.historyRow}>
+                <Text style={s.historyDate}>
+                  {new Date(i.at).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+                </Text>
+                <Text style={s.historyText}>
+                  {kindLabel(i.kind)}
+                  {i.note ? ` · ${i.note}` : ''}
+                </Text>
+              </View>
+            ))}
+          </>
+        )}
+
+        {/* Cadence */}
         <Text style={s.sectionLabel}>{t('person.cadenceLabel')}</Text>
         <View style={s.chips}>
           {CADENCE_PRESETS.map((preset) => {
@@ -166,6 +227,17 @@ export default function PersonDetailScreen({ route, navigation }: Props) {
             );
           })}
         </View>
+
+        {/* How you met */}
+        <Text style={s.sectionLabel}>{t('person.howWeMetLabel')}</Text>
+        <TextInput
+          style={s.input}
+          value={person.howWeMet ?? ''}
+          onChangeText={(v) => setHowWeMet(person.id, v)}
+          placeholder={t('person.howWeMetPlaceholder')}
+          placeholderTextColor={c.fgSubtle}
+          accessibilityLabel={t('person.howWeMetLabel')}
+        />
 
         {/* Notes */}
         <Text style={s.sectionLabel}>{t('person.notesLabel')}</Text>
@@ -202,9 +274,9 @@ export default function PersonDetailScreen({ route, navigation }: Props) {
             </View>
           );
         })}
-        <View style={s.dateAddRow}>
+        <View style={s.addRow}>
           <TextInput
-            style={[s.input, s.dateLabelInput]}
+            style={[s.input, s.flex1]}
             value={dateLabel}
             onChangeText={setDateLabel}
             placeholder={t('person.dateLabelPlaceholder')}
@@ -212,7 +284,7 @@ export default function PersonDetailScreen({ route, navigation }: Props) {
             accessibilityLabel={t('person.dateLabelPlaceholder')}
           />
           <TextInput
-            style={[s.input, s.dateNumInput]}
+            style={[s.input, s.numInput]}
             value={dateMonth}
             onChangeText={setDateMonth}
             placeholder={t('person.monthPlaceholder')}
@@ -222,7 +294,7 @@ export default function PersonDetailScreen({ route, navigation }: Props) {
             maxLength={2}
           />
           <TextInput
-            style={[s.input, s.dateNumInput]}
+            style={[s.input, s.numInput]}
             value={dateDay}
             onChangeText={setDateDay}
             placeholder={t('person.dayPlaceholder')}
@@ -275,9 +347,9 @@ export default function PersonDetailScreen({ route, navigation }: Props) {
             );
           })}
         </View>
-        <View style={s.dateAddRow}>
+        <View style={s.addRow}>
           <TextInput
-            style={[s.input, { flex: 1 }]}
+            style={[s.input, s.flex1]}
             value={prefText}
             onChangeText={setPrefText}
             onSubmitEditing={onAddPref}
@@ -316,13 +388,31 @@ function makeStyles(c: Colors) {
   return StyleSheet.create({
     safe: { flex: 1, backgroundColor: c.bg },
     pressed: { opacity: 0.6 },
+    flex1: { flex: 1 },
     content: { ...boundedContent, paddingHorizontal: space.s5, paddingBottom: space.s9 },
-    nameInput: {
-      ...ty.md,
-      fontFamily: fontFamily.sansSemibold,
-      color: c.fg,
-      paddingVertical: space.s4,
+    nameInput: { ...ty.md, fontFamily: fontFamily.sansSemibold, color: c.fg, paddingVertical: space.s4 },
+    chips: { flexDirection: 'row', flexWrap: 'wrap', gap: space.s2, marginTop: space.s2 },
+    chip: {
+      paddingHorizontal: space.s4,
+      paddingVertical: space.s2,
+      borderRadius: radius.pill,
+      backgroundColor: c.bgSubtle,
+      borderWidth: hairline,
+      borderColor: c.hairline,
     },
+    chipOn: { backgroundColor: c.fg, borderColor: c.fg },
+    chipText: { ...ty.sm, fontFamily: fontFamily.sans, color: c.fg },
+    chipTextOn: { color: c.bg, fontFamily: fontFamily.sansSemibold },
+    input: {
+      minHeight: target.min,
+      paddingHorizontal: space.s4,
+      borderRadius: radius.md,
+      backgroundColor: c.bgSubtle,
+      ...ty.base,
+      fontFamily: fontFamily.sans,
+      color: c.fg,
+    },
+    logNote: { marginTop: space.s3 },
     primaryBtn: {
       flexDirection: 'row',
       alignItems: 'center',
@@ -332,7 +422,7 @@ function makeStyles(c: Colors) {
       borderRadius: radius.md,
       backgroundColor: c.inkButton,
       paddingHorizontal: space.s5,
-      marginTop: space.s2,
+      marginTop: space.s3,
     },
     primaryBtnText: { ...ty.base, fontFamily: fontFamily.sansSemibold, color: c.inkButtonText },
     status: { ...ty.sm, fontFamily: fontFamily.sans, color: c.fgMuted, paddingTop: space.s3, textAlign: 'center' },
@@ -345,18 +435,16 @@ function makeStyles(c: Colors) {
       paddingTop: space.s7,
       paddingBottom: space.s3,
     },
-    chips: { flexDirection: 'row', flexWrap: 'wrap', gap: space.s2 },
-    chip: {
-      paddingHorizontal: space.s4,
+    historyRow: {
+      flexDirection: 'row',
+      alignItems: 'baseline',
+      gap: space.s3,
       paddingVertical: space.s2,
-      borderRadius: radius.pill,
-      backgroundColor: c.bgSubtle,
-      borderWidth: hairline,
-      borderColor: c.hairline,
+      borderBottomWidth: hairline,
+      borderBottomColor: c.hairline,
     },
-    chipOn: { backgroundColor: c.fg, borderColor: c.fg },
-    chipText: { ...ty.sm, fontFamily: fontFamily.sans, color: c.fg },
-    chipTextOn: { color: c.bg, fontFamily: fontFamily.sansSemibold },
+    historyDate: { ...ty.sm, fontFamily: fontFamily.sansSemibold, color: c.fgMuted, width: 56 },
+    historyText: { ...ty.sm, flex: 1, fontFamily: fontFamily.sans, color: c.fg },
     notes: {
       ...ty.base,
       fontFamily: fontFamily.sans,
@@ -382,18 +470,8 @@ function makeStyles(c: Colors) {
       textTransform: 'uppercase',
       letterSpacing: 0.5,
     },
-    dateAddRow: { flexDirection: 'row', alignItems: 'center', gap: space.s2, marginTop: space.s3 },
-    input: {
-      minHeight: target.min,
-      paddingHorizontal: space.s4,
-      borderRadius: radius.md,
-      backgroundColor: c.bgSubtle,
-      ...ty.base,
-      fontFamily: fontFamily.sans,
-      color: c.fg,
-    },
-    dateLabelInput: { flex: 1 },
-    dateNumInput: { width: 56, textAlign: 'center' },
+    addRow: { flexDirection: 'row', alignItems: 'center', gap: space.s2, marginTop: space.s3 },
+    numInput: { width: 56, textAlign: 'center' },
     addBtn: {
       width: target.min,
       height: target.min,
@@ -404,13 +482,7 @@ function makeStyles(c: Colors) {
     },
     addBtnDisabled: { opacity: 0.4 },
     iconBtn: { width: target.min, height: target.min, alignItems: 'center', justifyContent: 'center' },
-    deleteRow: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: space.s2,
-      marginTop: space.s8,
-      paddingVertical: space.s3,
-    },
+    deleteRow: { flexDirection: 'row', alignItems: 'center', gap: space.s2, marginTop: space.s8, paddingVertical: space.s3 },
     deleteText: { ...ty.base, fontFamily: fontFamily.sans, color: c.fgMuted },
   });
 }
