@@ -1,8 +1,8 @@
 {
   "$comment": "Selector registry for Tend. Flows reference @keys, never raw copy. text = Maestro regex (matches visible text OR a11y label, full-match). Anchors target the seeded people (src/qa/fixtures.ts). Wrap a card anchor in .* because rows can merge title+subtitle into one a11y label on iOS.",
   "anchors": {
-    "home-title": { "text": "People", "note": "PeopleHomeScreen header title (i18n home.title)" },
-    "seeded-person": { "text": "Mom.*", "note": "the seeded overdue person, top of the list" },
+    "home-title": { "text": "Today", "note": "TodayScreen header title (i18n today.title) — the default tab" },
+    "seeded-person": { "text": "Mom.*", "note": "the seeded overdue person, shown under 'Reach out' on Today" },
     "reached-out-btn": { "text": "I reached out", "note": "primary button on PersonDetail (i18n person.reachedOut) — logs contact" },
     "reached-out-confirm": { "text": "Reached out today", "note": "status after logging contact (i18n person.lastReachedToday); absent before the tap, present after" }
   }

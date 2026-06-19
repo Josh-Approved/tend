@@ -164,6 +164,22 @@ export function sortByUrgency(people: Person[], now: number): Person[] {
     });
 }
 
+/** People who need action now — overdue or due soon — most urgent first. Powers
+ *  the Today dashboard, which stays short no matter how many people you track. */
+export function actionablePeople(people: Person[], now: number): Person[] {
+  return sortByUrgency(people, now).filter((p) => {
+    const st = dueStatus(p, now).state;
+    return st === 'overdue' || st === 'soon';
+  });
+}
+
+/** Active people sorted A→Z for the People directory. */
+export function peopleByName(people: Person[]): Person[] {
+  return activePeople(people)
+    .slice()
+    .sort((a, b) => (a.name.trim() || '￿').localeCompare(b.name.trim() || '￿'));
+}
+
 /** Next annual occurrence (ms, local midnight) of a month/day on or after today. Pure. */
 export function nextOccurrence(date: ImportantDate, now: number): number {
   const d = new Date(now);

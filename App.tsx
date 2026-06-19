@@ -1,20 +1,28 @@
 /**
- * App root for Tend. The shell (<AppShell/>) owns all the chrome — gesture root,
- * safe area, error boundary, themed NavigationContainer, status bar, and the
- * cold-start splash. This file owns only the readiness gate (fonts + store
- * hydration) and the screen list.
+ * App root for Tend. The shell (<AppShell/>) owns the chrome — gesture root, safe
+ * area, error boundary, themed NavigationContainer, status bar, cold-start splash.
+ *
+ * Navigation: a bottom-tab navigator (Today | People) for the day-to-day surfaces,
+ * inside a root stack that also holds the full-screen PersonDetail, Settings, and
+ * Acknowledgements (so they cover the tab bar). Settings is reached via the gear,
+ * not a tab — tabs are for surfaces you touch daily.
  */
 
 import React, { useEffect } from 'react';
 import * as SplashScreen from 'expo-splash-screen';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { useAppFonts } from './src/theme';
+import { Sun, Users } from 'lucide-react-native';
+import { createNativeStackNavigator, type NativeStackScreenProps } from '@react-navigation/native-stack';
+import { createBottomTabNavigator, type BottomTabScreenProps } from '@react-navigation/bottom-tabs';
+import type { CompositeScreenProps, NavigatorScreenParams } from '@react-navigation/native';
+import { useAppFonts, useTheme, fontFamily } from './src/theme';
 import { AppShell } from './src/shell/AppShell';
 import { usePeopleStore } from './src/store/people';
-import PeopleHomeScreen from './src/screens/PeopleHomeScreen';
+import TodayScreen from './src/screens/TodayScreen';
+import PeopleScreen from './src/screens/PeopleScreen';
 import PersonDetailScreen from './src/screens/PersonDetailScreen';
 import SettingsScreen from './src/screens/SettingsScreen';
 import Credits from './src/components/Credits';
+import { t } from './src/i18n';
 import { QA_MODE } from './src/qa/qaMode';
 
 // Hold the native launch screen until the JS splash takes over (no icon blink).
@@ -24,14 +32,58 @@ if (!QA_MODE) {
   SplashScreen.preventAutoHideAsync().catch(() => {});
 }
 
-export type RootStackParamList = {
+export type TabParamList = {
+  Today: undefined;
   People: undefined;
+};
+
+export type RootStackParamList = {
+  Tabs: NavigatorScreenParams<TabParamList> | undefined;
   PersonDetail: { personId: string };
   Settings: undefined;
   Acknowledgements: undefined;
 };
 
-const Stack = createNativeStackNavigator<RootStackParamList>();
+/** Screen props for a tab screen that can also reach the root stack. */
+export type TabScreenProps<T extends keyof TabParamList> = CompositeScreenProps<
+  BottomTabScreenProps<TabParamList, T>,
+  NativeStackScreenProps<RootStackParamList>
+>;
+
+const Tab = createBottomTabNavigator<TabParamList>();
+const RootStack = createNativeStackNavigator<RootStackParamList>();
+
+function Tabs() {
+  const { c } = useTheme();
+  return (
+    <Tab.Navigator
+      screenOptions={{
+        headerShown: false,
+        tabBarActiveTintColor: c.appAccent,
+        tabBarInactiveTintColor: c.fgMuted,
+        tabBarStyle: { backgroundColor: c.bg, borderTopColor: c.hairline },
+        tabBarLabelStyle: { fontFamily: fontFamily.sans, fontSize: 12 },
+      }}
+    >
+      <Tab.Screen
+        name="Today"
+        component={TodayScreen}
+        options={{
+          tabBarLabel: t('nav.today'),
+          tabBarIcon: ({ color, size }) => <Sun color={color} size={size} strokeWidth={1.75} />,
+        }}
+      />
+      <Tab.Screen
+        name="People"
+        component={PeopleScreen}
+        options={{
+          tabBarLabel: t('nav.people'),
+          tabBarIcon: ({ color, size }) => <Users color={color} size={size} strokeWidth={1.75} />,
+        }}
+      />
+    </Tab.Navigator>
+  );
+}
 
 export default function App() {
   const [fontsLoaded] = useAppFonts();
@@ -46,17 +98,14 @@ export default function App() {
 
   return (
     <AppShell ready={ready}>
-      <Stack.Navigator
-        initialRouteName="People"
-        screenOptions={{ headerShown: false, animation: QA_MODE ? 'none' : undefined }}
-      >
-        <Stack.Screen name="People" component={PeopleHomeScreen} />
-        <Stack.Screen name="PersonDetail" component={PersonDetailScreen} />
-        <Stack.Screen name="Settings" component={SettingsScreen} />
-        <Stack.Screen name="Acknowledgements">
+      <RootStack.Navigator screenOptions={{ headerShown: false, animation: QA_MODE ? 'none' : undefined }}>
+        <RootStack.Screen name="Tabs" component={Tabs} />
+        <RootStack.Screen name="PersonDetail" component={PersonDetailScreen} />
+        <RootStack.Screen name="Settings" component={SettingsScreen} />
+        <RootStack.Screen name="Acknowledgements">
           {(props) => <Credits onBack={() => props.navigation.goBack()} />}
-        </Stack.Screen>
-      </Stack.Navigator>
+        </RootStack.Screen>
+      </RootStack.Navigator>
     </AppShell>
   );
 }

@@ -5,6 +5,16 @@
  */
 
 export const APP_STRINGS = {
+  nav: {
+    today: 'Today',
+    people: 'People',
+  },
+  today: {
+    title: 'Today',
+    reachOut: 'Reach out',
+    caughtUp: "You're all caught up.",
+    caughtUpSub: 'Nobody needs a nudge right now.',
+  },
   home: {
     title: 'People',
     empty: 'No one here yet. Add someone you want to keep up with — or bring people in from your contacts.',

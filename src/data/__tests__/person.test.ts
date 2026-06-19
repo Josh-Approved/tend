@@ -16,6 +16,8 @@ import {
   dueStatus,
   daysSinceContact,
   sortByUrgency,
+  actionablePeople,
+  peopleByName,
   nextOccurrence,
   upcomingDates,
   sanitizeImportedPerson,
@@ -85,6 +87,24 @@ describe('sortByUrgency', () => {
     const gone = at('Gone', { cadenceDays: 7, lastContactedAt: now - 99 * DAY_MS, deletedAt: now });
     const sorted = sortByUrgency([none, ok, soon, overdue, gone], now);
     expect(sorted.map((p) => p.name)).toEqual(['Overdue', 'Soon', 'Ok', 'None']);
+  });
+});
+
+describe('actionablePeople (Today dashboard)', () => {
+  const now = 1_700_000_000_000;
+  it('keeps only overdue + soon, most urgent first', () => {
+    const overdue = at('Overdue', { cadenceDays: 7, lastContactedAt: now - 30 * DAY_MS });
+    const soon = at('Soon', { cadenceDays: 14, lastContactedAt: now - 13 * DAY_MS });
+    const ok = at('Ok', { cadenceDays: 30, lastContactedAt: now - 1 * DAY_MS });
+    const none = at('None', { cadenceDays: null });
+    expect(actionablePeople([none, ok, soon, overdue], now).map((p) => p.name)).toEqual(['Overdue', 'Soon']);
+  });
+});
+
+describe('peopleByName (directory)', () => {
+  it('sorts A→Z and drops tombstoned', () => {
+    const list = [at('Zoe'), at('amir'), at('Gone', { deletedAt: Date.now() }), at('Bea')];
+    expect(peopleByName(list).map((p) => p.name)).toEqual(['amir', 'Bea', 'Zoe']);
   });
 });
 

@@ -1,21 +1,18 @@
 /**
- * Home — the people you're keeping up with, most-due first, with a "Coming up"
- * strip for nearby birthdays/anniversaries. The hook lives here: who should I
- * reach out to? Tap a row to open them; tap the round check to log a quick
- * "reached out"; the + adds someone; the gear opens Settings.
+ * People — the full directory tab. Everyone you're tracking, A→Z, each with their
+ * due status; tap to manage info + reminders. The + adds someone (and opens them);
+ * the gear opens Settings; the empty state offers a contacts import.
  */
 
 import React, { useState } from 'react';
 import { View, Text, Pressable, FlatList, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Settings as SettingsIcon, Plus, Check, UserPlus } from 'lucide-react-native';
-import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import type { RootStackParamList } from '../../App';
+import type { TabScreenProps } from '../../App';
 import { usePeopleStore } from '../store/people';
-import { sortByUrgency, dueStatus, upcomingDates, type Person } from '../data/person';
+import { peopleByName, dueStatus, type Person } from '../data/person';
 import { importFromContacts } from '../lib/contacts';
 import { EmptyState } from '../components/EmptyState';
-import { FundingFooter } from '../components/FundingFooter';
 import { t } from '../i18n';
 import {
   useTheme,
@@ -28,8 +25,6 @@ import {
   boundedContent,
   type Colors,
 } from '../theme';
-
-type Props = NativeStackScreenProps<RootStackParamList, 'People'>;
 
 function subline(person: Person, now: number): { text: string; urgent: boolean } {
   const s = dueStatus(person, now);
@@ -47,7 +42,7 @@ function subline(person: Person, now: number): { text: string; urgent: boolean }
   }
 }
 
-export default function PeopleHomeScreen({ navigation }: Props) {
+export default function PeopleScreen({ navigation }: TabScreenProps<'People'>) {
   const { c } = useTheme();
   const s = makeStyles(c);
   const people = usePeopleStore((st) => st.people);
@@ -57,8 +52,7 @@ export default function PeopleHomeScreen({ navigation }: Props) {
   const [status, setStatus] = useState<string | null>(null);
 
   const now = Date.now();
-  const ordered = sortByUrgency(people, now);
-  const upcoming = upcomingDates(people, now);
+  const directory = peopleByName(people);
 
   const onAdd = () => {
     const id = createPerson();
@@ -75,34 +69,9 @@ export default function PeopleHomeScreen({ navigation }: Props) {
     setStatus(n > 0 ? t('data.imported', { count: n }) : t('data.importNone'));
   };
 
-  const header =
-    upcoming.length > 0 ? (
-      <View style={s.comingUp}>
-        <Text style={s.sectionLabel}>{t('home.comingUp')}</Text>
-        {upcoming.map((u) => (
-          <Pressable
-            key={`${u.person.id}-${u.date.id}`}
-            onPress={() => navigation.navigate('PersonDetail', { personId: u.person.id })}
-            accessibilityRole="button"
-            style={({ pressed }) => [s.comingRow, pressed && s.pressed]}
-          >
-            <Text style={s.comingText}>
-              {u.days === 0
-                ? t('home.comingUpToday', { name: u.person.name.trim() || t('person.newPerson'), label: u.date.label })
-                : t('home.comingUpDays', {
-                    name: u.person.name.trim() || t('person.newPerson'),
-                    label: u.date.label,
-                    days: u.days,
-                  })}
-            </Text>
-          </Pressable>
-        ))}
-      </View>
-    ) : null;
-
   return (
     <SafeAreaView style={s.safe} edges={['top', 'left', 'right']}>
-      <View style={s.headerBar}>
+      <View style={s.header}>
         <Text style={s.title}>{t('home.title')}</Text>
         <Pressable
           onPress={() => navigation.navigate('Settings')}
@@ -115,7 +84,7 @@ export default function PeopleHomeScreen({ navigation }: Props) {
         </Pressable>
       </View>
 
-      {ordered.length === 0 ? (
+      {directory.length === 0 ? (
         <View style={s.emptyWrap}>
           <EmptyState message={t('home.empty')} />
           <Pressable
@@ -131,9 +100,8 @@ export default function PeopleHomeScreen({ navigation }: Props) {
         </View>
       ) : (
         <FlatList
-          data={ordered}
+          data={directory}
           keyExtractor={(p) => p.id}
-          ListHeaderComponent={header}
           contentContainerStyle={s.listContent}
           renderItem={({ item: person }) => {
             const sub = subline(person, now);
@@ -164,8 +132,6 @@ export default function PeopleHomeScreen({ navigation }: Props) {
         />
       )}
 
-      <FundingFooter />
-
       <Pressable
         style={({ pressed }) => [s.fab, pressed && s.fabPressed]}
         onPress={onAdd}
@@ -182,7 +148,7 @@ function makeStyles(c: Colors) {
   return StyleSheet.create({
     safe: { flex: 1, backgroundColor: c.bg },
     pressed: { opacity: 0.6 },
-    headerBar: {
+    header: {
       ...boundedContent,
       flexDirection: 'row',
       alignItems: 'center',
@@ -193,17 +159,6 @@ function makeStyles(c: Colors) {
     title: { ...ty.md, fontFamily: fontFamily.sansSemibold, color: c.fg },
     iconBtn: { width: target.min, height: target.min, alignItems: 'center', justifyContent: 'center' },
     listContent: { ...boundedContent, paddingBottom: space.s9 },
-    comingUp: { paddingHorizontal: space.s5, paddingBottom: space.s4 },
-    sectionLabel: {
-      ...ty.xs,
-      fontFamily: fontFamily.sansSemibold,
-      color: c.fgMuted,
-      textTransform: 'uppercase',
-      letterSpacing: 0.5,
-      paddingBottom: space.s2,
-    },
-    comingRow: { paddingVertical: space.s2 },
-    comingText: { ...ty.sm, fontFamily: fontFamily.sans, color: c.appAccent },
     row: {
       flexDirection: 'row',
       alignItems: 'center',
@@ -243,7 +198,7 @@ function makeStyles(c: Colors) {
     fab: {
       position: 'absolute',
       right: space.s6,
-      bottom: space.s8,
+      bottom: space.s7,
       width: 56,
       height: 56,
       borderRadius: radius.pill,

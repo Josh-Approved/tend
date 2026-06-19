@@ -15,7 +15,7 @@ appId: com.joshapproved.tend
     timeout: 8000
 - takeScreenshot: qa/captures/${STORE}/00-launch
 - extendedWaitUntil:
-    visible: { text: "People" }
+    visible: { text: "Today" }
     timeout: 30000
 - extendedWaitUntil:
     visible: { text: "Mom.*" }
