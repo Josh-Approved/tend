@@ -1,0 +1,10 @@
+{
+  "$comment": "Selector registry for the list archetype. Flows reference @keys, never raw copy. text = Maestro regex (matches visible text OR a11y label). Anchors target the seeded 'Weekend plan' list (src/qa/fixtures.ts). Wrap a card anchor in .* because list rows can merge title+subtitle into one a11y label on iOS and Maestro full-matches the regex.",
+  "anchors": {
+    "home-title":  { "text": "Lists", "note": "ListsHomeScreen header title (i18n home.title)" },
+    "seeded-list": { "text": "Weekend plan.*", "note": "the seeded QA list row" },
+    "first-item":  { "text": "Book the campsite", "note": "first seeded item, confirms the list opened" },
+    "add-input":   { "text": "Add an item", "note": "the add-item TextInput (placeholder + a11y label 'Add an item', i18n list.addItem). Tap to FOCUS before typing — the Add button is disabled while empty, so tapping it first is a no-op." },
+    "added-item":  { "text": "Buy marshmallows", "note": "an item NOT in the seed; typed + submitted by the core add action. assertNot before / assert after = the add actually landed." }
+  }
+}
