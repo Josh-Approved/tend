@@ -1,15 +1,15 @@
 /**
- * Domain SQLite persistence for the `list` archetype. Opens the SAME connection
- * the shell's storage/kv.ts owns (one file, one backup unit — canon § Backup
- * Layer 1: the DB lives in Documents and rides OS auto-backup) and adds the
- * one domain table. Rename `lists` to your domain when you fork this.
+ * Domain SQLite persistence for Tend. Opens the SAME connection the shell's
+ * storage/kv.ts owns (one file, one backup unit — canon § Backup Layer 1: the DB
+ * lives in Documents and rides OS auto-backup) and adds the one domain table.
  *
- * Writes are fire-and-forget (the in-memory store is the source of truth);
- * hydrate() is awaited once at app start.
+ * Nested collections (importantDates, preferences) are stored as JSON columns —
+ * a person is one row, one backup unit. Writes are fire-and-forget (the in-memory
+ * store is the source of truth); hydrate() is awaited once at app start.
  */
 
 import { getDb } from '../storage/kv';
-import type { ItemList, ListItem } from '../data/item';
+import type { Person, ImportantDate, Preference } from '../data/person';
 
 let _ready: Promise<void> | null = null;
 
@@ -18,54 +18,78 @@ async function ensureTable(): Promise<void> {
   _ready = (async () => {
     const db = await getDb();
     await db.execAsync(`
-      CREATE TABLE IF NOT EXISTS lists (
-        id        TEXT PRIMARY KEY NOT NULL,
-        name      TEXT NOT NULL,
-        items     TEXT NOT NULL,
-        createdAt INTEGER NOT NULL,
-        updatedAt INTEGER NOT NULL
+      CREATE TABLE IF NOT EXISTS people (
+        id              TEXT PRIMARY KEY NOT NULL,
+        name            TEXT NOT NULL,
+        cadenceDays     INTEGER,
+        lastContactedAt INTEGER,
+        notes           TEXT NOT NULL,
+        importantDates  TEXT NOT NULL,
+        preferences     TEXT NOT NULL,
+        createdAt       INTEGER NOT NULL,
+        updatedAt       INTEGER NOT NULL
       );
     `);
   })();
   return _ready;
 }
 
-interface ListRow {
+interface PersonRow {
   id: string;
   name: string;
-  items: string;
+  cadenceDays: number | null;
+  lastContactedAt: number | null;
+  notes: string;
+  importantDates: string;
+  preferences: string;
   createdAt: number;
   updatedAt: number;
 }
 
-function rowToList(row: ListRow): ItemList {
+function rowToPerson(row: PersonRow): Person {
   return {
     id: row.id,
     name: row.name,
-    items: JSON.parse(row.items) as ListItem[],
+    cadenceDays: row.cadenceDays ?? null,
+    lastContactedAt: row.lastContactedAt ?? null,
+    notes: row.notes,
+    importantDates: JSON.parse(row.importantDates) as ImportantDate[],
+    preferences: JSON.parse(row.preferences) as Preference[],
     createdAt: row.createdAt,
     updatedAt: row.updatedAt,
   };
 }
 
-export async function loadAllLists(): Promise<ItemList[]> {
+export async function loadAllPeople(): Promise<Person[]> {
   await ensureTable();
   const db = await getDb();
-  const rows = await db.getAllAsync<ListRow>('SELECT * FROM lists ORDER BY updatedAt DESC');
-  return rows.map(rowToList);
+  const rows = await db.getAllAsync<PersonRow>('SELECT * FROM people ORDER BY updatedAt DESC');
+  return rows.map(rowToPerson);
 }
 
-export async function saveList(list: ItemList): Promise<void> {
+export async function savePerson(person: Person): Promise<void> {
   await ensureTable();
   const db = await getDb();
   await db.runAsync(
-    `INSERT OR REPLACE INTO lists (id, name, items, createdAt, updatedAt) VALUES (?, ?, ?, ?, ?)`,
-    [list.id, list.name, JSON.stringify(list.items), list.createdAt, list.updatedAt]
+    `INSERT OR REPLACE INTO people
+      (id, name, cadenceDays, lastContactedAt, notes, importantDates, preferences, createdAt, updatedAt)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    [
+      person.id,
+      person.name,
+      person.cadenceDays,
+      person.lastContactedAt,
+      person.notes,
+      JSON.stringify(person.importantDates),
+      JSON.stringify(person.preferences),
+      person.createdAt,
+      person.updatedAt,
+    ]
   );
 }
 
-export async function deleteListFromDb(id: string): Promise<void> {
+export async function deletePersonFromDb(id: string): Promise<void> {
   await ensureTable();
   const db = await getDb();
-  await db.runAsync('DELETE FROM lists WHERE id = ?', [id]);
+  await db.runAsync('DELETE FROM people WHERE id = ?', [id]);
 }

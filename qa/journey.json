@@ -1,22 +1,20 @@
 {
-  "$comment": "list-archetype screenshot traversal + Tier-2 outcome assertions. Generates qa/flows/mobile.yaml (scripts/qa/compile-flow.mjs); never hand-edit the yaml. Anchors live in qa/selectors.json and target the seeded 'Weekend plan' list (src/qa/fixtures.ts). The add-item assertion pins the core action: an item absent before the add is visible after it (assertNot -> assert).",
+  "$comment": "Tend screenshot traversal + Tier-2 outcome assertions. Generates qa/flows/mobile.yaml (scripts/qa/compile-flow.mjs); never hand-edit the yaml. Anchors live in qa/selectors.json and target the seeded people (src/qa/fixtures.ts). The reach-out assertion pins the core action: logging contact flips the seeded person's status to 'Reached out today' (assertNot -> assert).",
   "appId": "com.joshapproved.tend",
   "clearState": true,
   "diagnosticLaunchShot": true,
   "settleMs": 8000,
   "steps": [
     { "waitFor": "@home-title", "timeout": 30000 },
-    { "waitFor": "@seeded-list", "timeout": 15000 },
+    { "waitFor": "@seeded-person", "timeout": 15000 },
     { "screenshot": "home" },
 
-    { "tap": "@seeded-list" },
-    { "waitFor": "@first-item", "timeout": 10000 },
-    { "screenshot": "list" },
+    { "tap": "@seeded-person" },
+    { "waitFor": "@reached-out-btn", "timeout": 10000 },
+    { "screenshot": "person" },
 
-    { "assertNot": "@added-item" },
-    { "tap": "@add-input" },
-    { "type": "Buy marshmallows" },
-    { "pressKey": "Enter" },
-    { "assert": "@added-item" }
+    { "assertNot": "@reached-out-confirm" },
+    { "tap": "@reached-out-btn" },
+    { "assert": "@reached-out-confirm" }
   ]
 }

@@ -15,19 +15,17 @@ appId: com.joshapproved.tend
     timeout: 8000
 - takeScreenshot: qa/captures/${STORE}/00-launch
 - extendedWaitUntil:
-    visible: { text: "Lists" }
+    visible: { text: "People" }
     timeout: 30000
 - extendedWaitUntil:
-    visible: { text: "Weekend plan.*" }
+    visible: { text: "Mom.*" }
     timeout: 15000
 - takeScreenshot: qa/captures/${STORE}/home
-- tapOn: { text: "Weekend plan.*" }
+- tapOn: { text: "Mom.*" }
 - extendedWaitUntil:
-    visible: { text: "Book the campsite" }
+    visible: { text: "I reached out" }
     timeout: 10000
-- takeScreenshot: qa/captures/${STORE}/list
-- assertNotVisible: { text: "Buy marshmallows" }
-- tapOn: { text: "Add an item" }
-- inputText: "Buy marshmallows"
-- pressKey: Enter
-- assertVisible: { text: "Buy marshmallows" }
+- takeScreenshot: qa/captures/${STORE}/person
+- assertNotVisible: { text: "Reached out today" }
+- tapOn: { text: "I reached out" }
+- assertVisible: { text: "Reached out today" }

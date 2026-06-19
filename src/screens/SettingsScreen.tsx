@@ -2,7 +2,7 @@
  * Settings / About. App-specific settings (here: the "Your data" export/import
  * rows) sit ABOVE the canonical About block, which is the shared
  * <SettingsAbout/> component — the canonical entries are the floor, not the
- * ceiling (canon § Settings / About). Add your app's toggles/prefs above it.
+ * ceiling (canon § Settings / About).
  */
 
 import React, { useCallback, useState } from 'react';
@@ -11,8 +11,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Upload, Download } from 'lucide-react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../../App';
-import { useListsStore } from '../store/lists';
-import { exportLists, pickAndParseLists } from '../lib/transfer';
+import { usePeopleStore } from '../store/people';
+import { exportPeople, pickAndParsePeople } from '../lib/transfer';
 import { AboutRow } from '../components/AboutRow';
 import { SettingsAbout } from '../components/SettingsAbout';
 import { ScreenHeader } from '../components/ScreenHeader';
@@ -32,27 +32,27 @@ type Props = NativeStackScreenProps<RootStackParamList, 'Settings'>;
 export default function SettingsScreen({ navigation }: Props) {
   const { c } = useTheme();
   const s = makeStyles(c);
-  const lists = useListsStore((st) => st.lists);
-  const importLists = useListsStore((st) => st.importLists);
+  const people = usePeopleStore((st) => st.people);
+  const importPeople = usePeopleStore((st) => st.importPeople);
   const [status, setStatus] = useState<string | null>(null);
 
   const onExport = useCallback(() => {
-    exportLists(lists).catch(() => setStatus(t('settings.couldntExport')));
-  }, [lists]);
+    exportPeople(people).catch(() => setStatus(t('settings.couldntExport')));
+  }, [people]);
 
   const onImport = useCallback(async () => {
     try {
-      const incoming = await pickAndParseLists();
+      const incoming = await pickAndParsePeople();
       if (incoming.length === 0) {
         setStatus(t('settings.nothingImported'));
         return;
       }
-      const n = importLists(incoming);
-      setStatus(t('list.itemCount', { done: n, total: n }));
+      const n = importPeople(incoming);
+      setStatus(t('data.imported', { count: n }));
     } catch {
       setStatus(t('settings.couldntRead'));
     }
-  }, [importLists]);
+  }, [importPeople]);
 
   return (
     <SafeAreaView style={s.safe} edges={['top', 'left', 'right', 'bottom']}>

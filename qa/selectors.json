@@ -1,10 +1,9 @@
 {
-  "$comment": "Selector registry for the list archetype. Flows reference @keys, never raw copy. text = Maestro regex (matches visible text OR a11y label). Anchors target the seeded 'Weekend plan' list (src/qa/fixtures.ts). Wrap a card anchor in .* because list rows can merge title+subtitle into one a11y label on iOS and Maestro full-matches the regex.",
+  "$comment": "Selector registry for Tend. Flows reference @keys, never raw copy. text = Maestro regex (matches visible text OR a11y label, full-match). Anchors target the seeded people (src/qa/fixtures.ts). Wrap a card anchor in .* because rows can merge title+subtitle into one a11y label on iOS.",
   "anchors": {
-    "home-title":  { "text": "Lists", "note": "ListsHomeScreen header title (i18n home.title)" },
-    "seeded-list": { "text": "Weekend plan.*", "note": "the seeded QA list row" },
-    "first-item":  { "text": "Book the campsite", "note": "first seeded item, confirms the list opened" },
-    "add-input":   { "text": "Add an item", "note": "the add-item TextInput (placeholder + a11y label 'Add an item', i18n list.addItem). Tap to FOCUS before typing — the Add button is disabled while empty, so tapping it first is a no-op." },
-    "added-item":  { "text": "Buy marshmallows", "note": "an item NOT in the seed; typed + submitted by the core add action. assertNot before / assert after = the add actually landed." }
+    "home-title": { "text": "People", "note": "PeopleHomeScreen header title (i18n home.title)" },
+    "seeded-person": { "text": "Mom.*", "note": "the seeded overdue person, top of the list" },
+    "reached-out-btn": { "text": "I reached out", "note": "primary button on PersonDetail (i18n person.reachedOut) — logs contact" },
+    "reached-out-confirm": { "text": "Reached out today", "note": "status after logging contact (i18n person.lastReachedToday); absent before the tap, present after" }
   }
 }
