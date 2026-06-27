@@ -21,7 +21,11 @@
         "monochromeImage": "./assets/android-icon-monochrome.png"
       },
       "predictiveBackGestureEnabled": false,
-      "package": "com.joshapproved.tend"
+      "package": "com.joshapproved.tend",
+      "permissions": [
+        "android.permission.READ_CONTACTS",
+        "android.permission.WRITE_CONTACTS"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -41,6 +45,11 @@
           "contactsPermission": "Relationships uses your contacts only to let you add the people you choose. Nothing leaves your device."
         }
       ]
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "77c6f808-28d1-4b40-b330-77f524de01c7"
+      }
+    }
   }
 }
