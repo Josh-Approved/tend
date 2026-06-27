@@ -9,7 +9,7 @@
  */
 
 import { getDb } from '../storage/kv';
-import type { Person, ImportantDate, Preference, Interaction } from '../data/person';
+import type { Person, ImportantDate, Preference, Interaction, PersonalityType } from '../data/person';
 
 let _ready: Promise<void> | null = null;
 
@@ -27,15 +27,17 @@ async function ensureTable(): Promise<void> {
         howWeMet        TEXT,
         importantDates  TEXT NOT NULL,
         preferences     TEXT NOT NULL,
+        personalityTypes TEXT NOT NULL DEFAULT '[]',
         interactions    TEXT NOT NULL DEFAULT '[]',
         createdAt       INTEGER NOT NULL,
         updatedAt       INTEGER NOT NULL
       );
     `);
-    // Migrate installs created before howWeMet / interactions existed.
+    // Migrate installs created before howWeMet / interactions / personalityTypes existed.
     for (const stmt of [
       `ALTER TABLE people ADD COLUMN howWeMet TEXT`,
       `ALTER TABLE people ADD COLUMN interactions TEXT NOT NULL DEFAULT '[]'`,
+      `ALTER TABLE people ADD COLUMN personalityTypes TEXT NOT NULL DEFAULT '[]'`,
     ]) {
       try {
         await db.execAsync(stmt);
@@ -56,6 +58,7 @@ interface PersonRow {
   howWeMet: string | null;
   importantDates: string;
   preferences: string;
+  personalityTypes: string | null;
   interactions: string | null;
   createdAt: number;
   updatedAt: number;
@@ -71,6 +74,7 @@ function rowToPerson(row: PersonRow): Person {
     howWeMet: row.howWeMet ?? undefined,
     importantDates: JSON.parse(row.importantDates) as ImportantDate[],
     preferences: JSON.parse(row.preferences) as Preference[],
+    personalityTypes: row.personalityTypes ? (JSON.parse(row.personalityTypes) as PersonalityType[]) : [],
     interactions: row.interactions ? (JSON.parse(row.interactions) as Interaction[]) : [],
     createdAt: row.createdAt,
     updatedAt: row.updatedAt,
@@ -89,8 +93,8 @@ export async function savePerson(person: Person): Promise<void> {
   const db = await getDb();
   await db.runAsync(
     `INSERT OR REPLACE INTO people
-      (id, name, cadenceDays, lastContactedAt, notes, howWeMet, importantDates, preferences, interactions, createdAt, updatedAt)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      (id, name, cadenceDays, lastContactedAt, notes, howWeMet, importantDates, preferences, personalityTypes, interactions, createdAt, updatedAt)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     [
       person.id,
       person.name,
@@ -100,6 +104,7 @@ export async function savePerson(person: Person): Promise<void> {
       person.howWeMet ?? null,
       JSON.stringify(person.importantDates),
       JSON.stringify(person.preferences),
+      JSON.stringify(person.personalityTypes),
       JSON.stringify(person.interactions),
       person.createdAt,
       person.updatedAt,

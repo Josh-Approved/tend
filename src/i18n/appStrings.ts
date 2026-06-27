@@ -29,6 +29,8 @@ export const APP_STRINGS = {
     comingUp: 'Coming up',
     comingUpToday: "{name}'s {label} · today",
     comingUpDays: "{name}'s {label} · in {days}d",
+    searchPlaceholder: 'Search people',
+    searchNoResults: 'No one matches “{query}”.',
   },
   person: {
     newPerson: 'New person',
@@ -73,6 +75,96 @@ export const APP_STRINGS = {
     cancel: 'Cancel',
     confirmRemove: 'Remove',
     untitled: 'this person',
+    personalityLabel: 'Personality',
+    personalityHint: 'Optional. If you know it, the app suggests gentle ways to show up — starting points, not boxes.',
+  },
+  personality: {
+    framework: {
+      enneagram: 'Enneagram type',
+      attachment: 'Attachment style',
+    },
+    enneagram: {
+      '1': {
+        short: '1',
+        label: 'Type 1 · The Improver',
+        relate:
+          "Principled, and wants things done right. Appreciate their high standards out loud, and don't take corrections personally — it's care, not criticism. Remind them that good enough is often enough.",
+      },
+      '2': {
+        short: '2',
+        label: 'Type 2 · The Helper',
+        relate:
+          'Warm and tuned to what everyone else needs. Ask what they need for a change — they rarely say. Notice the care they give and name it; they can pour out until they’re empty.',
+      },
+      '3': {
+        short: '3',
+        label: 'Type 3 · The Achiever',
+        relate:
+          'Driven and goal-focused. Celebrate the effort, not just the win. Remind them you value who they are, not only what they accomplish.',
+      },
+      '4': {
+        short: '4',
+        label: 'Type 4 · The Individualist',
+        relate:
+          'Deep-feeling and authentic. Meet their feelings without rushing to fix them — they want to be truly seen, not cheered up.',
+      },
+      '5': {
+        short: '5',
+        label: 'Type 5 · The Observer',
+        relate:
+          'Thoughtful and private. Give them space and a heads-up before big asks. Time alone to recharge isn’t distance from you.',
+      },
+      '6': {
+        short: '6',
+        label: 'Type 6 · The Loyal Skeptic',
+        relate:
+          'Loyal, and plans for what could go wrong. Be steady and consistent — predictability builds their trust. Take their worries seriously rather than brushing them off.',
+      },
+      '7': {
+        short: '7',
+        label: 'Type 7 · The Enthusiast',
+        relate:
+          'Upbeat and full of possibility. Bring them into plans and adventures. Gently stay with them through the hard feelings they’d rather skip past.',
+      },
+      '8': {
+        short: '8',
+        label: 'Type 8 · The Protector',
+        relate:
+          'Direct and strong-willed. Be straight with them — they respect honesty over tiptoeing. Underneath the strength is someone guarding a soft heart.',
+      },
+      '9': {
+        short: '9',
+        label: 'Type 9 · The Peacemaker',
+        relate:
+          'Easygoing and harmony-seeking. Ask for their opinion and wait for it — they downplay their own wants. Keep conflict calm; pressure makes them withdraw.',
+      },
+    },
+    attachment: {
+      secure: {
+        short: 'Secure',
+        label: 'Secure',
+        relate:
+          'Comfortable with both closeness and space. Keep doing what you do — honesty, reliability, and warmth land well. They make a steady anchor for others.',
+      },
+      anxious: {
+        short: 'Anxious',
+        label: 'Anxious',
+        relate:
+          'Craves closeness and feels distance keenly. Reassure them more than feels necessary, and be consistent about it. A quick “thinking of you” between visits settles a lot.',
+      },
+      avoidant: {
+        short: 'Avoidant',
+        label: 'Avoidant',
+        relate:
+          'Values independence and needs room. Don’t crowd them — give space and let them come back on their own. Pushing for closeness usually makes them retreat.',
+      },
+      disorganized: {
+        short: 'Mixed',
+        label: 'Mixed',
+        relate:
+          'Wants closeness but finds trust hard. Be patient and predictable — trust comes slowly. Steady, low-pressure presence does more than big gestures.',
+      },
+    },
   },
   notify: {
     reachOutTitle: 'Time to reach out to {name}',

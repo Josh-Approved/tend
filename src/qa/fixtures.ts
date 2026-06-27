@@ -16,6 +16,7 @@ import {
   type ImportantDate,
   type Preference,
   type Interaction,
+  type PersonalityType,
 } from '../data/person';
 
 export function qaPeople(): Person[] {
@@ -30,7 +31,8 @@ export function qaPeople(): Person[] {
     notes: string,
     importantDates: ImportantDate[],
     preferences: Preference[],
-    interactions: Interaction[]
+    interactions: Interaction[],
+    personalityTypes: PersonalityType[] = []
   ): Person {
     const p = makePerson(name);
     p.cadenceDays = cadenceDays;
@@ -40,6 +42,7 @@ export function qaPeople(): Person[] {
     p.importantDates = importantDates;
     p.preferences = preferences;
     p.interactions = interactions;
+    p.personalityTypes = personalityTypes;
     return p;
   }
 
@@ -55,6 +58,10 @@ export function qaPeople(): Person[] {
       [
         makeInteraction('call', 'Caught up about the garden', now - 12 * DAY_MS),
         makeInteraction('inPerson', 'Sunday dinner', now - 26 * DAY_MS),
+      ],
+      [
+        { framework: 'enneagram', value: '2' },
+        { framework: 'attachment', value: 'secure' },
       ]
     ),
     make(
@@ -65,7 +72,8 @@ export function qaPeople(): Person[] {
       'Tough stretch at work lately — more listening than fixing.',
       [makeImportantDate('Birthday', soon.getMonth() + 1, soon.getDate())],
       [makePreference('dislike', 'Lilies'), makePreference('like', 'Tulips'), makePreference('gift', 'A pottery class')],
-      [makeInteraction('text', 'Sent her a recipe she asked about', now - 13 * DAY_MS)]
+      [makeInteraction('text', 'Sent her a recipe she asked about', now - 13 * DAY_MS)],
+      [{ framework: 'attachment', value: 'anxious' }]
     ),
     make(
       'Dad',

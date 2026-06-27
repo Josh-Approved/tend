@@ -18,6 +18,9 @@ import {
   sortByUrgency,
   actionablePeople,
   peopleByName,
+  searchPeople,
+  personalityValue,
+  setPersonalityValue,
   nextOccurrence,
   upcomingDates,
   sanitizeImportedPerson,
@@ -108,6 +111,38 @@ describe('peopleByName (directory)', () => {
   });
 });
 
+describe('searchPeople (directory search)', () => {
+  it('returns the full A→Z directory for a blank query', () => {
+    const list = [at('Zoe'), at('amir'), at('Bea')];
+    expect(searchPeople(list, '   ').map((p) => p.name)).toEqual(['amir', 'Bea', 'Zoe']);
+  });
+
+  it('filters by case-insensitive name substring and drops tombstoned', () => {
+    const list = [at('Sarah Chen'), at('sara lee'), at('Marcus'), at('Gone', { deletedAt: Date.now() })];
+    expect(searchPeople(list, 'sar').map((p) => p.name)).toEqual(['sara lee', 'Sarah Chen']);
+    expect(searchPeople(list, 'xyz')).toEqual([]);
+  });
+});
+
+describe('personality types', () => {
+  it('getter reads the value for a framework, undefined when unset', () => {
+    const p = at('A', { personalityTypes: [{ framework: 'enneagram', value: '5' }] });
+    expect(personalityValue(p, 'enneagram')).toBe('5');
+    expect(personalityValue(p, 'attachment')).toBeUndefined();
+  });
+
+  it('setPersonalityValue replaces within a framework, keeps others, and clears with null', () => {
+    let types = setPersonalityValue([], 'enneagram', '5');
+    types = setPersonalityValue(types, 'attachment', 'secure');
+    expect(types).toHaveLength(2);
+    types = setPersonalityValue(types, 'enneagram', '8'); // replace, not append
+    expect(types.filter((t) => t.framework === 'enneagram')).toEqual([{ framework: 'enneagram', value: '8' }]);
+    expect(types).toHaveLength(2);
+    types = setPersonalityValue(types, 'enneagram', null); // clear
+    expect(types).toEqual([{ framework: 'attachment', value: 'secure' }]);
+  });
+});
+
 describe('sortedInteractions', () => {
   it('returns catch-ups newest first', () => {
     const p = at('A', {
@@ -146,6 +181,12 @@ describe('sanitizeImportedPerson', () => {
       howWeMet: 'College',
       importantDates: [{ label: 'Birthday', month: 5, day: 2 }, { nope: 1 }],
       preferences: [{ kind: 'dislike', text: 'Lilies' }, 'garbage'],
+      personalityTypes: [
+        { framework: 'enneagram', value: '4' },
+        { framework: 'mbti', value: 'INTJ' }, // unknown framework → dropped
+        { framework: 'enneagram', value: '7' }, // duplicate framework → dropped
+        { framework: 'attachment', value: 'secure' },
+      ],
       interactions: [{ at: 123, kind: 'text', note: 'caught up' }, { kind: 'call' }],
     });
     expect(safe).not.toBeNull();
@@ -153,6 +194,10 @@ describe('sanitizeImportedPerson', () => {
     expect(safe!.howWeMet).toBe('College');
     expect(safe!.importantDates).toHaveLength(1);
     expect(safe!.preferences).toHaveLength(1);
+    expect(safe!.personalityTypes).toEqual([
+      { framework: 'enneagram', value: '4' },
+      { framework: 'attachment', value: 'secure' },
+    ]);
     expect(safe!.interactions).toHaveLength(1); // the one without `at` is dropped
     expect(safe!.interactions[0].kind).toBe('text');
   });

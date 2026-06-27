@@ -44,6 +44,25 @@ export interface Interaction {
   note?: string;
 }
 
+/**
+ * Personality frameworks we support. Both are open (no trademark): the app
+ * records the type in ~2 taps and supplies its OWN plain "how to relate to this
+ * person" guidance (no trademarked text). MBTI® and the "Love Languages" are
+ * deliberately excluded — their names/text are protected (canon: clone the
+ * function, not the expression). The per-type labels + guidance live in i18n
+ * under `personality.<framework>.<value>.{short,label,relate}`; the value
+ * catalog + key helpers live in ./personality.
+ */
+export type PersonalityFramework = 'enneagram' | 'attachment';
+
+export const PERSONALITY_FRAMEWORKS: readonly PersonalityFramework[] = ['enneagram', 'attachment'];
+
+export interface PersonalityType {
+  framework: PersonalityFramework;
+  /** Framework-specific value key, e.g. '5' (enneagram) or 'secure' (attachment). */
+  value: string;
+}
+
 export interface Person {
   id: string;
   name: string;
@@ -56,6 +75,8 @@ export interface Person {
   howWeMet?: string;
   importantDates: ImportantDate[];
   preferences: Preference[];
+  /** Optional personality types (at most one per framework). Depth-as-lookup. */
+  personalityTypes: PersonalityType[];
   /** Catch-up history, newest first is not guaranteed — sort on read. */
   interactions: Interaction[];
   createdAt: number;
@@ -94,10 +115,29 @@ export function makePerson(name = ''): Person {
     howWeMet: undefined,
     importantDates: [],
     preferences: [],
+    personalityTypes: [],
     interactions: [],
     createdAt: now,
     updatedAt: now,
   };
+}
+
+/** The currently selected value for a framework, or undefined if none set. Pure. */
+export function personalityValue(person: Person, framework: PersonalityFramework): string | undefined {
+  return person.personalityTypes.find((pt) => pt.framework === framework)?.value;
+}
+
+/**
+ * Pure updater: set (or replace) the value for a framework, or clear it with
+ * null. At most one entry per framework. Returns a new array.
+ */
+export function setPersonalityValue(
+  types: PersonalityType[],
+  framework: PersonalityFramework,
+  value: string | null
+): PersonalityType[] {
+  const rest = types.filter((pt) => pt.framework !== framework);
+  return value ? [...rest, { framework, value }] : rest;
 }
 
 export function makePreference(kind: PreferenceKind, text: string): Preference {
@@ -180,6 +220,17 @@ export function peopleByName(people: Person[]): Person[] {
     .sort((a, b) => (a.name.trim() || '￿').localeCompare(b.name.trim() || '￿'));
 }
 
+/**
+ * The A→Z directory filtered by a name query (case-insensitive substring). An
+ * empty/blank query returns the full directory. Pure — powers People search.
+ */
+export function searchPeople(people: Person[], query: string): Person[] {
+  const sorted = peopleByName(people);
+  const q = query.trim().toLowerCase();
+  if (!q) return sorted;
+  return sorted.filter((p) => p.name.trim().toLowerCase().includes(q));
+}
+
 /** Next annual occurrence (ms, local midnight) of a month/day on or after today. Pure. */
 export function nextOccurrence(date: ImportantDate, now: number): number {
   const d = new Date(now);
@@ -257,6 +308,18 @@ export function sanitizeImportedPerson(raw: unknown): Person | null {
     }
   }
 
+  const personalityTypes: PersonalityType[] = [];
+  if (Array.isArray(r.personalityTypes)) {
+    for (const pt of r.personalityTypes as unknown[]) {
+      if (!pt || typeof pt !== 'object') continue;
+      const o = pt as Record<string, unknown>;
+      if (typeof o.value !== 'string') continue;
+      if (o.framework !== 'enneagram' && o.framework !== 'attachment') continue;
+      if (personalityTypes.some((x) => x.framework === o.framework)) continue; // one per framework
+      personalityTypes.push({ framework: o.framework, value: o.value });
+    }
+  }
+
   const interactions: Interaction[] = [];
   if (Array.isArray(r.interactions)) {
     for (const i of r.interactions as unknown[]) {
@@ -277,6 +340,7 @@ export function sanitizeImportedPerson(raw: unknown): Person | null {
     howWeMet: typeof r.howWeMet === 'string' && r.howWeMet.trim() ? r.howWeMet : undefined,
     importantDates,
     preferences,
+    personalityTypes,
     interactions,
   };
 }

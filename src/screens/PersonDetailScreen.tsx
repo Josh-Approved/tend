@@ -18,11 +18,19 @@ import {
   nextOccurrence,
   daysUntil,
   sortedInteractions,
+  personalityValue,
   CADENCE_PRESETS,
   INTERACTION_KINDS,
   type PreferenceKind,
   type InteractionKind,
 } from '../data/person';
+import {
+  PERSONALITY_CATALOG,
+  frameworkLabelKey,
+  optionShortKey,
+  optionLabelKey,
+  optionRelateKey,
+} from '../data/personality';
 import { ScreenHeader } from '../components/ScreenHeader';
 import { t } from '../i18n';
 import {
@@ -58,6 +66,7 @@ export default function PersonDetailScreen({ route, navigation }: Props) {
   const removeImportantDate = usePeopleStore((st) => st.removeImportantDate);
   const addPreference = usePeopleStore((st) => st.addPreference);
   const removePreference = usePeopleStore((st) => st.removePreference);
+  const setPersonalityType = usePeopleStore((st) => st.setPersonalityType);
   const deletePerson = usePeopleStore((st) => st.deletePerson);
 
   const [logKind, setLogKind] = useState<InteractionKind>('call');
@@ -369,6 +378,41 @@ export default function PersonDetailScreen({ route, navigation }: Props) {
           </Pressable>
         </View>
 
+        {/* Personality — depth as a lookup, not a questionnaire */}
+        <Text style={s.sectionLabel}>{t('person.personalityLabel')}</Text>
+        <Text style={s.personalityHint}>{t('person.personalityHint')}</Text>
+        {PERSONALITY_CATALOG.map((cat) => {
+          const selected = personalityValue(person, cat.framework);
+          return (
+            <View key={cat.framework} style={s.personalityBlock}>
+              <Text style={s.personalitySubLabel}>{t(frameworkLabelKey(cat.framework))}</Text>
+              <View style={s.chips}>
+                {cat.values.map((v) => {
+                  const on = selected === v;
+                  return (
+                    <Pressable
+                      key={v}
+                      onPress={() => setPersonalityType(person.id, cat.framework, on ? null : v)}
+                      accessibilityRole="button"
+                      accessibilityState={{ selected: on }}
+                      accessibilityLabel={t(optionLabelKey(cat.framework, v))}
+                      style={({ pressed }) => [s.chip, on && s.chipOn, pressed && s.pressed]}
+                    >
+                      <Text style={[s.chipText, on && s.chipTextOn]}>{t(optionShortKey(cat.framework, v))}</Text>
+                    </Pressable>
+                  );
+                })}
+              </View>
+              {selected ? (
+                <View style={s.relateCard}>
+                  <Text style={s.relateTitle}>{t(optionLabelKey(cat.framework, selected))}</Text>
+                  <Text style={s.relateBody}>{t(optionRelateKey(cat.framework, selected))}</Text>
+                </View>
+              ) : null}
+            </View>
+          );
+        })}
+
         {/* Remove */}
         <Pressable
           onPress={onDelete}
@@ -470,6 +514,20 @@ function makeStyles(c: Colors) {
       textTransform: 'uppercase',
       letterSpacing: 0.5,
     },
+    personalityHint: { ...ty.sm, fontFamily: fontFamily.sans, color: c.fgMuted, paddingBottom: space.s2 },
+    personalityBlock: { marginTop: space.s4 },
+    personalitySubLabel: { ...ty.sm, fontFamily: fontFamily.sansSemibold, color: c.fg, paddingBottom: space.s2 },
+    relateCard: {
+      marginTop: space.s3,
+      padding: space.s4,
+      borderRadius: radius.md,
+      backgroundColor: c.bgSubtle,
+      borderLeftWidth: 3,
+      borderLeftColor: c.appAccent,
+      gap: space.s2,
+    },
+    relateTitle: { ...ty.sm, fontFamily: fontFamily.sansSemibold, color: c.appAccent },
+    relateBody: { ...ty.sm, fontFamily: fontFamily.sans, color: c.fg, lineHeight: 20 },
     addRow: { flexDirection: 'row', alignItems: 'center', gap: space.s2, marginTop: space.s3 },
     numInput: { width: 56, textAlign: 'center' },
     addBtn: {
