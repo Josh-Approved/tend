@@ -10,4 +10,9 @@
  * light and dark background washes from it, so one declaration is enough.
  */
 
-export const APP_ACCENT = '#B26B72';
+// Warm dusty rose — tender, intimate, unmistakably warm (a soft clay undertone,
+// hue ~5° vs the slightly cool mauve ~354° it replaced), while staying muted and
+// reading as rose, not terracotta. In-app accent only; coexists with approval
+// green. A touch deeper than the old rose, which also lifts the urgency-text
+// contrast on paper. Finalized 2026-06-27.
+export const APP_ACCENT = '#B5645C';

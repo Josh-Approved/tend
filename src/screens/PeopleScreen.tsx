@@ -5,12 +5,12 @@
  */
 
 import React, { useState } from 'react';
-import { View, Text, Pressable, FlatList, StyleSheet } from 'react-native';
+import { View, Text, Pressable, TextInput, FlatList, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Settings as SettingsIcon, Plus, Check, UserPlus } from 'lucide-react-native';
+import { Settings as SettingsIcon, Plus, Check, UserPlus, Search, X } from 'lucide-react-native';
 import type { TabScreenProps } from '../../App';
 import { usePeopleStore } from '../store/people';
-import { peopleByName, dueStatus, type Person } from '../data/person';
+import { peopleByName, searchPeople, dueStatus, type Person } from '../data/person';
 import { importFromContacts } from '../lib/contacts';
 import { EmptyState } from '../components/EmptyState';
 import { t } from '../i18n';
@@ -25,6 +25,9 @@ import {
   boundedContent,
   type Colors,
 } from '../theme';
+
+/** Below this many people, a directory is short enough to skim — no search box. */
+const SEARCH_THRESHOLD = 8;
 
 function subline(person: Person, now: number): { text: string; urgent: boolean } {
   const s = dueStatus(person, now);
@@ -50,9 +53,12 @@ export default function PeopleScreen({ navigation }: TabScreenProps<'People'>) {
   const logContact = usePeopleStore((st) => st.logContact);
   const importPeople = usePeopleStore((st) => st.importPeople);
   const [status, setStatus] = useState<string | null>(null);
+  const [query, setQuery] = useState('');
 
   const now = Date.now();
   const directory = peopleByName(people);
+  const showSearch = directory.length >= SEARCH_THRESHOLD;
+  const visible = showSearch ? searchPeople(people, query) : directory;
 
   const onAdd = () => {
     const id = createPerson();
@@ -100,9 +106,43 @@ export default function PeopleScreen({ navigation }: TabScreenProps<'People'>) {
         </View>
       ) : (
         <FlatList
-          data={directory}
+          data={visible}
           keyExtractor={(p) => p.id}
           contentContainerStyle={s.listContent}
+          keyboardShouldPersistTaps="handled"
+          keyboardDismissMode="on-drag"
+          ListHeaderComponent={
+            showSearch ? (
+              <View style={s.searchRow}>
+                <Search size={18} color={c.fgMuted} strokeWidth={1.5} />
+                <TextInput
+                  style={s.searchInput}
+                  value={query}
+                  onChangeText={setQuery}
+                  placeholder={t('home.searchPlaceholder')}
+                  placeholderTextColor={c.fgSubtle}
+                  accessibilityLabel={t('home.searchPlaceholder')}
+                  autoCorrect={false}
+                  returnKeyType="search"
+                  clearButtonMode="never"
+                />
+                {query.length > 0 && (
+                  <Pressable
+                    onPress={() => setQuery('')}
+                    hitSlop={8}
+                    accessibilityRole="button"
+                    accessibilityLabel={t('person.cancel')}
+                    style={({ pressed }) => [s.searchClear, pressed && s.pressed]}
+                  >
+                    <X size={16} color={c.fgMuted} strokeWidth={1.5} />
+                  </Pressable>
+                )}
+              </View>
+            ) : null
+          }
+          ListEmptyComponent={
+            query.trim() ? <Text style={s.noResults}>{t('home.searchNoResults', { query: query.trim() })}</Text> : null
+          }
           renderItem={({ item: person }) => {
             const sub = subline(person, now);
             const displayName = person.name.trim() || t('person.newPerson');
@@ -159,6 +199,27 @@ function makeStyles(c: Colors) {
     title: { ...ty.md, fontFamily: fontFamily.sansSemibold, color: c.fg },
     iconBtn: { width: target.min, height: target.min, alignItems: 'center', justifyContent: 'center' },
     listContent: { ...boundedContent, paddingBottom: space.s9 },
+    searchRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: space.s2,
+      marginHorizontal: space.s5,
+      marginBottom: space.s3,
+      paddingHorizontal: space.s4,
+      minHeight: target.min,
+      borderRadius: radius.md,
+      backgroundColor: c.bgSubtle,
+    },
+    searchInput: { flex: 1, ...ty.base, fontFamily: fontFamily.sans, color: c.fg, paddingVertical: space.s2 },
+    searchClear: { width: 28, height: 28, alignItems: 'center', justifyContent: 'center' },
+    noResults: {
+      ...ty.base,
+      fontFamily: fontFamily.sans,
+      color: c.fgMuted,
+      textAlign: 'center',
+      paddingHorizontal: space.s5,
+      paddingTop: space.s6,
+    },
     row: {
       flexDirection: 'row',
       alignItems: 'center',

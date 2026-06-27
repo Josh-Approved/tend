@@ -13,10 +13,12 @@ import {
   type Person,
   type PreferenceKind,
   type InteractionKind,
+  type PersonalityFramework,
   makePerson,
   makePreference,
   makeImportantDate,
   makeInteraction,
+  setPersonalityValue,
 } from '../data/person';
 import { putTombstone } from '../storage/kv';
 import { loadAllPeople, savePerson, deletePersonFromDb } from './db';
@@ -40,6 +42,7 @@ interface PeopleState {
   removeImportantDate: (id: string, dateId: string) => void;
   addPreference: (id: string, kind: PreferenceKind, text: string) => void;
   removePreference: (id: string, prefId: string) => void;
+  setPersonalityType: (id: string, framework: PersonalityFramework, value: string | null) => void;
   deletePerson: (id: string) => void;
   importPeople: (incoming: Person[]) => number;
 }
@@ -144,6 +147,10 @@ export const usePeopleStore = create<PeopleState>()((set, get) => {
 
     removePreference: (id, prefId) => {
       mutate(id, (p) => ({ ...p, preferences: p.preferences.filter((pr) => pr.id !== prefId) }));
+    },
+
+    setPersonalityType: (id, framework, value) => {
+      mutate(id, (p) => ({ ...p, personalityTypes: setPersonalityValue(p.personalityTypes, framework, value) }));
     },
 
     deletePerson: (id) => {

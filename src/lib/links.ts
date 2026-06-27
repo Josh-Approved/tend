@@ -12,12 +12,12 @@
 import { Linking, Platform } from 'react-native';
 import * as Application from 'expo-application';
 
-export const APP_NAME = 'Tend - Josh Approved';
+export const APP_NAME = 'Relationships - Josh Approved';
 
 /** Numeric App Store Connect id — filled once the ASC record exists (store
  *  setup). Empty is the known pre-store state; the review deep link no-ops
  *  cleanly until then. */
-export const IOS_APP_STORE_ID = '';
+export const IOS_APP_STORE_ID = '6785106429';
 export const ANDROID_PACKAGE = 'com.joshapproved.tend';
 
 export const BMAC_URL = 'https://buymeacoffee.com/jtysonwilliams';

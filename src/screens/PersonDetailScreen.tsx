@@ -9,20 +9,31 @@
 import React, { useState } from 'react';
 import { View, Text, Pressable, TextInput, ScrollView, StyleSheet, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Check, Plus, Trash2, X } from 'lucide-react-native';
+import { Check, Plus, Trash2, X, MessageCircleHeart, ChevronRight } from 'lucide-react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../../App';
 import { usePeopleStore } from '../store/people';
+import { useConversationsStore } from '../store/conversations';
+import { openConversationsForPerson } from '../data/conversation';
+import { flavorLabelKey } from '../data/conversationFramework';
 import {
   daysSinceContact,
   nextOccurrence,
   daysUntil,
   sortedInteractions,
+  personalityValue,
   CADENCE_PRESETS,
   INTERACTION_KINDS,
   type PreferenceKind,
   type InteractionKind,
 } from '../data/person';
+import {
+  PERSONALITY_CATALOG,
+  frameworkLabelKey,
+  optionShortKey,
+  optionLabelKey,
+  optionRelateKey,
+} from '../data/personality';
 import { ScreenHeader } from '../components/ScreenHeader';
 import { t } from '../i18n';
 import {
@@ -58,7 +69,10 @@ export default function PersonDetailScreen({ route, navigation }: Props) {
   const removeImportantDate = usePeopleStore((st) => st.removeImportantDate);
   const addPreference = usePeopleStore((st) => st.addPreference);
   const removePreference = usePeopleStore((st) => st.removePreference);
+  const setPersonalityType = usePeopleStore((st) => st.setPersonalityType);
   const deletePerson = usePeopleStore((st) => st.deletePerson);
+  const conversations = useConversationsStore((st) => st.conversations);
+  const createConversation = useConversationsStore((st) => st.createConversation);
 
   const [logKind, setLogKind] = useState<InteractionKind>('call');
   const [logNote, setLogNote] = useState('');
@@ -103,6 +117,7 @@ export default function PersonDetailScreen({ route, navigation }: Props) {
   const prefKinds: PreferenceKind[] = ['like', 'dislike', 'gift'];
   const prefKindLabel = (k: PreferenceKind) => t(`person.${k}`);
   const history = sortedInteractions(person).slice(0, 6);
+  const personConversations = openConversationsForPerson(conversations, person.id);
 
   const onLog = () => {
     logContact(person.id, logKind, logNote);
@@ -123,6 +138,11 @@ export default function PersonDetailScreen({ route, navigation }: Props) {
     if (!prefText.trim()) return;
     addPreference(person.id, prefKind, prefText);
     setPrefText('');
+  };
+
+  const onStartConversation = () => {
+    const id = createConversation(person.id, person.name);
+    navigation.navigate('ConversationDetail', { conversationId: id });
   };
 
   const onDelete = () => {
@@ -369,6 +389,67 @@ export default function PersonDetailScreen({ route, navigation }: Props) {
           </Pressable>
         </View>
 
+        {/* Personality — depth as a lookup, not a questionnaire */}
+        <Text style={s.sectionLabel}>{t('person.personalityLabel')}</Text>
+        <Text style={s.personalityHint}>{t('person.personalityHint')}</Text>
+        {PERSONALITY_CATALOG.map((cat) => {
+          const selected = personalityValue(person, cat.framework);
+          return (
+            <View key={cat.framework} style={s.personalityBlock}>
+              <Text style={s.personalitySubLabel}>{t(frameworkLabelKey(cat.framework))}</Text>
+              <View style={s.chips}>
+                {cat.values.map((v) => {
+                  const on = selected === v;
+                  return (
+                    <Pressable
+                      key={v}
+                      onPress={() => setPersonalityType(person.id, cat.framework, on ? null : v)}
+                      accessibilityRole="button"
+                      accessibilityState={{ selected: on }}
+                      accessibilityLabel={t(optionLabelKey(cat.framework, v))}
+                      style={({ pressed }) => [s.chip, on && s.chipOn, pressed && s.pressed]}
+                    >
+                      <Text style={[s.chipText, on && s.chipTextOn]}>{t(optionShortKey(cat.framework, v))}</Text>
+                    </Pressable>
+                  );
+                })}
+              </View>
+              {selected ? (
+                <View style={s.relateCard}>
+                  <Text style={s.relateTitle}>{t(optionLabelKey(cat.framework, selected))}</Text>
+                  <Text style={s.relateBody}>{t(optionRelateKey(cat.framework, selected))}</Text>
+                </View>
+              ) : null}
+            </View>
+          );
+        })}
+
+        {/* Conversations to have (Have the Conversation) */}
+        <Text style={s.sectionLabel}>{t('htc.personSection')}</Text>
+        {personConversations.map((conv) => (
+          <Pressable
+            key={conv.id}
+            onPress={() => navigation.navigate('ConversationDetail', { conversationId: conv.id })}
+            accessibilityRole="button"
+            accessibilityLabel={conv.topic.trim() || t(flavorLabelKey(conv.flavor))}
+            style={({ pressed }) => [s.listRow, pressed && s.pressed]}
+          >
+            <Text style={s.listRowText} numberOfLines={1}>
+              {conv.topic.trim() || t(flavorLabelKey(conv.flavor))}
+            </Text>
+            <ChevronRight size={18} color={c.fgSubtle} strokeWidth={1.5} />
+          </Pressable>
+        ))}
+        <Pressable
+          onPress={onStartConversation}
+          accessibilityRole="button"
+          accessibilityLabel={t('htc.add')}
+          style={({ pressed }) => [s.convBtn, pressed && s.pressed]}
+        >
+          <MessageCircleHeart size={18} color={c.fg} strokeWidth={1.5} />
+          <Text style={s.convBtnText}>{t('htc.add')}</Text>
+        </Pressable>
+
         {/* Remove */}
         <Pressable
           onPress={onDelete}
@@ -470,6 +551,20 @@ function makeStyles(c: Colors) {
       textTransform: 'uppercase',
       letterSpacing: 0.5,
     },
+    personalityHint: { ...ty.sm, fontFamily: fontFamily.sans, color: c.fgMuted, paddingBottom: space.s2 },
+    personalityBlock: { marginTop: space.s4 },
+    personalitySubLabel: { ...ty.sm, fontFamily: fontFamily.sansSemibold, color: c.fg, paddingBottom: space.s2 },
+    relateCard: {
+      marginTop: space.s3,
+      padding: space.s4,
+      borderRadius: radius.md,
+      backgroundColor: c.bgSubtle,
+      borderLeftWidth: 3,
+      borderLeftColor: c.appAccent,
+      gap: space.s2,
+    },
+    relateTitle: { ...ty.sm, fontFamily: fontFamily.sansSemibold, color: c.appAccent },
+    relateBody: { ...ty.sm, fontFamily: fontFamily.sans, color: c.fg, lineHeight: 20 },
     addRow: { flexDirection: 'row', alignItems: 'center', gap: space.s2, marginTop: space.s3 },
     numInput: { width: 56, textAlign: 'center' },
     addBtn: {
@@ -482,6 +577,18 @@ function makeStyles(c: Colors) {
     },
     addBtnDisabled: { opacity: 0.4 },
     iconBtn: { width: target.min, height: target.min, alignItems: 'center', justifyContent: 'center' },
+    convBtn: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: space.s2,
+      minHeight: target.min,
+      paddingHorizontal: space.s4,
+      marginTop: space.s3,
+      borderRadius: radius.md,
+      borderWidth: hairline,
+      borderColor: c.hairlineStrong,
+    },
+    convBtnText: { ...ty.base, fontFamily: fontFamily.sans, color: c.fg },
     deleteRow: { flexDirection: 'row', alignItems: 'center', gap: space.s2, marginTop: space.s8, paddingVertical: space.s3 },
     deleteText: { ...ty.base, fontFamily: fontFamily.sans, color: c.fgMuted },
   });
