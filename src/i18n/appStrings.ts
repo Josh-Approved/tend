@@ -8,6 +8,7 @@ export const APP_STRINGS = {
   nav: {
     today: 'Today',
     people: 'People',
+    htc: 'HTC',
   },
   today: {
     title: 'Today',
@@ -165,6 +166,73 @@ export const APP_STRINGS = {
           'Wants closeness but finds trust hard. Be patient and predictable — trust comes slowly. Steady, low-pressure presence does more than big gestures.',
       },
     },
+  },
+  htc: {
+    title: 'Have the Conversation',
+    whatIsThis: 'What is this?',
+    introTitle: 'Have the conversation',
+    introBody1:
+      'Closeness quietly stalls when something goes unspoken — a hurt you haven’t named, a disappointment you’ve swallowed, or something about yourself that’s hard to say.',
+    introBody2:
+      'When something is big enough to put distance between you, but hard enough that you hold it in, that’s the signal to have the conversation.',
+    introBody3:
+      'This space helps you name it, find the words, and walk in prepared — one honest conversation at a time.',
+    introPrivacy: 'Whatever you write stays on your device.',
+    introDismiss: 'Got it',
+    toHave: 'To have',
+    had: 'Had',
+    empty:
+      'No conversations yet. When something’s sitting between you and someone, name it here and plan how you’ll say it.',
+    add: 'Start a conversation',
+    personSection: 'Conversations to have',
+    someone: 'someone',
+    untitled: 'A conversation to have',
+    newConversation: 'New conversation',
+    whoLabel: 'Who is this with?',
+    whoPlaceholder: 'Their name',
+    flavorLabel: 'What kind of conversation is this?',
+    core: {
+      topicLabel: 'What do you need to share or talk about?',
+      topicPlaceholder: 'The thing that’s sitting between you…',
+      storyLabel: 'The story I’m telling myself…',
+      storyPlaceholder: 'What you’re making it mean — which may or may not be true.',
+      impactLabel: 'How is this affecting you, or the relationship?',
+      impactPlaceholder: 'The cost of leaving it unsaid…',
+      hopeLabel: 'What do you hope comes from this conversation?',
+      hopePlaceholder: 'Picture a good outcome…',
+    },
+    flavor: {
+      open: 'Something to share',
+      hurt: 'Something that hurt me',
+      aboutMe: 'Hard to share about myself',
+      boundary: 'A boundary I need',
+      apology: 'An apology I owe',
+      appreciation: 'Appreciation I’ve held back',
+    },
+    prompt: {
+      iStatement: { label: 'Say it as an “I” statement', placeholder: 'When ___ happened, I felt ___' },
+      vulnerable: { label: 'What feels vulnerable to share', placeholder: 'What’s hard to say is…' },
+      need: { label: 'The boundary I need', placeholder: 'What I need going forward is…' },
+      sorryFor: { label: 'I’m sorry for…', placeholder: 'Name specifically what you did.' },
+      theHurt: {
+        label: 'How I think it hurt you',
+        placeholder: 'Name the impact on them — this is what makes an apology land.',
+      },
+      askForgiveness: { label: 'Ask for forgiveness', placeholder: 'e.g. “Will you forgive me?”' },
+      holdingBack: { label: 'What I’ve been meaning to tell you', placeholder: 'I appreciate…' },
+    },
+    note: {
+      apology:
+        'A real apology has three parts: name what you did, name how it hurt them, and ask for forgiveness. That last step is the one most people skip — and it’s what opens the door to reconciliation.',
+    },
+    markHad: 'We had this conversation',
+    hadOn: 'Had this conversation',
+    reopen: 'Mark as still to have',
+    reflectionLabel: 'How did it go?',
+    reflectionPlaceholder: 'What happened, how it felt, what you learned…',
+    deleteConversation: 'Delete this conversation',
+    deleteConfirmTitle: 'Delete this conversation?',
+    deleteConfirmBody: 'This removes everything you’ve written here. It can’t be undone.',
   },
   notify: {
     reachOutTitle: 'Time to reach out to {name}',

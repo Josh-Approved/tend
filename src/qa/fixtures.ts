@@ -18,6 +18,7 @@ import {
   type Interaction,
   type PersonalityType,
 } from '../data/person';
+import { makeConversation, type Conversation } from '../data/conversation';
 
 export function qaPeople(): Person[] {
   const now = Date.now();
@@ -89,5 +90,79 @@ export function qaPeople(): Person[] {
       makePreference('gift', 'Trail running socks'),
     ], []),
     make('Priya', null, 4, 'Met at the design conference.', 'Follow up about the book she recommended.', [], [], []),
+  ];
+}
+
+/**
+ * QA seed for Have the Conversation. Links to the already-seeded people by name
+ * (so the per-person badge demos too), with a spread across flavors and one
+ * already-had conversation so the "Had" section + reflection show.
+ */
+export function qaConversations(people: Person[]): Conversation[] {
+  const now = Date.now();
+  const find = (name: string): Person | undefined => people.find((p) => p.name === name);
+
+  function make(
+    person: Person | undefined,
+    personName: string,
+    flavor: Conversation['flavor'],
+    fields: Partial<Conversation>,
+    flavorFields: Record<string, string> = {}
+  ): Conversation {
+    const c = makeConversation(person?.id ?? null, personName, flavor);
+    Object.assign(c, fields);
+    c.flavorFields = flavorFields;
+    return c;
+  }
+
+  const mom = find('Mom');
+  const sarah = find('Sarah Chen');
+  const dad = find('Dad');
+
+  return [
+    make(
+      mom,
+      'Mom',
+      'apology',
+      {
+        createdAt: now - 1 * DAY_MS,
+        topic: 'I snapped at her on the phone last weekend and never circled back.',
+        story: "The story I'm telling myself is that if I bring it up I'll just make it worse.",
+        impact: "We've been a little stiff with each other since, and I hate that.",
+        hope: 'To own it cleanly and feel close again.',
+      },
+      {
+        sorryFor: 'I’m sorry for snapping at you when you were just trying to help.',
+        theHurt: 'I think it made you feel brushed off, like your help wasn’t wanted.',
+        askForgiveness: 'Will you forgive me?',
+      }
+    ),
+    make(
+      sarah,
+      'Sarah Chen',
+      'hurt',
+      {
+        createdAt: now - 4 * DAY_MS,
+        topic: 'She’s canceled our last two plans last-minute.',
+        story: "The story I'm telling myself is that I'm not a priority to her right now.",
+        impact: "I've started to pull back instead of saying anything.",
+        hope: 'To be honest without blaming, and understand what’s going on for her.',
+      },
+      { iStatement: 'When plans fall through last-minute, I feel like I don’t matter.' }
+    ),
+    make(
+      dad,
+      'Dad',
+      'appreciation',
+      {
+        createdAt: now - 10 * DAY_MS,
+        status: 'had',
+        hadAt: now - 2 * DAY_MS,
+        topic: 'I’ve never actually told him how much his steadiness meant growing up.',
+        hope: 'Just to say it, out loud, while I can.',
+        reflection: 'Said it on our call. He got quiet, then thanked me. Glad I didn’t wait.',
+      },
+      { holdingBack: 'I’ve been meaning to tell you that you were my steady ground.' }
+    ),
   ];
 }

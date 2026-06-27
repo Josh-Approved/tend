@@ -10,6 +10,7 @@
 
 import { getDb } from '../storage/kv';
 import type { Person, ImportantDate, Preference, Interaction, PersonalityType } from '../data/person';
+import type { Conversation, ConversationFlavor, ConversationStatus } from '../data/conversation';
 
 let _ready: Promise<void> | null = null;
 
@@ -116,4 +117,110 @@ export async function deletePersonFromDb(id: string): Promise<void> {
   await ensureTable();
   const db = await getDb();
   await db.runAsync('DELETE FROM people WHERE id = ?', [id]);
+}
+
+// ---------- Conversations (Have the Conversation) ----------
+// Same connection / file / backup unit as people; flavorFields is a JSON column.
+
+let _convReady: Promise<void> | null = null;
+
+async function ensureConversationsTable(): Promise<void> {
+  if (_convReady) return _convReady;
+  _convReady = (async () => {
+    const db = await getDb();
+    await db.execAsync(`
+      CREATE TABLE IF NOT EXISTS conversations (
+        id           TEXT PRIMARY KEY NOT NULL,
+        personId     TEXT,
+        personName   TEXT NOT NULL,
+        flavor       TEXT NOT NULL,
+        topic        TEXT NOT NULL,
+        story        TEXT NOT NULL,
+        impact       TEXT NOT NULL,
+        hope         TEXT NOT NULL,
+        flavorFields TEXT NOT NULL DEFAULT '{}',
+        status       TEXT NOT NULL,
+        reflection   TEXT NOT NULL,
+        createdAt    INTEGER NOT NULL,
+        updatedAt    INTEGER NOT NULL,
+        hadAt        INTEGER
+      );
+    `);
+  })();
+  return _convReady;
+}
+
+interface ConversationRow {
+  id: string;
+  personId: string | null;
+  personName: string;
+  flavor: string;
+  topic: string;
+  story: string;
+  impact: string;
+  hope: string;
+  flavorFields: string;
+  status: string;
+  reflection: string;
+  createdAt: number;
+  updatedAt: number;
+  hadAt: number | null;
+}
+
+function rowToConversation(row: ConversationRow): Conversation {
+  return {
+    id: row.id,
+    personId: row.personId ?? null,
+    personName: row.personName,
+    flavor: row.flavor as ConversationFlavor,
+    topic: row.topic,
+    story: row.story,
+    impact: row.impact,
+    hope: row.hope,
+    flavorFields: JSON.parse(row.flavorFields) as Record<string, string>,
+    status: row.status as ConversationStatus,
+    reflection: row.reflection,
+    createdAt: row.createdAt,
+    updatedAt: row.updatedAt,
+    hadAt: row.hadAt ?? null,
+  };
+}
+
+export async function loadAllConversations(): Promise<Conversation[]> {
+  await ensureConversationsTable();
+  const db = await getDb();
+  const rows = await db.getAllAsync<ConversationRow>('SELECT * FROM conversations ORDER BY updatedAt DESC');
+  return rows.map(rowToConversation);
+}
+
+export async function saveConversation(c: Conversation): Promise<void> {
+  await ensureConversationsTable();
+  const db = await getDb();
+  await db.runAsync(
+    `INSERT OR REPLACE INTO conversations
+      (id, personId, personName, flavor, topic, story, impact, hope, flavorFields, status, reflection, createdAt, updatedAt, hadAt)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    [
+      c.id,
+      c.personId,
+      c.personName,
+      c.flavor,
+      c.topic,
+      c.story,
+      c.impact,
+      c.hope,
+      JSON.stringify(c.flavorFields),
+      c.status,
+      c.reflection,
+      c.createdAt,
+      c.updatedAt,
+      c.hadAt,
+    ]
+  );
+}
+
+export async function deleteConversationFromDb(id: string): Promise<void> {
+  await ensureConversationsTable();
+  const db = await getDb();
+  await db.runAsync('DELETE FROM conversations WHERE id = ?', [id]);
 }
