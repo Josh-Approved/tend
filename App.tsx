@@ -10,7 +10,7 @@
 
 import React, { useEffect } from 'react';
 import * as SplashScreen from 'expo-splash-screen';
-import { Sun, Users, MessageCircleHeart } from 'lucide-react-native';
+import { Sun, Users, MessageCircleHeart, CircleUser } from 'lucide-react-native';
 import { createNativeStackNavigator, type NativeStackScreenProps } from '@react-navigation/native-stack';
 import { createBottomTabNavigator, type BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import type { CompositeScreenProps, NavigatorScreenParams } from '@react-navigation/native';
@@ -18,11 +18,13 @@ import { useAppFonts, useTheme, fontFamily } from './src/theme';
 import { AppShell } from './src/shell/AppShell';
 import { usePeopleStore } from './src/store/people';
 import { useConversationsStore } from './src/store/conversations';
+import { useMeStore } from './src/store/me';
 import TodayScreen from './src/screens/TodayScreen';
 import PeopleScreen from './src/screens/PeopleScreen';
 import PersonDetailScreen from './src/screens/PersonDetailScreen';
 import HTCScreen from './src/screens/HTCScreen';
 import ConversationDetailScreen from './src/screens/ConversationDetailScreen';
+import MeScreen from './src/screens/MeScreen';
 import SettingsScreen from './src/screens/SettingsScreen';
 import Credits from './src/components/Credits';
 import { t } from './src/i18n';
@@ -39,6 +41,7 @@ export type TabParamList = {
   Today: undefined;
   People: undefined;
   HTC: undefined;
+  Me: undefined;
 };
 
 export type RootStackParamList = {
@@ -94,6 +97,14 @@ function Tabs() {
           tabBarIcon: ({ color, size }) => <MessageCircleHeart color={color} size={size} strokeWidth={1.75} />,
         }}
       />
+      <Tab.Screen
+        name="Me"
+        component={MeScreen}
+        options={{
+          tabBarLabel: t('nav.me'),
+          tabBarIcon: ({ color, size }) => <CircleUser color={color} size={size} strokeWidth={1.75} />,
+        }}
+      />
     </Tab.Navigator>
   );
 }
@@ -104,16 +115,19 @@ export default function App() {
   const hydratePeople = usePeopleStore((s) => s.hydrate);
   const conversationsHydrated = useConversationsStore((s) => s.hydrated);
   const hydrateConversations = useConversationsStore((s) => s.hydrate);
+  const meHydrated = useMeStore((s) => s.hydrated);
+  const hydrateMe = useMeStore((s) => s.hydrate);
 
   useEffect(() => {
     // Sequential: people seed first so QA-mode conversations can link to them.
     (async () => {
       await hydratePeople();
       await hydrateConversations();
+      await hydrateMe();
     })();
-  }, [hydratePeople, hydrateConversations]);
+  }, [hydratePeople, hydrateConversations, hydrateMe]);
 
-  const ready = fontsLoaded && peopleHydrated && conversationsHydrated;
+  const ready = fontsLoaded && peopleHydrated && conversationsHydrated && meHydrated;
 
   return (
     <AppShell ready={ready}>

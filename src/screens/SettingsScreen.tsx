@@ -13,6 +13,7 @@ import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../../App';
 import { usePeopleStore } from '../store/people';
 import { useConversationsStore } from '../store/conversations';
+import { useMeStore } from '../store/me';
 import { exportData, pickAndParseData } from '../lib/transfer';
 import { importFromContacts } from '../lib/contacts';
 import { AboutRow } from '../components/AboutRow';
@@ -38,6 +39,8 @@ export default function SettingsScreen({ navigation }: Props) {
   const importPeople = usePeopleStore((st) => st.importPeople);
   const conversations = useConversationsStore((st) => st.conversations);
   const importConversations = useConversationsStore((st) => st.importConversations);
+  const me = useMeStore((st) => st.profile);
+  const importMe = useMeStore((st) => st.importProfile);
   const [status, setStatus] = useState<string | null>(null);
 
   const onImportContacts = useCallback(async () => {
@@ -51,13 +54,13 @@ export default function SettingsScreen({ navigation }: Props) {
   }, [importPeople]);
 
   const onExport = useCallback(() => {
-    exportData(people, conversations).catch(() => setStatus(t('settings.couldntExport')));
-  }, [people, conversations]);
+    exportData(people, conversations, me).catch(() => setStatus(t('settings.couldntExport')));
+  }, [people, conversations, me]);
 
   const onImport = useCallback(async () => {
     try {
-      const { people: ppl, conversations: convs } = await pickAndParseData();
-      const n = importPeople(ppl) + importConversations(convs);
+      const { people: ppl, conversations: convs, me: meImp } = await pickAndParseData();
+      const n = importPeople(ppl) + importConversations(convs) + importMe(meImp);
       if (n === 0) {
         setStatus(t('settings.nothingImported'));
         return;
@@ -66,7 +69,7 @@ export default function SettingsScreen({ navigation }: Props) {
     } catch {
       setStatus(t('settings.couldntRead'));
     }
-  }, [importPeople, importConversations]);
+  }, [importPeople, importConversations, importMe]);
 
   return (
     <SafeAreaView style={s.safe} edges={['top', 'left', 'right', 'bottom']}>

@@ -10,24 +10,26 @@
 import { exportEnvelope, pickEnvelope } from './backup';
 import { type Person, sanitizeImportedPerson } from '../data/person';
 import { type Conversation, sanitizeImportedConversation } from '../data/conversation';
+import { type MeProfile, sanitizeImportedMe } from '../data/me';
 
 const APP_SLUG = 'tend';
 const EXPORT_VERSION = 1;
 
-export async function exportData(people: Person[], conversations: Conversation[]): Promise<void> {
-  await exportEnvelope(APP_SLUG, EXPORT_VERSION, { people, conversations });
+export async function exportData(people: Person[], conversations: Conversation[], me: MeProfile): Promise<void> {
+  await exportEnvelope(APP_SLUG, EXPORT_VERSION, { people, conversations, me });
 }
 
 export interface ParsedImport {
   people: Person[];
   conversations: Conversation[];
+  me: MeProfile;
 }
 
 /** Pick a file and return the records to add. Returns empties on cancel / bad
- *  file; an older export with no `conversations` key simply yields none. */
+ *  file; an older export missing a key (conversations / me) simply yields none. */
 export async function pickAndParseData(): Promise<ParsedImport> {
   const env = await pickEnvelope();
-  const payload = env?.payload as { people?: unknown[]; conversations?: unknown[] } | undefined;
+  const payload = env?.payload as { people?: unknown[]; conversations?: unknown[]; me?: unknown } | undefined;
 
   const people: Person[] = [];
   for (const raw of Array.isArray(payload?.people) ? payload!.people : []) {
@@ -41,5 +43,7 @@ export async function pickAndParseData(): Promise<ParsedImport> {
     if (safe) conversations.push(safe);
   }
 
-  return { people, conversations };
+  const me = sanitizeImportedMe(payload?.me);
+
+  return { people, conversations, me };
 }

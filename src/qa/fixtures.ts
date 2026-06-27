@@ -19,6 +19,7 @@ import {
   type PersonalityType,
 } from '../data/person';
 import { makeConversation, type Conversation } from '../data/conversation';
+import { type MeProfile } from '../data/me';
 
 export function qaPeople(): Person[] {
   const now = Date.now();
@@ -165,4 +166,16 @@ export function qaConversations(people: Person[]): Conversation[] {
       { holdingBack: 'I’ve been meaning to tell you that you were my steady ground.' }
     ),
   ];
+}
+
+/** QA seed for the Me manual — a partially-filled profile, so the screen reads
+ *  like real use (a manual you fill over time, not all at once). */
+export function qaMeProfile(): MeProfile {
+  return {
+    communicate: 'I’m slow to open up, and I think better in writing before I say it out loud.',
+    feedback: 'Straight up is fine — just lead with what’s working, and give me a beat to sit with it.',
+    feelCared: 'Undivided attention. A check-in text on a hard day lands more than a big gesture.',
+    fillsMeUp: 'Long walks, a quiet morning, and one real conversation beats a room full of small talk.',
+    values: 'Honesty, loyalty, and showing up — especially when it’s inconvenient.',
+  };
 }

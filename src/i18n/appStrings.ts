@@ -9,6 +9,7 @@ export const APP_STRINGS = {
     today: 'Today',
     people: 'People',
     htc: 'HTC',
+    me: 'Me',
   },
   today: {
     title: 'Today',
@@ -233,6 +234,25 @@ export const APP_STRINGS = {
     deleteConversation: 'Delete this conversation',
     deleteConfirmTitle: 'Delete this conversation?',
     deleteConfirmBody: 'This removes everything you’ve written here. It can’t be undone.',
+  },
+  me: {
+    title: 'Me',
+    intro:
+      'A manual about you — the things you’d want the people who love you to understand. Fill in what resonates; it’s yours to keep, and yours to share when you’re ready.',
+    share: 'Share my manual',
+    shareHeading: 'A bit about me',
+    prompt: {
+      communicate: { label: 'How I communicate', placeholder: 'Direct, or slow to open up? Better in writing or out loud?' },
+      feedback: { label: 'How I like feedback', placeholder: 'Gently, or straight up? Do I need time to sit with it?' },
+      conflict: { label: 'How I am in conflict', placeholder: 'Do I need space first, or to talk it through right away?' },
+      feelCared: { label: 'How I feel cared for', placeholder: 'What actually lands as love for me…' },
+      showCare: { label: 'How I show I care', placeholder: 'The way care comes out of me — so it’s not misread…' },
+      fillsMeUp: { label: 'What fills me up', placeholder: 'The people, places, and things that recharge me…' },
+      drains: { label: 'What wears me down', placeholder: 'What drains me, my pet peeves…' },
+      growth: { label: 'What I’m working on', placeholder: 'A growth edge I’d want someone close to me to know…' },
+      support: { label: 'How to support me when I’m low', placeholder: 'When I’m struggling, what actually helps…' },
+      values: { label: 'What matters most to me', placeholder: 'The values I try to live by…' },
+    },
   },
   notify: {
     reachOutTitle: 'Time to reach out to {name}',
