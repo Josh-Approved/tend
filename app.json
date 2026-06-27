@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "Tend",
+    "name": "Relationships",
     "slug": "tend",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -8,7 +8,10 @@
     "userInterfaceStyle": "automatic",
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.joshapproved.tend"
+      "bundleIdentifier": "com.joshapproved.tend",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -35,7 +38,7 @@
       [
         "expo-contacts",
         {
-          "contactsPermission": "Tend uses your contacts only to let you add the people you choose. Nothing leaves your device."
+          "contactsPermission": "Relationships uses your contacts only to let you add the people you choose. Nothing leaves your device."
         }
       ]
     ]
