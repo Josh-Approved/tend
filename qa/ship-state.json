@@ -1,0 +1,12 @@
+{
+  "events": [
+    {
+      "stage": "beta-ios",
+      "at": "2026-06-27T16:08:04-07:00",
+      "build": "1.0.0",
+      "source": "manual",
+      "note": "First TestFlight build (#3, marketing 1.0.0) submitted by Josh + FINISHED 2026-06-27 (interactive first-bind of the EAS-vault ASC key); recorded after the fact so the production gate reflects reality. Confirmed live on ASC: build #3 processingState=VALID, not expired.",
+      "gitSha": "2a3d56bd547f414b09577459aeeb1748d09a0e87"
+    }
+  ]
+}
