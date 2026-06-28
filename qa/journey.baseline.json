@@ -1,0 +1,16 @@
+{
+  "anchors": {
+    "seeded-person": {
+      "text": "Mom",
+      "id": null
+    },
+    "reached-out-btn": {
+      "text": "I reached out",
+      "id": null
+    },
+    "reached-out-confirm": {
+      "text": "Reached out today",
+      "id": null
+    }
+  }
+}
