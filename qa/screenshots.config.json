@@ -1,0 +1,26 @@
+{
+  "stores": {
+    "ios": [
+      { "id": "core", "source": "ios/home.png", "caption": "See who to reach out to today." },
+      { "id": "josh-approved", "kind": "card" },
+      { "id": "person", "source": "ios/person.png", "caption": "Remember what matters about each person." }
+    ],
+    "ipad": [
+      { "id": "core", "source": "ipad/home.png", "caption": "See who to reach out to today." },
+      { "id": "josh-approved", "kind": "card" },
+      { "id": "person", "source": "ipad/person.png", "caption": "Remember what matters about each person." }
+    ],
+    "android": [
+      { "id": "core", "source": "android/home.png", "caption": "See who to reach out to today." },
+      { "id": "josh-approved", "kind": "card" },
+      { "id": "person", "source": "android/person.png", "caption": "Remember what matters about each person." }
+    ],
+    "androidTablet": [
+      { "id": "core", "source": "androidTablet/home.png", "caption": "See who to reach out to today." },
+      { "id": "josh-approved", "kind": "card" },
+      { "id": "person", "source": "androidTablet/person.png", "caption": "Remember what matters about each person." }
+    ]
+  },
+  "style": "signature",
+  "motif": "dots"
+}
