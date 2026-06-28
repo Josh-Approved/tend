@@ -1,0 +1,32 @@
+{
+  "configVersion": 0,
+  "apple": {
+    "info": {
+      "en-US": {
+        "title": "Relationships - Josh Approved",
+        "subtitle": "No paywall. No ads.",
+        "privacyPolicyUrl": "https://github.com/Josh-Approved/tend/blob/main/PRIVACY.md",
+        "description": "A calm, private companion for the people you love — partner, family, and friends, all in one place. Get a gentle nudge when it's been too long, remember what's going on in their lives, and find the words for the conversations that are hard to start. No paywall. No ads. No tracking. No accounts.\n\nWhat it does:\n- A calm \"Today\" that shows only who to reach out to and what's coming up — never a guilt trip\n- Keep what matters about each person: how you met, important dates, what they love, what to ask about next time\n- Note how to relate to someone — an optional personality read with plain, supportive guidance\n- \"Have the Conversation\" — a quiet space to prepare for the hard, honest talks: an apology, a hurt, something you've held back, one step at a time\n- A \"Me\" manual about yourself — the things you'd want the people who love you to understand, yours to keep and yours to share\n- Reminders to reach out, on your terms — set a rhythm for each person, or none at all\n\nYour data stays with you. Everything you write lives on your phone — there are no accounts, and nothing about the people in your life leaves your device. Keep your own encrypted backup, and share your \"Me\" manual only when you choose to.\n\nWhat it doesn't do:\nNo paywall. No ads. No tracking. No accounts. No subscriptions. No streaks, no guilt. The whole app is the whole app, free.\n\nJosh Approved is supported by the people who use it. No ads, no subscriptions, no data harvest — what keeps this sustainable is whether it's worth a few dollars to you. If it is, please consider donating: https://buymeacoffee.com/jtysonwilliams\n\nSend feedback: feedback@joshapproved.com",
+        "keywords": ["relationships", "friends", "family", "friendship", "reminder", "connection", "contacts", "birthday", "care", "reach", "checkin"],
+        "promoText": "Open source, pay what you want. Built by one person — no ads, no tracking, no accounts. A calm place to keep up with the people you love, free, always.",
+        "supportUrl": "https://github.com/Josh-Approved/tend/issues",
+        "marketingUrl": "https://github.com/Josh-Approved/tend",
+        "releaseNotes": "First release. A calm, private place to keep up with the people you love — gentle reach-out reminders, the details that matter about each person, a space to prepare for hard conversations, and a \"Me\" manual to share. No accounts, no ads, no tracking."
+      }
+    },
+    "version": "1.0.0",
+    "categories": ["LIFESTYLE"],
+    "copyright": "© 2026 Josh Approved",
+    "review": {
+      "firstName": "Josh",
+      "lastName": "Williams",
+      "email": "info@joshapproved.com",
+      "phone": "512-522-3572",
+      "notes": "This app is fully local. No account or sign-up is required to use any feature.",
+      "demoRequired": false
+    },
+    "release": {
+      "automaticRelease": false
+    }
+  }
+}
