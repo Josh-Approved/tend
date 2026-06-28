@@ -7,6 +7,38 @@
       "source": "manual",
       "note": "First TestFlight build (#3, marketing 1.0.0) submitted by Josh + FINISHED 2026-06-27 (interactive first-bind of the EAS-vault ASC key); recorded after the fact so the production gate reflects reality. Confirmed live on ASC: build #3 processingState=VALID, not expired.",
       "gitSha": "2a3d56bd547f414b09577459aeeb1748d09a0e87"
+    },
+    {
+      "stage": "beta-ios",
+      "build": "1.0.0",
+      "source": "claude",
+      "note": "iOS build #4 (marketing 1.0.0) built --local + eas submit → TestFlight, FINISHED 2026-06-28. Unattended (key already bound from build #3).",
+      "at": "2026-06-28T14:59:02Z",
+      "gitSha": "5b294140194bd591b7d11b4533fbee37e01fc116"
+    },
+    {
+      "stage": "beta-android",
+      "build": "1.0.0",
+      "source": "claude",
+      "note": "Android cold first release: build --local .aab + eas submit -p android → Play Internal testing, FINISHED 2026-06-28 (submission 23cb23c0). Non-interactive from the first release.",
+      "at": "2026-06-28T14:59:03Z",
+      "gitSha": "5b294140194bd591b7d11b4533fbee37e01fc116"
+    },
+    {
+      "stage": "beta-ios",
+      "build": "1.0.0",
+      "source": "claude",
+      "note": "iOS build #6 (new two-people icon) -> TestFlight, FINISHED 2026-06-28.",
+      "at": "2026-06-28T22:08:19Z",
+      "gitSha": "181b9cfdaf1289fe1ed4151603a1129930505773"
+    },
+    {
+      "stage": "beta-android",
+      "build": "1.0.0",
+      "source": "claude",
+      "note": "Android build (new icon) -> Play Internal, FINISHED 2026-06-28 (submission 98b3cd2a). First attempt errored on a gzip-tar artifact; extracted the real .aab + re-submitted; ship-eas.sh hardened.",
+      "at": "2026-06-28T22:08:19Z",
+      "gitSha": "181b9cfdaf1289fe1ed4151603a1129930505773"
     }
   ]
 }
