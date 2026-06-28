@@ -1,0 +1,11 @@
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+  <rect id="bg" width="1024" height="1024" fill="#B5645C"/>
+  <g id="glyph" fill="#FAFAF7">
+    <!-- back person (smaller, higher, right) -->
+    <circle cx="700" cy="372" r="100"/>
+    <path d="M593 700 L593 648 C593 560 649 450 700 450 C751 450 807 560 807 648 L807 700 Z"/>
+    <!-- front person (larger, lower, left) -->
+    <circle cx="398" cy="414" r="120"/>
+    <path d="M225 754 L225 690 C225 580 303 500 398 500 C493 500 571 580 571 690 L571 754 Z"/>
+  </g>
+</svg>
