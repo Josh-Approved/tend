@@ -21,6 +21,7 @@ import {
   setPersonalityValue,
 } from '../data/person';
 import { putTombstone } from '../storage/kv';
+import { dedupePeopleByName } from '../lib/contacts';
 import { loadAllPeople, savePerson, deletePersonFromDb } from './db';
 import { rescheduleAll } from '../lib/notifications';
 import { QA_MODE } from '../qa/qaMode';
@@ -161,11 +162,15 @@ export const usePeopleStore = create<PeopleState>()((set, get) => {
     },
 
     importPeople: (incoming) => {
-      if (incoming.length === 0) return 0;
-      set((s) => ({ people: [...incoming, ...s.people] }));
-      for (const p of incoming) persist(p);
+      // Dedupe against the people we already have so re-running an import (or
+      // importing a contact list with someone already tracked) never doubles
+      // anyone. Return the count ACTUALLY added so the UI can speak the truth.
+      const toAdd = dedupePeopleByName(get().people, incoming);
+      if (toAdd.length === 0) return 0;
+      set((s) => ({ people: [...toAdd, ...s.people] }));
+      for (const p of toAdd) persist(p);
       syncNotifications();
-      return incoming.length;
+      return toAdd.length;
     },
   };
 });

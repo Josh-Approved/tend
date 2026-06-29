@@ -6,7 +6,7 @@
  * dates, and likes/dislikes/gift ideas. Depth accretes a little at a time.
  */
 
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { View, Text, Pressable, TextInput, ScrollView, StyleSheet, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Check, Plus, Trash2, X, MessageCircleHeart, ChevronRight } from 'lucide-react-native';
@@ -58,8 +58,11 @@ export default function PersonDetailScreen({ route, navigation }: Props) {
   const { c } = useTheme();
   const s = makeStyles(c);
   const { personId } = route.params;
+  // No personId → NEW mode: a draft that persists nothing until the user saves.
+  const isNew = personId == null;
   const person = usePeopleStore((st) => st.people.find((p) => p.id === personId));
 
+  const createPerson = usePeopleStore((st) => st.createPerson);
   const renamePerson = usePeopleStore((st) => st.renamePerson);
   const setCadence = usePeopleStore((st) => st.setCadence);
   const logContact = usePeopleStore((st) => st.logContact);
@@ -81,12 +84,107 @@ export default function PersonDetailScreen({ route, navigation }: Props) {
   const [dateDay, setDateDay] = useState('');
   const [prefKind, setPrefKind] = useState<PreferenceKind>('like');
   const [prefText, setPrefText] = useState('');
+  // NEW-mode draft: a local cadence + name that aren't persisted until Save.
+  const [draftName, setDraftName] = useState('');
+  const [draftCadence, setDraftCadence] = useState<number | null>(null);
+  const nameRef = useRef<TextInput>(null);
 
-  if (!person) {
+  // Keyboard up on mount in new mode. autoFocus handles iOS; the timed .focus()
+  // is the Android-reliability belt-and-braces (autoFocus can no-op there).
+  useEffect(() => {
+    if (!isNew) return;
+    const id = setTimeout(() => nameRef.current?.focus(), 80);
+    return () => clearTimeout(id);
+  }, [isNew]);
+
+  // Only bounce when an explicit person was asked for but isn't there (deleted).
+  // In new mode there is no person yet, and that's expected — don't bounce.
+  if (!isNew && !person) {
     navigation.goBack();
     return null;
   }
 
+  // Cadence preset labels — used in both new (draft) and edit modes, and depend
+  // on nothing person-specific, so they're computed before the new-mode return.
+  const cadenceLabels: Record<string, string> = {
+    none: t('person.cadenceNone'),
+    weekly: t('person.cadenceWeekly'),
+    biweekly: t('person.cadenceBiweekly'),
+    monthly: t('person.cadenceMonthly'),
+    quarterly: t('person.cadenceQuarterly'),
+  };
+
+  // NEW mode: a calm draft — name (autofocused) + optional cadence + a Save FAB.
+  // Nothing is written to the store until Save, so backing out persists nothing.
+  if (isNew) {
+    const trimmedName = draftName.trim();
+    const onSave = () => {
+      if (!trimmedName) return;
+      const id = createPerson(trimmedName);
+      if (draftCadence != null) setCadence(id, draftCadence);
+      // Become the normal edit screen for the new person (replace, not push, so
+      // back from here returns to the directory, not to a stale draft).
+      navigation.replace('PersonDetail', { personId: id });
+    };
+    return (
+      <SafeAreaView style={s.safe} edges={['top', 'left', 'right']}>
+        <ScreenHeader title={t('person.newPerson')} onBack={() => navigation.goBack()} />
+        <ScrollView
+          contentContainerStyle={s.content}
+          keyboardShouldPersistTaps="handled"
+          keyboardDismissMode="on-drag"
+        >
+          <TextInput
+            ref={nameRef}
+            style={s.nameInput}
+            value={draftName}
+            onChangeText={setDraftName}
+            placeholder={t('person.namePlaceholder')}
+            placeholderTextColor={c.fgSubtle}
+            accessibilityLabel={t('person.namePlaceholder')}
+            autoFocus
+            returnKeyType="done"
+            onSubmitEditing={onSave}
+          />
+
+          {/* Cadence (optional even before saving) */}
+          <Text style={s.sectionLabel}>{t('person.cadenceLabel')}</Text>
+          <View style={s.chips}>
+            {CADENCE_PRESETS.map((preset) => {
+              const selected = draftCadence === preset.days;
+              return (
+                <Pressable
+                  key={preset.key}
+                  onPress={() => setDraftCadence(preset.days)}
+                  accessibilityRole="button"
+                  accessibilityState={{ selected }}
+                  accessibilityLabel={cadenceLabels[preset.key]}
+                  style={({ pressed }) => [s.chip, selected && s.chipOn, pressed && s.pressed]}
+                >
+                  <Text style={[s.chipText, selected && s.chipTextOn]}>{cadenceLabels[preset.key]}</Text>
+                </Pressable>
+              );
+            })}
+          </View>
+        </ScrollView>
+
+        {/* Save FAB — disabled until a name is entered (name is required) */}
+        <Pressable
+          onPress={onSave}
+          disabled={!trimmedName}
+          accessibilityRole="button"
+          accessibilityLabel={t('common.save')}
+          style={({ pressed }) => [s.saveFab, pressed && s.fabPressed, !trimmedName && s.saveFabDisabled]}
+        >
+          <Check size={20} color={c.inkButtonText} strokeWidth={2.5} />
+          <Text style={s.saveFabText}>{t('common.save')}</Text>
+        </Pressable>
+      </SafeAreaView>
+    );
+  }
+
+  // EDIT mode below — person is guaranteed to exist past the guard above.
+  if (!person) return null; // unreachable; satisfies the type narrower
   const now = Date.now();
   const displayName = person.name.trim() || t('person.newPerson');
   const since = daysSinceContact(person, now);
@@ -96,14 +194,6 @@ export default function PersonDetailScreen({ route, navigation }: Props) {
       : since === 0
         ? t('person.lastReachedToday')
         : t('person.lastReachedDays', { days: since });
-
-  const cadenceLabels: Record<string, string> = {
-    none: t('person.cadenceNone'),
-    weekly: t('person.cadenceWeekly'),
-    biweekly: t('person.cadenceBiweekly'),
-    monthly: t('person.cadenceMonthly'),
-    quarterly: t('person.cadenceQuarterly'),
-  };
 
   const kindLabel = (k: InteractionKind): string =>
     k === 'call'
@@ -162,7 +252,11 @@ export default function PersonDetailScreen({ route, navigation }: Props) {
   return (
     <SafeAreaView style={s.safe} edges={['top', 'left', 'right']}>
       <ScreenHeader title={displayName} onBack={() => navigation.goBack()} />
-      <ScrollView contentContainerStyle={s.content} keyboardShouldPersistTaps="handled">
+      <ScrollView
+        contentContainerStyle={s.content}
+        keyboardShouldPersistTaps="handled"
+        keyboardDismissMode="on-drag"
+      >
         {/* Name */}
         <TextInput
           style={s.nameInput}
@@ -173,60 +267,65 @@ export default function PersonDetailScreen({ route, navigation }: Props) {
           accessibilityLabel={t('person.namePlaceholder')}
         />
 
-        {/* Log a catch-up */}
-        <View style={s.chips}>
-          {INTERACTION_KINDS.map((k) => {
-            const selected = logKind === k;
-            return (
-              <Pressable
-                key={k}
-                onPress={() => setLogKind(k)}
-                accessibilityRole="button"
-                accessibilityState={{ selected }}
-                accessibilityLabel={kindLabel(k)}
-                style={({ pressed }) => [s.chip, selected && s.chipOn, pressed && s.pressed]}
-              >
-                <Text style={[s.chipText, selected && s.chipTextOn]}>{kindLabel(k)}</Text>
-              </Pressable>
-            );
-          })}
-        </View>
-        <TextInput
-          style={[s.input, s.logNote]}
-          value={logNote}
-          onChangeText={setLogNote}
-          placeholder={t('person.logNotePlaceholder')}
-          placeholderTextColor={c.fgSubtle}
-          accessibilityLabel={t('person.logNotePlaceholder')}
-        />
-        <Pressable
-          onPress={onLog}
-          accessibilityRole="button"
-          accessibilityLabel={t('person.reachedOut')}
-          style={({ pressed }) => [s.primaryBtn, pressed && s.pressed]}
-        >
-          <Check size={18} color={c.inkButtonText} strokeWidth={2.5} />
-          <Text style={s.primaryBtnText}>{t('person.reachedOut')}</Text>
-        </Pressable>
-        <Text style={s.status}>{statusText}</Text>
+        {/* The ACTION — logging a catch-up — set apart from the information below.
+            Grouped in its own card under a clear header so it reads as "do this",
+            not as more facts about the person. */}
+        <Text style={s.sectionLabel}>{t('person.logSectionLabel')}</Text>
+        <View style={s.actionCard}>
+          <View style={s.chips}>
+            {INTERACTION_KINDS.map((k) => {
+              const selected = logKind === k;
+              return (
+                <Pressable
+                  key={k}
+                  onPress={() => setLogKind(k)}
+                  accessibilityRole="button"
+                  accessibilityState={{ selected }}
+                  accessibilityLabel={kindLabel(k)}
+                  style={({ pressed }) => [s.chip, selected && s.chipOn, pressed && s.pressed]}
+                >
+                  <Text style={[s.chipText, selected && s.chipTextOn]}>{kindLabel(k)}</Text>
+                </Pressable>
+              );
+            })}
+          </View>
+          <TextInput
+            style={[s.input, s.logNote]}
+            value={logNote}
+            onChangeText={setLogNote}
+            placeholder={t('person.logNotePlaceholder')}
+            placeholderTextColor={c.fgSubtle}
+            accessibilityLabel={t('person.logNotePlaceholder')}
+          />
+          <Pressable
+            onPress={onLog}
+            accessibilityRole="button"
+            accessibilityLabel={t('person.reachedOut')}
+            style={({ pressed }) => [s.primaryBtn, pressed && s.pressed]}
+          >
+            <Check size={18} color={c.inkButtonText} strokeWidth={2.5} />
+            <Text style={s.primaryBtnText}>{t('person.reachedOut')}</Text>
+          </Pressable>
+          <Text style={s.status}>{statusText}</Text>
 
-        {/* History */}
-        {history.length > 0 && (
-          <>
-            <Text style={s.sectionLabel}>{t('person.historyLabel')}</Text>
-            {history.map((i) => (
-              <View key={i.id} style={s.historyRow}>
-                <Text style={s.historyDate}>
-                  {new Date(i.at).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
-                </Text>
-                <Text style={s.historyText}>
-                  {kindLabel(i.kind)}
-                  {i.note ? ` · ${i.note}` : ''}
-                </Text>
-              </View>
-            ))}
-          </>
-        )}
+          {/* Recent catch-ups — history of the action, kept with it */}
+          {history.length > 0 && (
+            <>
+              <Text style={s.historyLabel}>{t('person.historyLabel')}</Text>
+              {history.map((i) => (
+                <View key={i.id} style={s.historyRow}>
+                  <Text style={s.historyDate}>
+                    {new Date(i.at).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+                  </Text>
+                  <Text style={s.historyText}>
+                    {kindLabel(i.kind)}
+                    {i.note ? ` · ${i.note}` : ''}
+                  </Text>
+                </View>
+              ))}
+            </>
+          )}
+        </View>
 
         {/* Cadence */}
         <Text style={s.sectionLabel}>{t('person.cadenceLabel')}</Text>
@@ -470,8 +569,18 @@ function makeStyles(c: Colors) {
     safe: { flex: 1, backgroundColor: c.bg },
     pressed: { opacity: 0.6 },
     flex1: { flex: 1 },
-    content: { ...boundedContent, paddingHorizontal: space.s5, paddingBottom: space.s9 },
+    // Generous bottom padding so the last fields clear the keyboard on both OSes
+    // (and so the floating Save button never sits over the final input).
+    content: { ...boundedContent, paddingHorizontal: space.s5, paddingBottom: 120 },
     nameInput: { ...ty.md, fontFamily: fontFamily.sansSemibold, color: c.fg, paddingVertical: space.s4 },
+    // The action group ("log a catch-up") — a subtle card that separates the one
+    // thing you DO here from the information about the person below it.
+    actionCard: {
+      backgroundColor: c.bgSubtle,
+      borderRadius: radius.md,
+      padding: space.s4,
+      marginTop: space.s2,
+    },
     chips: { flexDirection: 'row', flexWrap: 'wrap', gap: space.s2, marginTop: space.s2 },
     chip: {
       paddingHorizontal: space.s4,
@@ -523,6 +632,17 @@ function makeStyles(c: Colors) {
       paddingVertical: space.s2,
       borderBottomWidth: hairline,
       borderBottomColor: c.hairline,
+    },
+    // Quieter than sectionLabel — it lives INSIDE the action card, so no big
+    // top gap and no uppercase shout competing with the card's own header.
+    historyLabel: {
+      ...ty.xs,
+      fontFamily: fontFamily.sansSemibold,
+      color: c.fgMuted,
+      textTransform: 'uppercase',
+      letterSpacing: 0.5,
+      paddingTop: space.s5,
+      paddingBottom: space.s2,
     },
     historyDate: { ...ty.sm, fontFamily: fontFamily.sansSemibold, color: c.fgMuted, width: 56 },
     historyText: { ...ty.sm, flex: 1, fontFamily: fontFamily.sans, color: c.fg },
@@ -591,5 +711,22 @@ function makeStyles(c: Colors) {
     convBtnText: { ...ty.base, fontFamily: fontFamily.sans, color: c.fg },
     deleteRow: { flexDirection: 'row', alignItems: 'center', gap: space.s2, marginTop: space.s8, paddingVertical: space.s3 },
     deleteText: { ...ty.base, fontFamily: fontFamily.sans, color: c.fgMuted },
+    // Floating Save (new-person mode only) — ink-button pill, bottom-right, same
+    // visual language as PeopleScreen's fab but labeled.
+    saveFab: {
+      position: 'absolute',
+      right: space.s6,
+      bottom: space.s7,
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: space.s2,
+      height: 52,
+      paddingHorizontal: space.s6,
+      borderRadius: radius.pill,
+      backgroundColor: c.inkButton,
+    },
+    saveFabText: { ...ty.base, fontFamily: fontFamily.sansSemibold, color: c.inkButtonText },
+    saveFabDisabled: { opacity: 0.4 },
+    fabPressed: { opacity: 0.85 },
   });
 }

@@ -49,10 +49,10 @@ export default function PeopleScreen({ navigation }: TabScreenProps<'People'>) {
   const { c } = useTheme();
   const s = makeStyles(c);
   const people = usePeopleStore((st) => st.people);
-  const createPerson = usePeopleStore((st) => st.createPerson);
   const logContact = usePeopleStore((st) => st.logContact);
   const importPeople = usePeopleStore((st) => st.importPeople);
   const [status, setStatus] = useState<string | null>(null);
+  const [importing, setImporting] = useState(false);
   const [query, setQuery] = useState('');
 
   const now = Date.now();
@@ -60,34 +60,62 @@ export default function PeopleScreen({ navigation }: TabScreenProps<'People'>) {
   const showSearch = directory.length >= SEARCH_THRESHOLD;
   const visible = showSearch ? searchPeople(people, query) : directory;
 
+  // Draft-based new person: navigate WITHOUT creating, so backing straight out
+  // of a blank screen persists nothing. The record is created on Save.
   const onAdd = () => {
-    const id = createPerson();
-    navigation.navigate('PersonDetail', { personId: id });
+    navigation.navigate('PersonDetail', {});
   };
 
   const onImport = async () => {
-    const res = await importFromContacts();
-    if (res && 'denied' in res) {
-      setStatus(t('data.importDenied'));
-      return;
+    if (importing) return; // guard double-tap
+    setImporting(true);
+    setStatus(t('home.importing'));
+    try {
+      const res = await importFromContacts();
+      if ('denied' in res) {
+        setStatus(t('data.importDenied'));
+        return;
+      }
+      if ('error' in res) {
+        setStatus(t('data.importError'));
+        return;
+      }
+      const n = importPeople(res.people);
+      if (n === 0) {
+        setStatus(t('data.importNone'));
+      } else {
+        setStatus(res.limited ? t('data.importLimited', { count: n }) : t('data.imported', { count: n }));
+      }
+    } finally {
+      setImporting(false);
     }
-    const n = res && 'people' in res ? importPeople(res.people) : 0;
-    setStatus(n > 0 ? t('data.imported', { count: n }) : t('data.importNone'));
   };
 
   return (
     <SafeAreaView style={s.safe} edges={['top', 'left', 'right']}>
       <View style={s.header}>
         <Text style={s.title}>{t('home.title')}</Text>
-        <Pressable
-          onPress={() => navigation.navigate('Settings')}
-          hitSlop={8}
-          accessibilityRole="button"
-          accessibilityLabel={t('settings.title')}
-          style={({ pressed }) => [s.iconBtn, pressed && s.pressed]}
-        >
-          <SettingsIcon size={22} color={c.fg} strokeWidth={1.5} />
-        </Pressable>
+        <View style={s.headerActions}>
+          <Pressable
+            onPress={onImport}
+            disabled={importing}
+            hitSlop={8}
+            accessibilityRole="button"
+            accessibilityLabel={t('home.importContacts')}
+            style={({ pressed }) => [s.iconBtn, pressed && s.pressed, importing && s.pressed]}
+          >
+            <UserPlus size={22} color={c.fg} strokeWidth={1.5} />
+          </Pressable>
+          <Pressable
+            onPress={() => navigation.navigate('Settings')}
+            hitSlop={8}
+            accessibilityRole="button"
+            accessibilityLabel={t('settings.title')}
+            style={({ pressed }) => [s.iconBtn, pressed && s.pressed]}
+          >
+            <SettingsIcon size={22} color={c.fg} strokeWidth={1.5} />
+          </Pressable>
+        </View>
       </View>
 
       {directory.length === 0 ? (
@@ -95,12 +123,13 @@ export default function PeopleScreen({ navigation }: TabScreenProps<'People'>) {
           <EmptyState message={t('home.empty')} />
           <Pressable
             onPress={onImport}
+            disabled={importing}
             accessibilityRole="button"
             accessibilityLabel={t('home.importContacts')}
-            style={({ pressed }) => [s.importBtn, pressed && s.pressed]}
+            style={({ pressed }) => [s.importBtn, pressed && s.pressed, importing && s.pressed]}
           >
             <UserPlus size={18} color={c.fg} strokeWidth={1.5} />
-            <Text style={s.importText}>{t('home.importContacts')}</Text>
+            <Text style={s.importText}>{importing ? t('home.importing') : t('home.importContacts')}</Text>
           </Pressable>
           {status ? <Text style={s.status}>{status}</Text> : null}
         </View>
@@ -197,6 +226,7 @@ function makeStyles(c: Colors) {
       paddingVertical: space.s4,
     },
     title: { ...ty.md, fontFamily: fontFamily.sansSemibold, color: c.fg },
+    headerActions: { flexDirection: 'row', alignItems: 'center' },
     iconBtn: { width: target.min, height: target.min, alignItems: 'center', justifyContent: 'center' },
     listContent: { ...boundedContent, paddingBottom: space.s9 },
     searchRow: {

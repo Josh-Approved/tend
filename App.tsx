@@ -46,7 +46,7 @@ export type TabParamList = {
 
 export type RootStackParamList = {
   Tabs: NavigatorScreenParams<TabParamList> | undefined;
-  PersonDetail: { personId: string };
+  PersonDetail: { personId?: string };
   ConversationDetail: { conversationId: string };
   Settings: undefined;
   Acknowledgements: undefined;
