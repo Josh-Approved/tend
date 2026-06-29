@@ -15,6 +15,7 @@ import { openConversations, hadConversations, conversationDisplayName, type Conv
 import { flavorLabelKey } from '../data/conversationFramework';
 import { EmptyState } from '../components/EmptyState';
 import { HTCIntro } from '../components/HTCIntro';
+import { PersonPicker, type PersonPickResult } from '../components/PersonPicker';
 import { getAppSetting, setAppSetting } from '../storage/kv';
 import { t } from '../i18n';
 import {
@@ -37,6 +38,7 @@ export default function HTCScreen({ navigation }: TabScreenProps<'HTC'>) {
   const conversations = useConversationsStore((st) => st.conversations);
   const createConversation = useConversationsStore((st) => st.createConversation);
   const [introVisible, setIntroVisible] = useState(false);
+  const [pickerVisible, setPickerVisible] = useState(false);
 
   useEffect(() => {
     let active = true;
@@ -59,8 +61,12 @@ export default function HTCScreen({ navigation }: TabScreenProps<'HTC'>) {
   const had = hadConversations(conversations);
   const isEmpty = open.length === 0 && had.length === 0;
 
-  const onAdd = () => {
-    const id = createConversation();
+  const onPick = (result: PersonPickResult) => {
+    setPickerVisible(false);
+    const id =
+      result.kind === 'person'
+        ? createConversation(result.id, result.name)
+        : createConversation();
     navigation.navigate('ConversationDetail', { conversationId: id });
   };
 
@@ -135,13 +141,14 @@ export default function HTCScreen({ navigation }: TabScreenProps<'HTC'>) {
 
       <Pressable
         style={({ pressed }) => [s.fab, pressed && s.fabPressed]}
-        onPress={onAdd}
+        onPress={() => setPickerVisible(true)}
         accessibilityRole="button"
         accessibilityLabel={t('htc.add')}
       >
         <Plus size={24} color={c.inkButtonText} strokeWidth={2} />
       </Pressable>
 
+      <PersonPicker visible={pickerVisible} onClose={() => setPickerVisible(false)} onSelect={onPick} />
       <HTCIntro visible={introVisible} onClose={dismissIntro} />
     </SafeAreaView>
   );

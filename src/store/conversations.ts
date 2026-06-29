@@ -30,6 +30,7 @@ interface ConversationsState {
   createConversation: (personId?: string | null, personName?: string, flavor?: ConversationFlavor) => string;
   getConversation: (id: string) => Conversation | undefined;
   setField: (id: string, field: EditableField, value: string) => void;
+  setPerson: (id: string, personId: string | null, personName: string) => void;
   setFlavor: (id: string, flavor: ConversationFlavor) => void;
   setFlavorField: (id: string, key: string, value: string) => void;
   markHad: (id: string) => void;
@@ -87,6 +88,10 @@ export const useConversationsStore = create<ConversationsState>()((set, get) => 
 
     setField: (id, field, value) => {
       mutate(id, (c) => ({ ...c, [field]: value }));
+    },
+
+    setPerson: (id, personId, personName) => {
+      mutate(id, (c) => ({ ...c, personId, personName }));
     },
 
     setFlavor: (id, flavor) => {

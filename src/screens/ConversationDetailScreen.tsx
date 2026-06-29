@@ -7,14 +7,26 @@
  * opens a short reflection.
  */
 
-import React from 'react';
-import { View, Text, Pressable, TextInput, ScrollView, StyleSheet, Alert } from 'react-native';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import {
+  View,
+  Text,
+  Pressable,
+  TextInput,
+  ScrollView,
+  StyleSheet,
+  Alert,
+  KeyboardAvoidingView,
+  Keyboard,
+  Platform,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Check, Trash2, RotateCcw } from 'lucide-react-native';
+import { Check, Trash2, RotateCcw, Users } from 'lucide-react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../../App';
 import { useConversationsStore } from '../store/conversations';
-import { CONVERSATION_FLAVORS, conversationDisplayName } from '../data/conversation';
+import { CONVERSATION_FLAVORS, conversationDisplayName, type Conversation } from '../data/conversation';
+import { PersonPicker, type PersonPickResult } from '../components/PersonPicker';
 import {
   flavorDef,
   flavorLabelKey,
@@ -46,11 +58,37 @@ export default function ConversationDetailScreen({ route, navigation }: Props) {
   const conversation = useConversationsStore((st) => st.conversations.find((x) => x.id === conversationId));
 
   const setField = useConversationsStore((st) => st.setField);
+  const setPerson = useConversationsStore((st) => st.setPerson);
   const setFlavor = useConversationsStore((st) => st.setFlavor);
   const setFlavorField = useConversationsStore((st) => st.setFlavorField);
   const markHad = useConversationsStore((st) => st.markHad);
   const reopen = useConversationsStore((st) => st.reopen);
   const deleteConversation = useConversationsStore((st) => st.deleteConversation);
+
+  const [pickerVisible, setPickerVisible] = useState(false);
+  // True once the user explicitly deletes, so the unmount guard doesn't also
+  // try to delete (and so a deliberate delete is never second-guessed).
+  const deletedRef = useRef(false);
+
+  // Discard a brand-new, entirely empty conversation when the user leaves, so a
+  // blank shell is never saved (same safeguard as the People tab). Reads the
+  // latest record from the store to avoid a stale closure.
+  const discardIfEmpty = useCallback(() => {
+    if (deletedRef.current) return;
+    const current = useConversationsStore.getState().getConversation(conversationId);
+    if (current && isConversationEmpty(current)) {
+      deletedRef.current = true;
+      deleteConversation(conversationId);
+    }
+  }, [conversationId, deleteConversation]);
+
+  // Back gesture / header back / programmatic pop all route through here.
+  useEffect(() => {
+    const unsub = navigation.addListener('beforeRemove', () => {
+      discardIfEmpty();
+    });
+    return unsub;
+  }, [navigation, discardIfEmpty]);
 
   if (!conversation) {
     navigation.goBack();
@@ -68,6 +106,7 @@ export default function ConversationDetailScreen({ route, navigation }: Props) {
         text: t('person.confirmRemove'),
         style: 'destructive',
         onPress: () => {
+          deletedRef.current = true;
           deleteConversation(conversation.id);
           navigation.goBack();
         },
@@ -75,20 +114,77 @@ export default function ConversationDetailScreen({ route, navigation }: Props) {
     ]);
   };
 
+  // Save = commit & exit. Everything already auto-saves on each keystroke, so
+  // this just dismisses the keyboard and leaves (the beforeRemove guard handles
+  // discarding a blank conversation).
+  const onSave = () => {
+    Keyboard.dismiss();
+    navigation.goBack();
+  };
+
+  const onPickPerson = (result: PersonPickResult) => {
+    setPickerVisible(false);
+    if (result.kind === 'person') {
+      setPerson(conversation.id, result.id, result.name);
+    }
+    // 'new' keeps the current free-text name; nothing to link.
+  };
+
+  // Typing in the free-text name field unlinks any real-person link, so a stale
+  // link can't linger behind a name the user has since edited by hand.
+  const onChangeName = (v: string) => {
+    if (conversation.personId) {
+      setPerson(conversation.id, null, v);
+    } else {
+      setField(conversation.id, 'personName', v);
+    }
+  };
+
+  const isLinked = conversation.personId != null;
+
   return (
     <SafeAreaView style={s.safe} edges={['top', 'left', 'right']}>
       <ScreenHeader title={displayName} onBack={() => navigation.goBack()} />
-      <ScrollView contentContainerStyle={s.content} keyboardShouldPersistTaps="handled">
-        {/* Who */}
-        <Text style={s.sectionLabel}>{t('htc.whoLabel')}</Text>
-        <TextInput
-          style={s.input}
-          value={conversation.personName}
-          onChangeText={(v) => setField(conversation.id, 'personName', v)}
-          placeholder={t('htc.whoPlaceholder')}
-          placeholderTextColor={c.fgSubtle}
-          accessibilityLabel={t('htc.whoLabel')}
-        />
+      <KeyboardAvoidingView style={s.flex} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+        <ScrollView
+          contentContainerStyle={s.content}
+          keyboardShouldPersistTaps="handled"
+          keyboardDismissMode="on-drag"
+        >
+          {/* Who */}
+          <Text style={s.sectionLabel}>{t('htc.whoLabel')}</Text>
+          <TextInput
+            style={s.input}
+            value={conversation.personName}
+            onChangeText={onChangeName}
+            placeholder={t('htc.whoPlaceholder')}
+            placeholderTextColor={c.fgSubtle}
+            accessibilityLabel={t('htc.whoLabel')}
+          />
+          {isLinked ? (
+            <Pressable
+              onPress={() => setPickerVisible(true)}
+              accessibilityRole="button"
+              accessibilityLabel={t('htc.changePerson')}
+              style={({ pressed }) => [s.linkRow, pressed && s.pressed]}
+            >
+              <Users size={16} color={c.appAccent} strokeWidth={1.75} />
+              <Text style={s.linkedText} numberOfLines={1}>
+                {conversation.personName.trim() || t('htc.someone')}
+              </Text>
+              <Text style={s.changeText}>{t('htc.changePerson')}</Text>
+            </Pressable>
+          ) : (
+            <Pressable
+              onPress={() => setPickerVisible(true)}
+              accessibilityRole="button"
+              accessibilityLabel={t('htc.linkExisting')}
+              style={({ pressed }) => [s.linkRow, pressed && s.pressed]}
+            >
+              <Users size={16} color={c.fgMuted} strokeWidth={1.5} />
+              <Text style={s.linkText}>{t('htc.linkExisting')}</Text>
+            </Pressable>
+          )}
 
         {/* Flavor */}
         <Text style={s.sectionLabel}>{t('htc.flavorLabel')}</Text>
@@ -234,16 +330,47 @@ export default function ConversationDetailScreen({ route, navigation }: Props) {
           <Trash2 size={18} color={c.fgMuted} strokeWidth={1.5} />
           <Text style={s.deleteText}>{t('htc.deleteConversation')}</Text>
         </Pressable>
-      </ScrollView>
+        </ScrollView>
+      </KeyboardAvoidingView>
+
+      <Pressable
+        onPress={onSave}
+        accessibilityRole="button"
+        accessibilityLabel={t('common.save')}
+        style={({ pressed }) => [s.saveFab, pressed && s.saveFabPressed]}
+      >
+        <Check size={18} color={c.inkButtonText} strokeWidth={2.5} />
+        <Text style={s.saveFabText}>{t('common.save')}</Text>
+      </Pressable>
+
+      <PersonPicker
+        visible={pickerVisible}
+        onClose={() => setPickerVisible(false)}
+        onSelect={onPickPerson}
+      />
     </SafeAreaView>
   );
+}
+
+/** A brand-new conversation with nothing in it — safe to discard on exit. */
+function isConversationEmpty(c: Conversation): boolean {
+  if (c.personName.trim()) return false;
+  if (c.topic.trim()) return false;
+  if (c.story.trim()) return false;
+  if (c.impact.trim()) return false;
+  if (c.hope.trim()) return false;
+  if (Object.values(c.flavorFields).some((v) => v.trim())) return false;
+  return true;
 }
 
 function makeStyles(c: Colors) {
   return StyleSheet.create({
     safe: { flex: 1, backgroundColor: c.bg },
+    flex: { flex: 1 },
     pressed: { opacity: 0.6 },
-    content: { ...boundedContent, paddingHorizontal: space.s5, paddingBottom: space.s9 },
+    // Generous bottom padding so the last field scrolls clear of the keyboard
+    // and content never hides behind the floating Save button.
+    content: { ...boundedContent, paddingHorizontal: space.s5, paddingBottom: 160 },
     sectionLabel: {
       ...ty.xs,
       fontFamily: fontFamily.sansSemibold,
@@ -317,5 +444,30 @@ function makeStyles(c: Colors) {
     reopenText: { ...ty.sm, fontFamily: fontFamily.sans, color: c.fgMuted },
     deleteRow: { flexDirection: 'row', alignItems: 'center', gap: space.s2, marginTop: space.s8, paddingVertical: space.s3 },
     deleteText: { ...ty.base, fontFamily: fontFamily.sans, color: c.fgMuted },
+    linkRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: space.s2,
+      marginTop: space.s3,
+      paddingVertical: space.s2,
+    },
+    linkText: { ...ty.sm, fontFamily: fontFamily.sans, color: c.fgMuted },
+    linkedText: { flex: 1, ...ty.sm, fontFamily: fontFamily.sansSemibold, color: c.fg },
+    changeText: { ...ty.sm, fontFamily: fontFamily.sansSemibold, color: c.appAccent },
+    saveFab: {
+      position: 'absolute',
+      right: space.s6,
+      bottom: space.s7,
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: space.s2,
+      height: 52,
+      paddingHorizontal: space.s6,
+      borderRadius: radius.pill,
+      backgroundColor: c.inkButton,
+      justifyContent: 'center',
+    },
+    saveFabPressed: { opacity: 0.85 },
+    saveFabText: { ...ty.base, fontFamily: fontFamily.sansSemibold, color: c.inkButtonText },
   });
 }
