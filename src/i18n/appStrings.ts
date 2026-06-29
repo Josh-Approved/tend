@@ -33,10 +33,12 @@ export const APP_STRINGS = {
     comingUpDays: "{name}'s {label} · in {days}d",
     searchPlaceholder: 'Search people',
     searchNoResults: 'No one matches “{query}”.',
+    importing: 'Importing…',
   },
   person: {
     newPerson: 'New person',
     namePlaceholder: 'Their name',
+    logSectionLabel: 'Log a catch-up',
     reachedOut: 'I reached out',
     logKindCall: 'Call',
     logKindText: 'Text',
@@ -191,6 +193,12 @@ export const APP_STRINGS = {
     newConversation: 'New conversation',
     whoLabel: 'Who is this with?',
     whoPlaceholder: 'Their name',
+    pickPersonTitle: 'Who is this with?',
+    someoneNew: 'Someone new',
+    chooseExisting: 'Someone you’re tracking',
+    linkExisting: 'Choose from your people',
+    changePerson: 'Change',
+    noPeopleYet: 'No one in your people list yet.',
     flavorLabel: 'What kind of conversation is this?',
     core: {
       topicLabel: 'What do you need to share or talk about?',
@@ -264,5 +272,7 @@ export const APP_STRINGS = {
     imported: '{count} added',
     importDenied: 'Contacts access was declined.',
     importNone: 'No contacts found to add.',
+    importLimited: '{count} added from the contacts you shared.',
+    importError: 'Couldn’t read your contacts. Please try again.',
   },
 } as const;
