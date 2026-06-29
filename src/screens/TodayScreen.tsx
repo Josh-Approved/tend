@@ -13,6 +13,7 @@ import type { TabScreenProps } from '../../App';
 import { usePeopleStore } from '../store/people';
 import { actionablePeople, dueStatus, upcomingDates, type Person } from '../data/person';
 import { FundingFooter } from '../components/FundingFooter';
+import { usePullRevealFooter } from '../components/usePullRevealFooter';
 import { t } from '../i18n';
 import {
   useTheme,
@@ -44,6 +45,7 @@ export default function TodayScreen({ navigation }: TabScreenProps<'Today'>) {
   const actionable = actionablePeople(people, now);
   const upcoming = upcomingDates(people, now, 14);
   const nothing = actionable.length === 0 && upcoming.length === 0;
+  const { pullToReveal, reveal, onScrollJS } = usePullRevealFooter();
 
   return (
     <SafeAreaView style={s.safe} edges={['top', 'left', 'right']}>
@@ -61,12 +63,21 @@ export default function TodayScreen({ navigation }: TabScreenProps<'Today'>) {
       </View>
 
       {nothing ? (
-        <View style={s.empty}>
-          <Text style={s.emptyTitle}>{t('today.caughtUp')}</Text>
-          <Text style={s.emptySub}>{t('today.caughtUpSub')}</Text>
-        </View>
+        <>
+          <View style={s.empty}>
+            <Text style={s.emptyTitle}>{t('today.caughtUp')}</Text>
+            <Text style={s.emptySub}>{t('today.caughtUpSub')}</Text>
+          </View>
+          <FundingFooter />
+        </>
       ) : (
-        <ScrollView contentContainerStyle={s.content}>
+        <ScrollView
+          style={s.scroll}
+          contentContainerStyle={s.content}
+          onScroll={pullToReveal ? onScrollJS : undefined}
+          scrollEventThrottle={16}
+          alwaysBounceVertical={pullToReveal}
+        >
           {actionable.length > 0 && (
             <>
               <Text style={s.sectionLabel}>{t('today.reachOut')}</Text>
@@ -120,10 +131,11 @@ export default function TodayScreen({ navigation }: TabScreenProps<'Today'>) {
               })}
             </>
           )}
+          <View style={s.footerHolder}>
+            <FundingFooter reveal={reveal} pullToReveal={pullToReveal} />
+          </View>
         </ScrollView>
       )}
-
-      <FundingFooter />
     </SafeAreaView>
   );
 }
@@ -142,7 +154,11 @@ function makeStyles(c: Colors) {
     },
     title: { ...ty.md, fontFamily: fontFamily.sansSemibold, color: c.fg },
     iconBtn: { width: target.min, height: target.min, alignItems: 'center', justifyContent: 'center' },
-    content: { ...boundedContent, paddingHorizontal: space.s5, paddingBottom: space.s9 },
+    scroll: { flex: 1 },
+    // flexGrow lets short content fill the screen so the footer rests at the
+    // BOTTOM of the scroll; over-pull past it reveals the wordmark.
+    content: { ...boundedContent, flexGrow: 1, paddingHorizontal: space.s5, paddingBottom: space.s5 },
+    footerHolder: { marginTop: 'auto' },
     sectionLabel: {
       ...ty.xs,
       fontFamily: fontFamily.sansSemibold,
