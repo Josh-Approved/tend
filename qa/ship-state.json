@@ -39,6 +39,22 @@
       "note": "Android build (new icon) -> Play Internal, FINISHED 2026-06-28 (submission 98b3cd2a). First attempt errored on a gzip-tar artifact; extracted the real .aab + re-submitted; ship-eas.sh hardened.",
       "at": "2026-06-28T22:08:19Z",
       "gitSha": "181b9cfdaf1289fe1ed4151603a1129930505773"
+    },
+    {
+      "stage": "beta-ios",
+      "build": "1.0.0",
+      "source": "claude",
+      "note": "iOS build #7 (marketing 1.0.0) — on-device UX feedback fixes (robust contacts import, draft-based new-person flow with required name + Save FAB, info/action separation, HTC existing-person picker + keyboard-safe scroll + Save) plus full in-app (domain) translation into es/de/fr/it/pt-BR/ja. Built --local + eas submit -> TestFlight, FINISHED (submission 3b476066). Unattended.",
+      "at": "2026-06-30T01:20:43Z",
+      "gitSha": "b59ecf8062eed2547d9a87ba8a264947a96ae97f"
+    },
+    {
+      "stage": "beta-android",
+      "build": "1.0.0",
+      "source": "claude",
+      "note": "Android (same payload as iOS #7) -> Play Internal, FINISHED (submission c6ed19ba). GOTCHA: raw `eas build -p android --local --output X.aab` wrote a gzip-tar (bundle/release/app-release.aab + apk/debug/app-debug.apk), so the first submit ERRORED 'APKs are not allowed for this application'; extracted the real app-release.aab and re-submitted. Next time use the factory ship script (handles extraction) or extract before `eas submit`.",
+      "at": "2026-06-30T01:20:43Z",
+      "gitSha": "b59ecf8062eed2547d9a87ba8a264947a96ae97f"
     }
   ]
 }
