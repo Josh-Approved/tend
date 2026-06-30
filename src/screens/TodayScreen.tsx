@@ -8,6 +8,7 @@
 import React from 'react';
 import { View, Text, Pressable, ScrollView, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { GestureDetector } from 'react-native-gesture-handler';
 import { Settings as SettingsIcon, Check } from 'lucide-react-native';
 import type { TabScreenProps } from '../../App';
 import { usePeopleStore } from '../store/people';
@@ -45,7 +46,14 @@ export default function TodayScreen({ navigation }: TabScreenProps<'Today'>) {
   const actionable = actionablePeople(people, now);
   const upcoming = upcomingDates(people, now, 14);
   const nothing = actionable.length === 0 && upcoming.length === 0;
-  const { pullToReveal, reveal, onScrollJS } = usePullRevealFooter();
+  const {
+    pullToReveal,
+    reveal,
+    gesture,
+    onScrollJS,
+    onScrollViewLayout,
+    onContentSizeChange,
+  } = usePullRevealFooter();
 
   return (
     <SafeAreaView style={s.safe} edges={['top', 'left', 'right']}>
@@ -71,12 +79,16 @@ export default function TodayScreen({ navigation }: TabScreenProps<'Today'>) {
           <FundingFooter />
         </>
       ) : (
+        <GestureDetector gesture={gesture}>
         <ScrollView
           style={s.scroll}
           contentContainerStyle={s.content}
           onScroll={pullToReveal ? onScrollJS : undefined}
           scrollEventThrottle={16}
           alwaysBounceVertical={pullToReveal}
+          overScrollMode={pullToReveal ? 'never' : 'auto'}
+          onLayout={onScrollViewLayout}
+          onContentSizeChange={onContentSizeChange}
         >
           {actionable.length > 0 && (
             <>
@@ -135,6 +147,7 @@ export default function TodayScreen({ navigation }: TabScreenProps<'Today'>) {
             <FundingFooter reveal={reveal} pullToReveal={pullToReveal} />
           </View>
         </ScrollView>
+        </GestureDetector>
       )}
     </SafeAreaView>
   );
