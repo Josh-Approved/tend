@@ -4,6 +4,7 @@
     "home-title": { "text": "Today", "note": "TodayScreen header title (i18n today.title) — the default tab" },
     "seeded-person": { "text": "Mom.*", "note": "the seeded overdue person, shown under 'Reach out' on Today" },
     "reached-out-btn": { "text": "I reached out", "note": "primary button on PersonDetail (i18n person.reachedOut) — logs contact" },
-    "reached-out-confirm": { "text": "Reached out today", "note": "status after logging contact (i18n person.lastReachedToday); absent before the tap, present after" }
+    "reached-out-confirm": { "text": "Reached out today", "note": "status after logging contact (i18n person.lastReachedToday); absent before the tap, present after" },
+    "people-tab": { "text": "People", "note": "the People bottom-tab (i18n nav.people). The T4 survival flow re-reaches the seeded person AFTER logging contact through here: once contacted, they drop off Today's 'Reach out' list, so post-relaunch navigation goes via the full People directory, not Today." }
   }
 }
