@@ -71,6 +71,26 @@
       "note": "Android (versionCode 6, same payload as iOS #9) -> Play Internal, FINISHED (submission 98e75d3c-6fa0-4c05-a69d-daa54f73633a). ship-eas.sh auto-detected the gzip-tar artifact and extracted bundle/release/app-release.aab before submit — the 2026-06-28/30 gotcha is now handled by the script, no manual re-submit needed.",
       "at": "2026-07-01T04:19:19Z",
       "gitSha": "ae5353df9a1ce7aa711c6b5740c19c45a5aa53a1"
+    },
+    {
+      "stage": "beta-ios",
+      "platform": "ios",
+      "version": "1.0.0",
+      "build": null,
+      "source": "send-train",
+      "note": "ios binary uploaded to the beta lane via submit-beta.mjs (non-interactive).",
+      "at": "2026-07-03T16:27:54Z",
+      "gitSha": "e023d63eb96426ccbbc36b63085f389db8b19752"
+    },
+    {
+      "stage": "beta-android",
+      "platform": "android",
+      "version": "1.0.0",
+      "build": null,
+      "source": "send-train",
+      "note": "android binary uploaded to the beta lane via submit-beta.mjs (non-interactive).",
+      "at": "2026-07-03T16:30:38Z",
+      "gitSha": "e023d63eb96426ccbbc36b63085f389db8b19752"
     }
   ]
 }
