@@ -1,0 +1,563 @@
+{
+  "$comment": "Action-coverage registry (Uplevel-3 T3). Every user-facing action mapped to its proof: tier2-assert (a qa/journey.json waypoint) | rntl (a component test) | unit (a trust-core test) | none (a gap to backfill). Maintained by scripts/qa/action-coverage.mjs — it appends new-in-code actions + flags stale ones, never rewrites a proof by hand.",
+  "actions": [
+    {
+      "id": "components/AboutRow#pressable-56",
+      "label": "Pressable (dynamic label)",
+      "where": "src/components/AboutRow.tsx:56",
+      "proof": {
+        "kind": "none"
+      },
+      "note": "Pressable · onPress · dynamic/child-text label"
+    },
+    {
+      "id": "components/Credits#common.back",
+      "label": "common.back",
+      "where": "src/components/Credits.tsx:45",
+      "proof": {
+        "kind": "none"
+      },
+      "note": "Pressable · onPress"
+    },
+    {
+      "id": "components/Credits#pressable-66",
+      "label": "Pressable (dynamic label)",
+      "where": "src/components/Credits.tsx:66",
+      "proof": {
+        "kind": "none"
+      },
+      "note": "Pressable · onPress · dynamic/child-text label"
+    },
+    {
+      "id": "components/DonationModal#donate.supporta11y",
+      "label": "donate.supportA11y",
+      "where": "src/components/DonationModal.tsx:77",
+      "proof": {
+        "kind": "none"
+      },
+      "note": "Pressable · onPress"
+    },
+    {
+      "id": "components/DonationModal#common.maybelater",
+      "label": "common.maybeLater",
+      "where": "src/components/DonationModal.tsx:85",
+      "proof": {
+        "kind": "none"
+      },
+      "note": "Pressable · onPress"
+    },
+    {
+      "id": "components/FundingFooter#about.support",
+      "label": "about.support",
+      "where": "src/components/FundingFooter.tsx:78",
+      "proof": {
+        "kind": "none"
+      },
+      "note": "Pressable · onPress"
+    },
+    {
+      "id": "components/FundingFooter#about.feedback",
+      "label": "about.feedback",
+      "where": "src/components/FundingFooter.tsx:89",
+      "proof": {
+        "kind": "none"
+      },
+      "note": "Pressable · onPress"
+    },
+    {
+      "id": "components/HTCIntro#htc.introdismiss",
+      "label": "htc.introDismiss",
+      "where": "src/components/HTCIntro.tsx:36",
+      "proof": {
+        "kind": "none"
+      },
+      "note": "Pressable · onPress"
+    },
+    {
+      "id": "components/LanguageSetting#pressable-95",
+      "label": "Pressable (dynamic label)",
+      "where": "src/components/LanguageSetting.tsx:95",
+      "proof": {
+        "kind": "none"
+      },
+      "note": "Pressable · onPress · dynamic/child-text label"
+    },
+    {
+      "id": "components/LanguageSetting#common.cancel",
+      "label": "common.cancel",
+      "where": "src/components/LanguageSetting.tsx:113",
+      "proof": {
+        "kind": "none"
+      },
+      "note": "Pressable · onPress"
+    },
+    {
+      "id": "components/LanguageSetting#pressable-114",
+      "label": "Pressable (dynamic label)",
+      "where": "src/components/LanguageSetting.tsx:114",
+      "proof": {
+        "kind": "none"
+      },
+      "note": "Pressable · onPress · dynamic/child-text label"
+    },
+    {
+      "id": "components/LanguageSetting#common.done",
+      "label": "common.done",
+      "where": "src/components/LanguageSetting.tsx:117",
+      "proof": {
+        "kind": "none"
+      },
+      "note": "Pressable · onPress"
+    },
+    {
+      "id": "components/LanguageSetting#pressable-135",
+      "label": "Pressable (dynamic label)",
+      "where": "src/components/LanguageSetting.tsx:135",
+      "proof": {
+        "kind": "none"
+      },
+      "note": "Pressable · onPress · dynamic/child-text label"
+    },
+    {
+      "id": "components/MoreFromJA#pressable-58",
+      "label": "Pressable (dynamic label)",
+      "where": "src/components/MoreFromJA.tsx:58",
+      "proof": {
+        "kind": "none"
+      },
+      "note": "Pressable · onPress · dynamic/child-text label"
+    },
+    {
+      "id": "components/PersonPicker#pressable-66",
+      "label": "Pressable (dynamic label)",
+      "where": "src/components/PersonPicker.tsx:66",
+      "proof": {
+        "kind": "none"
+      },
+      "note": "Pressable · onPress · dynamic/child-text label"
+    },
+    {
+      "id": "components/PersonPicker#common.cancel",
+      "label": "common.cancel",
+      "where": "src/components/PersonPicker.tsx:86",
+      "proof": {
+        "kind": "none"
+      },
+      "note": "Pressable · onPress"
+    },
+    {
+      "id": "components/PersonPicker#htc.someonenew",
+      "label": "htc.someoneNew",
+      "where": "src/components/PersonPicker.tsx:107",
+      "proof": {
+        "kind": "none"
+      },
+      "note": "Pressable · onPress"
+    },
+    {
+      "id": "components/PersonPicker#common.cancel-2",
+      "label": "common.cancel",
+      "where": "src/components/PersonPicker.tsx:139",
+      "proof": {
+        "kind": "none"
+      },
+      "note": "Pressable · onPress"
+    },
+    {
+      "id": "components/ReviewModal#review.leavea11y",
+      "label": "review.leaveA11y",
+      "where": "src/components/ReviewModal.tsx:119",
+      "proof": {
+        "kind": "none"
+      },
+      "note": "Pressable · onPress"
+    },
+    {
+      "id": "components/ReviewModal#common.notnow",
+      "label": "common.notNow",
+      "where": "src/components/ReviewModal.tsx:127",
+      "proof": {
+        "kind": "none"
+      },
+      "note": "Pressable · onPress"
+    },
+    {
+      "id": "components/ScreenHeader#common.back",
+      "label": "common.back",
+      "where": "src/components/ScreenHeader.tsx:35",
+      "proof": {
+        "kind": "none"
+      },
+      "note": "Pressable · onPress"
+    },
+    {
+      "id": "components/SettingsAbout#about.learnmorea11y",
+      "label": "about.learnMoreA11y",
+      "where": "src/components/SettingsAbout.tsx:68",
+      "proof": {
+        "kind": "none"
+      },
+      "note": "Pressable · onPress"
+    },
+    {
+      "id": "screens/ConversationDetailScreen#htc.changeperson",
+      "label": "htc.changePerson",
+      "where": "src/screens/ConversationDetailScreen.tsx:165",
+      "proof": {
+        "kind": "none"
+      },
+      "note": "Pressable · onPress"
+    },
+    {
+      "id": "screens/ConversationDetailScreen#htc.linkexisting",
+      "label": "htc.linkExisting",
+      "where": "src/screens/ConversationDetailScreen.tsx:178",
+      "proof": {
+        "kind": "none"
+      },
+      "note": "Pressable · onPress"
+    },
+    {
+      "id": "screens/ConversationDetailScreen#pressable-195",
+      "label": "Pressable (dynamic label)",
+      "where": "src/screens/ConversationDetailScreen.tsx:195",
+      "proof": {
+        "kind": "none"
+      },
+      "note": "Pressable · onPress · dynamic/child-text label"
+    },
+    {
+      "id": "screens/ConversationDetailScreen#htc.reopen",
+      "label": "htc.reopen",
+      "where": "src/screens/ConversationDetailScreen.tsx:301",
+      "proof": {
+        "kind": "none"
+      },
+      "note": "Pressable · onPress"
+    },
+    {
+      "id": "screens/ConversationDetailScreen#htc.markhad",
+      "label": "htc.markHad",
+      "where": "src/screens/ConversationDetailScreen.tsx:312",
+      "proof": {
+        "kind": "none"
+      },
+      "note": "Pressable · onPress"
+    },
+    {
+      "id": "screens/ConversationDetailScreen#htc.deleteconversation",
+      "label": "htc.deleteConversation",
+      "where": "src/screens/ConversationDetailScreen.tsx:324",
+      "proof": {
+        "kind": "none"
+      },
+      "note": "Pressable · onPress"
+    },
+    {
+      "id": "screens/ConversationDetailScreen#common.save",
+      "label": "common.save",
+      "where": "src/screens/ConversationDetailScreen.tsx:336",
+      "proof": {
+        "kind": "none"
+      },
+      "note": "Pressable · onPress"
+    },
+    {
+      "id": "screens/HTCScreen#pressable-77",
+      "label": "Pressable (dynamic label)",
+      "where": "src/screens/HTCScreen.tsx:77",
+      "proof": {
+        "kind": "none"
+      },
+      "note": "Pressable · onPress · dynamic/child-text label"
+    },
+    {
+      "id": "screens/HTCScreen#htc.whatisthis",
+      "label": "htc.whatIsThis",
+      "where": "src/screens/HTCScreen.tsx:100",
+      "proof": {
+        "kind": "none"
+      },
+      "note": "Pressable · onPress"
+    },
+    {
+      "id": "screens/HTCScreen#settings.title",
+      "label": "settings.title",
+      "where": "src/screens/HTCScreen.tsx:109",
+      "proof": {
+        "kind": "none"
+      },
+      "note": "Pressable · onPress"
+    },
+    {
+      "id": "screens/HTCScreen#htc.add",
+      "label": "htc.add",
+      "where": "src/screens/HTCScreen.tsx:142",
+      "proof": {
+        "kind": "none"
+      },
+      "note": "Pressable · onPress"
+    },
+    {
+      "id": "screens/MeScreen#settings.title",
+      "label": "settings.title",
+      "where": "src/screens/MeScreen.tsx:46",
+      "proof": {
+        "kind": "none"
+      },
+      "note": "Pressable · onPress"
+    },
+    {
+      "id": "screens/MeScreen#me.share",
+      "label": "me.share",
+      "where": "src/screens/MeScreen.tsx:76",
+      "proof": {
+        "kind": "none"
+      },
+      "note": "Pressable · onPress"
+    },
+    {
+      "id": "screens/PeopleScreen#home.importcontacts",
+      "label": "home.importContacts",
+      "where": "src/screens/PeopleScreen.tsx:99",
+      "proof": {
+        "kind": "none"
+      },
+      "note": "Pressable · onPress"
+    },
+    {
+      "id": "screens/PeopleScreen#settings.title",
+      "label": "settings.title",
+      "where": "src/screens/PeopleScreen.tsx:109",
+      "proof": {
+        "kind": "none"
+      },
+      "note": "Pressable · onPress"
+    },
+    {
+      "id": "screens/PeopleScreen#home.importcontacts-2",
+      "label": "home.importContacts",
+      "where": "src/screens/PeopleScreen.tsx:124",
+      "proof": {
+        "kind": "none"
+      },
+      "note": "Pressable · onPress"
+    },
+    {
+      "id": "screens/PeopleScreen#person.cancel",
+      "label": "person.cancel",
+      "where": "src/screens/PeopleScreen.tsx:159",
+      "proof": {
+        "kind": "none"
+      },
+      "note": "Pressable · onPress"
+    },
+    {
+      "id": "screens/PeopleScreen#pressable-180",
+      "label": "Pressable (dynamic label)",
+      "where": "src/screens/PeopleScreen.tsx:180",
+      "proof": {
+        "kind": "none"
+      },
+      "note": "Pressable · onPress · dynamic/child-text label"
+    },
+    {
+      "id": "screens/PeopleScreen#home.markreached",
+      "label": "home.markReached",
+      "where": "src/screens/PeopleScreen.tsx:189",
+      "proof": {
+        "kind": "none"
+      },
+      "note": "Pressable · onPress"
+    },
+    {
+      "id": "screens/PeopleScreen#home.add",
+      "label": "home.add",
+      "where": "src/screens/PeopleScreen.tsx:204",
+      "proof": {
+        "kind": "none"
+      },
+      "note": "Pressable · onPress"
+    },
+    {
+      "id": "screens/PersonDetailScreen#person.nameplaceholder",
+      "label": "person.namePlaceholder",
+      "where": "src/screens/PersonDetailScreen.tsx:137",
+      "proof": {
+        "kind": "none"
+      },
+      "note": "TextInput · onSubmitEditing"
+    },
+    {
+      "id": "screens/PersonDetailScreen#pressable-156",
+      "label": "Pressable (dynamic label)",
+      "where": "src/screens/PersonDetailScreen.tsx:156",
+      "proof": {
+        "kind": "none"
+      },
+      "note": "Pressable · onPress · dynamic/child-text label"
+    },
+    {
+      "id": "screens/PersonDetailScreen#common.save",
+      "label": "common.save",
+      "where": "src/screens/PersonDetailScreen.tsx:172",
+      "proof": {
+        "kind": "none"
+      },
+      "note": "Pressable · onPress"
+    },
+    {
+      "id": "screens/PersonDetailScreen#pressable-279",
+      "label": "Pressable (dynamic label)",
+      "where": "src/screens/PersonDetailScreen.tsx:279",
+      "proof": {
+        "kind": "none"
+      },
+      "note": "Pressable · onPress · dynamic/child-text label"
+    },
+    {
+      "id": "screens/PersonDetailScreen#person.reachedout",
+      "label": "person.reachedOut",
+      "where": "src/screens/PersonDetailScreen.tsx:300",
+      "proof": {
+        "kind": "none"
+      },
+      "note": "Pressable · onPress"
+    },
+    {
+      "id": "screens/PersonDetailScreen#pressable-336",
+      "label": "Pressable (dynamic label)",
+      "where": "src/screens/PersonDetailScreen.tsx:336",
+      "proof": {
+        "kind": "none"
+      },
+      "note": "Pressable · onPress · dynamic/child-text label"
+    },
+    {
+      "id": "screens/PersonDetailScreen#person.remove",
+      "label": "person.remove",
+      "where": "src/screens/PersonDetailScreen.tsx:384",
+      "proof": {
+        "kind": "none"
+      },
+      "note": "Pressable · onPress"
+    },
+    {
+      "id": "screens/PersonDetailScreen#person.adddate",
+      "label": "person.addDate",
+      "where": "src/screens/PersonDetailScreen.tsx:425",
+      "proof": {
+        "kind": "none"
+      },
+      "note": "Pressable · onPress"
+    },
+    {
+      "id": "screens/PersonDetailScreen#person.remove-2",
+      "label": "person.remove",
+      "where": "src/screens/PersonDetailScreen.tsx:441",
+      "proof": {
+        "kind": "none"
+      },
+      "note": "Pressable · onPress"
+    },
+    {
+      "id": "screens/PersonDetailScreen#pressable-456",
+      "label": "Pressable (dynamic label)",
+      "where": "src/screens/PersonDetailScreen.tsx:456",
+      "proof": {
+        "kind": "none"
+      },
+      "note": "Pressable · onPress · dynamic/child-text label"
+    },
+    {
+      "id": "screens/PersonDetailScreen#person.prefplaceholder",
+      "label": "person.prefPlaceholder",
+      "where": "src/screens/PersonDetailScreen.tsx:470",
+      "proof": {
+        "kind": "none"
+      },
+      "note": "TextInput · onSubmitEditing"
+    },
+    {
+      "id": "screens/PersonDetailScreen#person.addpref",
+      "label": "person.addPref",
+      "where": "src/screens/PersonDetailScreen.tsx:480",
+      "proof": {
+        "kind": "none"
+      },
+      "note": "Pressable · onPress"
+    },
+    {
+      "id": "screens/PersonDetailScreen#pressable-503",
+      "label": "Pressable (dynamic label)",
+      "where": "src/screens/PersonDetailScreen.tsx:503",
+      "proof": {
+        "kind": "none"
+      },
+      "note": "Pressable · onPress · dynamic/child-text label"
+    },
+    {
+      "id": "screens/PersonDetailScreen#pressable-529",
+      "label": "Pressable (dynamic label)",
+      "where": "src/screens/PersonDetailScreen.tsx:529",
+      "proof": {
+        "kind": "none"
+      },
+      "note": "Pressable · onPress · dynamic/child-text label"
+    },
+    {
+      "id": "screens/PersonDetailScreen#htc.add",
+      "label": "htc.add",
+      "where": "src/screens/PersonDetailScreen.tsx:542",
+      "proof": {
+        "kind": "none"
+      },
+      "note": "Pressable · onPress"
+    },
+    {
+      "id": "screens/PersonDetailScreen#person.deleteperson",
+      "label": "person.deletePerson",
+      "where": "src/screens/PersonDetailScreen.tsx:553",
+      "proof": {
+        "kind": "none"
+      },
+      "note": "Pressable · onPress"
+    },
+    {
+      "id": "screens/TodayScreen#settings.title",
+      "label": "settings.title",
+      "where": "src/screens/TodayScreen.tsx:62",
+      "proof": {
+        "kind": "none"
+      },
+      "note": "Pressable · onPress"
+    },
+    {
+      "id": "screens/TodayScreen#pressable-100",
+      "label": "Pressable (dynamic label)",
+      "where": "src/screens/TodayScreen.tsx:100",
+      "proof": {
+        "kind": "none"
+      },
+      "note": "Pressable · onPress · dynamic/child-text label"
+    },
+    {
+      "id": "screens/TodayScreen#home.markreached",
+      "label": "home.markReached",
+      "where": "src/screens/TodayScreen.tsx:109",
+      "proof": {
+        "kind": "none"
+      },
+      "note": "Pressable · onPress"
+    },
+    {
+      "id": "screens/TodayScreen#pressable-130",
+      "label": "Pressable (dynamic label)",
+      "where": "src/screens/TodayScreen.tsx:130",
+      "proof": {
+        "kind": "none"
+      },
+      "note": "Pressable · onPress · dynamic/child-text label"
+    }
+  ]
+}
