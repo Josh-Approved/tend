@@ -1,15 +1,16 @@
 /**
- * Person detail — the practical memory you keep about one person, plus your
- * catch-up history. Core loop: pick how you connected (call / text / in person),
- * optionally note what you talked about, tap "I reached out" — it logs the
- * catch-up and resets their clock. Below: cadence, how you met, notes, important
- * dates, and likes/dislikes/gift ideas. Depth accretes a little at a time.
+ * Person detail — the hub for one person. The ACTION (log a catch-up) stays
+ * front and center with its history; everything you *know* about them —
+ * cadence, how you met, notes, important dates, likes & gifts, personality —
+ * is a summary row that opens its own focused sheet (hub-and-spoke, canon
+ * proposal home-maintenance-20260710-1), so the hub reads as a receipt
+ * instead of a wall of forms. Depth still accretes a little at a time.
  */
 
 import React, { useEffect, useRef, useState } from 'react';
 import { View, Text, Pressable, TextInput, ScrollView, StyleSheet, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Check, Plus, Trash2, X, MessageCircleHeart, ChevronRight } from 'lucide-react-native';
+import { Check, Trash2, MessageCircleHeart, ChevronRight } from 'lucide-react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../../App';
 import { usePeopleStore } from '../store/people';
@@ -22,19 +23,17 @@ import {
   daysUntil,
   sortedInteractions,
   personalityValue,
-  CADENCE_PRESETS,
   INTERACTION_KINDS,
-  type PreferenceKind,
   type InteractionKind,
 } from '../data/person';
-import {
-  PERSONALITY_CATALOG,
-  frameworkLabelKey,
-  optionShortKey,
-  optionLabelKey,
-  optionRelateKey,
-} from '../data/personality';
+import { PERSONALITY_CATALOG, optionShortKey } from '../data/personality';
 import { ScreenHeader } from '../components/ScreenHeader';
+import { DrilldownRow } from '../components/DrilldownRow';
+import { CadenceSheet, cadenceLabel } from '../components/CadenceSheet';
+import { PersonTextSheet } from '../components/PersonTextSheet';
+import { DatesSheet } from '../components/DatesSheet';
+import { PrefsSheet } from '../components/PrefsSheet';
+import { PersonalitySheet } from '../components/PersonalitySheet';
 import { t } from '../i18n';
 import {
   useTheme,
@@ -49,9 +48,12 @@ import {
 } from '../theme';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'PersonDetail'>;
+type SheetId = 'cadence' | 'howWeMet' | 'notes' | 'dates' | 'prefs' | 'personality' | null;
 
-function formatMonthDay(month: number, day: number): string {
-  return new Date(2001, month - 1, day).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+/** First line of a prose field, shortened for a summary-row value. */
+function preview(v: string | undefined): string {
+  const line = (v ?? '').trim().split('\n')[0];
+  return line.length > 36 ? `${line.slice(0, 36)}…` : line;
 }
 
 export default function PersonDetailScreen({ route, navigation }: Props) {
@@ -79,11 +81,7 @@ export default function PersonDetailScreen({ route, navigation }: Props) {
 
   const [logKind, setLogKind] = useState<InteractionKind>('call');
   const [logNote, setLogNote] = useState('');
-  const [dateLabel, setDateLabel] = useState('');
-  const [dateMonth, setDateMonth] = useState('');
-  const [dateDay, setDateDay] = useState('');
-  const [prefKind, setPrefKind] = useState<PreferenceKind>('like');
-  const [prefText, setPrefText] = useState('');
+  const [sheet, setSheet] = useState<SheetId>(null);
   // NEW-mode draft: a local cadence + name that aren't persisted until Save.
   const [draftName, setDraftName] = useState('');
   const [draftCadence, setDraftCadence] = useState<number | null>(null);
@@ -104,17 +102,7 @@ export default function PersonDetailScreen({ route, navigation }: Props) {
     return null;
   }
 
-  // Cadence preset labels — used in both new (draft) and edit modes, and depend
-  // on nothing person-specific, so they're computed before the new-mode return.
-  const cadenceLabels: Record<string, string> = {
-    none: t('person.cadenceNone'),
-    weekly: t('person.cadenceWeekly'),
-    biweekly: t('person.cadenceBiweekly'),
-    monthly: t('person.cadenceMonthly'),
-    quarterly: t('person.cadenceQuarterly'),
-  };
-
-  // NEW mode: a calm draft — name (autofocused) + optional cadence + a Save FAB.
+  // NEW mode: a calm draft — name (autofocused) + the cadence row + a Save FAB.
   // Nothing is written to the store until Save, so backing out persists nothing.
   if (isNew) {
     const trimmedName = draftName.trim();
@@ -146,26 +134,12 @@ export default function PersonDetailScreen({ route, navigation }: Props) {
             returnKeyType="done"
             onSubmitEditing={onSave}
           />
-
-          {/* Cadence (optional even before saving) */}
-          <Text style={s.sectionLabel}>{t('person.cadenceLabel')}</Text>
-          <View style={s.chips}>
-            {CADENCE_PRESETS.map((preset) => {
-              const selected = draftCadence === preset.days;
-              return (
-                <Pressable
-                  key={preset.key}
-                  onPress={() => setDraftCadence(preset.days)}
-                  accessibilityRole="button"
-                  accessibilityState={{ selected }}
-                  accessibilityLabel={cadenceLabels[preset.key]}
-                  style={({ pressed }) => [s.chip, selected && s.chipOn, pressed && s.pressed]}
-                >
-                  <Text style={[s.chipText, selected && s.chipTextOn]}>{cadenceLabels[preset.key]}</Text>
-                </Pressable>
-              );
-            })}
-          </View>
+          <DrilldownRow
+            label={t('person.cadenceRow')}
+            value={cadenceLabel(draftCadence)}
+            placeholder={draftCadence == null}
+            onPress={() => setSheet('cadence')}
+          />
         </ScrollView>
 
         {/* Save FAB — disabled until a name is entered (name is required) */}
@@ -179,6 +153,13 @@ export default function PersonDetailScreen({ route, navigation }: Props) {
           <Check size={20} color={c.inkButtonText} strokeWidth={2.5} />
           <Text style={s.saveFabText}>{t('common.save')}</Text>
         </Pressable>
+
+        <CadenceSheet
+          visible={sheet === 'cadence'}
+          value={draftCadence}
+          onClose={() => setSheet(null)}
+          onPick={setDraftCadence}
+        />
       </SafeAreaView>
     );
   }
@@ -204,30 +185,33 @@ export default function PersonDetailScreen({ route, navigation }: Props) {
           ? t('person.logKindInPerson')
           : t('person.logKindOther');
 
-  const prefKinds: PreferenceKind[] = ['like', 'dislike', 'gift'];
-  const prefKindLabel = (k: PreferenceKind) => t(`person.${k}`);
   const history = sortedInteractions(person).slice(0, 6);
   const personConversations = openConversationsForPerson(conversations, person.id);
+
+  // Summary-row values — the hub is a receipt of what's filled in.
+  const nextDate = person.importantDates
+    .map((d) => ({ d, du: daysUntil(nextOccurrence(d, now), now) }))
+    .sort((a, b) => a.du - b.du)[0];
+  const dateValue = nextDate
+    ? `${nextDate.d.label} · ${nextDate.du === 0 ? t('person.dateToday') : t('person.inDays', { days: nextDate.du })}`
+    : t('person.noneYet');
+  const prefsValue =
+    person.preferences.length === 0
+      ? t('person.noneYet')
+      : person.preferences.length === 1
+        ? t('person.oneSaved')
+        : t('person.countSaved', { count: person.preferences.length });
+  const personalityValueText =
+    PERSONALITY_CATALOG.map((cat) => {
+      const v = personalityValue(person, cat.framework);
+      return v ? t(optionShortKey(cat.framework, v)) : null;
+    })
+      .filter(Boolean)
+      .join(' · ') || t('person.notSet');
 
   const onLog = () => {
     logContact(person.id, logKind, logNote);
     setLogNote('');
-  };
-
-  const onAddDate = () => {
-    const month = parseInt(dateMonth, 10);
-    const day = parseInt(dateDay, 10);
-    if (!(month >= 1 && month <= 12) || !(day >= 1 && day <= 31)) return;
-    addImportantDate(person.id, dateLabel.trim() || t('person.datesLabel'), month, day);
-    setDateLabel('');
-    setDateMonth('');
-    setDateDay('');
-  };
-
-  const onAddPref = () => {
-    if (!prefText.trim()) return;
-    addPreference(person.id, prefKind, prefText);
-    setPrefText('');
   };
 
   const onStartConversation = () => {
@@ -327,201 +311,45 @@ export default function PersonDetailScreen({ route, navigation }: Props) {
           )}
         </View>
 
-        {/* Cadence */}
-        <Text style={s.sectionLabel}>{t('person.cadenceLabel')}</Text>
-        <View style={s.chips}>
-          {CADENCE_PRESETS.map((preset) => {
-            const selected = person.cadenceDays === preset.days;
-            return (
-              <Pressable
-                key={preset.key}
-                onPress={() => setCadence(person.id, preset.days)}
-                accessibilityRole="button"
-                accessibilityState={{ selected }}
-                accessibilityLabel={cadenceLabels[preset.key]}
-                style={({ pressed }) => [s.chip, selected && s.chipOn, pressed && s.pressed]}
-              >
-                <Text style={[s.chipText, selected && s.chipTextOn]}>{cadenceLabels[preset.key]}</Text>
-              </Pressable>
-            );
-          })}
-        </View>
-
-        {/* How you met */}
-        <Text style={s.sectionLabel}>{t('person.howWeMetLabel')}</Text>
-        <TextInput
-          style={s.input}
-          value={person.howWeMet ?? ''}
-          onChangeText={(v) => setHowWeMet(person.id, v)}
-          placeholder={t('person.howWeMetPlaceholder')}
-          placeholderTextColor={c.fgSubtle}
-          accessibilityLabel={t('person.howWeMetLabel')}
+        {/* What you know about them — one summary row per dimension; each opens
+            its own focused sheet. */}
+        <Text style={s.sectionLabel}>{t('person.aboutSectionLabel')}</Text>
+        <DrilldownRow
+          label={t('person.cadenceRow')}
+          value={cadenceLabel(person.cadenceDays)}
+          placeholder={person.cadenceDays == null}
+          onPress={() => setSheet('cadence')}
         />
-
-        {/* Notes */}
-        <Text style={s.sectionLabel}>{t('person.notesLabel')}</Text>
-        <TextInput
-          style={s.notes}
-          value={person.notes}
-          onChangeText={(v) => setNotes(person.id, v)}
-          placeholder={t('person.notesPlaceholder')}
-          placeholderTextColor={c.fgSubtle}
-          accessibilityLabel={t('person.notesLabel')}
-          multiline
-          textAlignVertical="top"
+        <DrilldownRow
+          label={t('person.howWeMetLabel')}
+          value={preview(person.howWeMet) || t('person.notSet')}
+          placeholder={!person.howWeMet?.trim()}
+          onPress={() => setSheet('howWeMet')}
         />
-
-        {/* Important dates */}
-        <Text style={s.sectionLabel}>{t('person.datesLabel')}</Text>
-        {person.importantDates.map((d) => {
-          const du = daysUntil(nextOccurrence(d, now), now);
-          const rel = du === 0 ? t('person.dateToday') : t('person.inDays', { days: du });
-          return (
-            <View key={d.id} style={s.listRow}>
-              <Text style={s.listRowText}>
-                {d.label} · {formatMonthDay(d.month, d.day)} · {rel}
-              </Text>
-              <Pressable
-                onPress={() => removeImportantDate(person.id, d.id)}
-                hitSlop={8}
-                accessibilityRole="button"
-                accessibilityLabel={t('person.remove')}
-                style={({ pressed }) => [s.iconBtn, pressed && s.pressed]}
-              >
-                <Trash2 size={16} color={c.fgSubtle} strokeWidth={1.5} />
-              </Pressable>
-            </View>
-          );
-        })}
-        <View style={s.addRow}>
-          <TextInput
-            style={[s.input, s.flex1]}
-            value={dateLabel}
-            onChangeText={setDateLabel}
-            placeholder={t('person.dateLabelPlaceholder')}
-            placeholderTextColor={c.fgSubtle}
-            accessibilityLabel={t('person.dateLabelPlaceholder')}
-          />
-          <TextInput
-            style={[s.input, s.numInput]}
-            value={dateMonth}
-            onChangeText={setDateMonth}
-            placeholder={t('person.monthPlaceholder')}
-            placeholderTextColor={c.fgSubtle}
-            accessibilityLabel={t('person.monthPlaceholder')}
-            keyboardType="number-pad"
-            maxLength={2}
-          />
-          <TextInput
-            style={[s.input, s.numInput]}
-            value={dateDay}
-            onChangeText={setDateDay}
-            placeholder={t('person.dayPlaceholder')}
-            placeholderTextColor={c.fgSubtle}
-            accessibilityLabel={t('person.dayPlaceholder')}
-            keyboardType="number-pad"
-            maxLength={2}
-          />
-          <Pressable
-            onPress={onAddDate}
-            accessibilityRole="button"
-            accessibilityLabel={t('person.addDate')}
-            style={({ pressed }) => [s.addBtn, pressed && s.pressed]}
-          >
-            <Plus size={20} color={c.inkButtonText} strokeWidth={2} />
-          </Pressable>
-        </View>
-
-        {/* Likes / dislikes / gift ideas */}
-        <Text style={s.sectionLabel}>{t('person.prefsLabel')}</Text>
-        {person.preferences.map((pref) => (
-          <View key={pref.id} style={s.listRow}>
-            <Text style={s.prefTag}>{prefKindLabel(pref.kind)}</Text>
-            <Text style={s.listRowText}>{pref.text}</Text>
-            <Pressable
-              onPress={() => removePreference(person.id, pref.id)}
-              hitSlop={8}
-              accessibilityRole="button"
-              accessibilityLabel={t('person.remove')}
-              style={({ pressed }) => [s.iconBtn, pressed && s.pressed]}
-            >
-              <X size={16} color={c.fgSubtle} strokeWidth={1.5} />
-            </Pressable>
-          </View>
-        ))}
-        <View style={s.chips}>
-          {prefKinds.map((k) => {
-            const selected = prefKind === k;
-            return (
-              <Pressable
-                key={k}
-                onPress={() => setPrefKind(k)}
-                accessibilityRole="button"
-                accessibilityState={{ selected }}
-                accessibilityLabel={prefKindLabel(k)}
-                style={({ pressed }) => [s.chip, selected && s.chipOn, pressed && s.pressed]}
-              >
-                <Text style={[s.chipText, selected && s.chipTextOn]}>{prefKindLabel(k)}</Text>
-              </Pressable>
-            );
-          })}
-        </View>
-        <View style={s.addRow}>
-          <TextInput
-            style={[s.input, s.flex1]}
-            value={prefText}
-            onChangeText={setPrefText}
-            onSubmitEditing={onAddPref}
-            placeholder={t('person.prefPlaceholder')}
-            placeholderTextColor={c.fgSubtle}
-            accessibilityLabel={t('person.prefPlaceholder')}
-            returnKeyType="done"
-          />
-          <Pressable
-            onPress={onAddPref}
-            disabled={!prefText.trim()}
-            accessibilityRole="button"
-            accessibilityLabel={t('person.addPref')}
-            style={({ pressed }) => [s.addBtn, pressed && s.pressed, !prefText.trim() && s.addBtnDisabled]}
-          >
-            <Plus size={20} color={c.inkButtonText} strokeWidth={2} />
-          </Pressable>
-        </View>
-
-        {/* Personality — depth as a lookup, not a questionnaire */}
-        <Text style={s.sectionLabel}>{t('person.personalityLabel')}</Text>
-        <Text style={s.personalityHint}>{t('person.personalityHint')}</Text>
-        {PERSONALITY_CATALOG.map((cat) => {
-          const selected = personalityValue(person, cat.framework);
-          return (
-            <View key={cat.framework} style={s.personalityBlock}>
-              <Text style={s.personalitySubLabel}>{t(frameworkLabelKey(cat.framework))}</Text>
-              <View style={s.chips}>
-                {cat.values.map((v) => {
-                  const on = selected === v;
-                  return (
-                    <Pressable
-                      key={v}
-                      onPress={() => setPersonalityType(person.id, cat.framework, on ? null : v)}
-                      accessibilityRole="button"
-                      accessibilityState={{ selected: on }}
-                      accessibilityLabel={t(optionLabelKey(cat.framework, v))}
-                      style={({ pressed }) => [s.chip, on && s.chipOn, pressed && s.pressed]}
-                    >
-                      <Text style={[s.chipText, on && s.chipTextOn]}>{t(optionShortKey(cat.framework, v))}</Text>
-                    </Pressable>
-                  );
-                })}
-              </View>
-              {selected ? (
-                <View style={s.relateCard}>
-                  <Text style={s.relateTitle}>{t(optionLabelKey(cat.framework, selected))}</Text>
-                  <Text style={s.relateBody}>{t(optionRelateKey(cat.framework, selected))}</Text>
-                </View>
-              ) : null}
-            </View>
-          );
-        })}
+        <DrilldownRow
+          label={t('person.notesLabel')}
+          value={preview(person.notes) || t('person.notSet')}
+          placeholder={!person.notes.trim()}
+          onPress={() => setSheet('notes')}
+        />
+        <DrilldownRow
+          label={t('person.datesLabel')}
+          value={dateValue}
+          placeholder={!nextDate}
+          onPress={() => setSheet('dates')}
+        />
+        <DrilldownRow
+          label={t('person.prefsLabel')}
+          value={prefsValue}
+          placeholder={person.preferences.length === 0}
+          onPress={() => setSheet('prefs')}
+        />
+        <DrilldownRow
+          label={t('person.personalityLabel')}
+          value={personalityValueText}
+          placeholder={personalityValueText === t('person.notSet')}
+          onPress={() => setSheet('personality')}
+        />
 
         {/* Conversations to have (Have the Conversation) */}
         <Text style={s.sectionLabel}>{t('htc.personSection')}</Text>
@@ -560,6 +388,50 @@ export default function PersonDetailScreen({ route, navigation }: Props) {
           <Text style={s.deleteText}>{t('person.deletePerson')}</Text>
         </Pressable>
       </ScrollView>
+
+      <CadenceSheet
+        visible={sheet === 'cadence'}
+        value={person.cadenceDays}
+        onClose={() => setSheet(null)}
+        onPick={(days) => setCadence(person.id, days)}
+      />
+      <PersonTextSheet
+        visible={sheet === 'howWeMet'}
+        title={t('person.howWeMetLabel')}
+        value={person.howWeMet ?? ''}
+        placeholder={t('person.howWeMetPlaceholder')}
+        onClose={() => setSheet(null)}
+        onChange={(v) => setHowWeMet(person.id, v)}
+      />
+      <PersonTextSheet
+        visible={sheet === 'notes'}
+        title={t('person.notesLabel')}
+        value={person.notes}
+        placeholder={t('person.notesPlaceholder')}
+        multiline
+        onClose={() => setSheet(null)}
+        onChange={(v) => setNotes(person.id, v)}
+      />
+      <DatesSheet
+        visible={sheet === 'dates'}
+        dates={person.importantDates}
+        onClose={() => setSheet(null)}
+        onAdd={(label, month, day) => addImportantDate(person.id, label, month, day)}
+        onRemove={(id) => removeImportantDate(person.id, id)}
+      />
+      <PrefsSheet
+        visible={sheet === 'prefs'}
+        preferences={person.preferences}
+        onClose={() => setSheet(null)}
+        onAdd={(kind, text) => addPreference(person.id, kind, text)}
+        onRemove={(id) => removePreference(person.id, id)}
+      />
+      <PersonalitySheet
+        visible={sheet === 'personality'}
+        person={person}
+        onClose={() => setSheet(null)}
+        onPick={(framework, value) => setPersonalityType(person.id, framework, value)}
+      />
     </SafeAreaView>
   );
 }
@@ -568,7 +440,6 @@ function makeStyles(c: Colors) {
   return StyleSheet.create({
     safe: { flex: 1, backgroundColor: c.bg },
     pressed: { opacity: 0.6 },
-    flex1: { flex: 1 },
     // Generous bottom padding so the last fields clear the keyboard on both OSes
     // (and so the floating Save button never sits over the final input).
     content: { ...boundedContent, paddingHorizontal: space.s5, paddingBottom: 120 },
@@ -646,15 +517,6 @@ function makeStyles(c: Colors) {
     },
     historyDate: { ...ty.sm, fontFamily: fontFamily.sansSemibold, color: c.fgMuted, width: 56 },
     historyText: { ...ty.sm, flex: 1, fontFamily: fontFamily.sans, color: c.fg },
-    notes: {
-      ...ty.base,
-      fontFamily: fontFamily.sans,
-      color: c.fg,
-      minHeight: 96,
-      borderRadius: radius.md,
-      backgroundColor: c.bgSubtle,
-      padding: space.s4,
-    },
     listRow: {
       flexDirection: 'row',
       alignItems: 'center',
@@ -664,39 +526,6 @@ function makeStyles(c: Colors) {
       borderBottomColor: c.hairline,
     },
     listRowText: { ...ty.base, flex: 1, fontFamily: fontFamily.sans, color: c.fg },
-    prefTag: {
-      ...ty.xs,
-      fontFamily: fontFamily.sansSemibold,
-      color: c.appAccent,
-      textTransform: 'uppercase',
-      letterSpacing: 0.5,
-    },
-    personalityHint: { ...ty.sm, fontFamily: fontFamily.sans, color: c.fgMuted, paddingBottom: space.s2 },
-    personalityBlock: { marginTop: space.s4 },
-    personalitySubLabel: { ...ty.sm, fontFamily: fontFamily.sansSemibold, color: c.fg, paddingBottom: space.s2 },
-    relateCard: {
-      marginTop: space.s3,
-      padding: space.s4,
-      borderRadius: radius.md,
-      backgroundColor: c.bgSubtle,
-      borderLeftWidth: 3,
-      borderLeftColor: c.appAccent,
-      gap: space.s2,
-    },
-    relateTitle: { ...ty.sm, fontFamily: fontFamily.sansSemibold, color: c.appAccent },
-    relateBody: { ...ty.sm, fontFamily: fontFamily.sans, color: c.fg, lineHeight: 20 },
-    addRow: { flexDirection: 'row', alignItems: 'center', gap: space.s2, marginTop: space.s3 },
-    numInput: { width: 56, textAlign: 'center' },
-    addBtn: {
-      width: target.min,
-      height: target.min,
-      borderRadius: radius.md,
-      backgroundColor: c.inkButton,
-      alignItems: 'center',
-      justifyContent: 'center',
-    },
-    addBtnDisabled: { opacity: 0.4 },
-    iconBtn: { width: target.min, height: target.min, alignItems: 'center', justifyContent: 'center' },
     convBtn: {
       flexDirection: 'row',
       alignItems: 'center',

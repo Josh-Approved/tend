@@ -29,3 +29,11 @@ appId: com.joshapproved.tend
 - assertNotVisible: { text: "Reached out today" }
 - tapOn: { text: "I reached out" }
 - assertVisible: { text: "Reached out today" }
+- tapOn: { text: "How often: Weekly" }
+- extendedWaitUntil:
+    visible: { text: "How often do you want to reach out?" }
+    timeout: 10000
+- takeScreenshot: qa/captures/${STORE}/person-cadence
+- tapOn: { text: "Monthly" }
+- assertNotVisible: { text: "How often do you want to reach out?" }
+- assertVisible: { text: ".*How often: Monthly.*" }

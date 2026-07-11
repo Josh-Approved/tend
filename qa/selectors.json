@@ -1,10 +1,41 @@
 {
   "$comment": "Selector registry for Tend. Flows reference @keys, never raw copy. text = Maestro regex (matches visible text OR a11y label, full-match). Anchors target the seeded people (src/qa/fixtures.ts). Wrap a card anchor in .* because rows can merge title+subtitle into one a11y label on iOS.",
   "anchors": {
-    "home-title": { "text": "Today", "note": "TodayScreen header title (i18n today.title) — the default tab" },
-    "seeded-person": { "text": "Mom.*", "note": "the seeded overdue person, shown under 'Reach out' on Today" },
-    "reached-out-btn": { "text": "I reached out", "note": "primary button on PersonDetail (i18n person.reachedOut) — logs contact" },
-    "reached-out-confirm": { "text": "Reached out today", "note": "status after logging contact (i18n person.lastReachedToday); absent before the tap, present after" },
-    "people-tab": { "text": "People", "note": "the People bottom-tab (i18n nav.people). The T4 survival flow re-reaches the seeded person AFTER logging contact through here: once contacted, they drop off Today's 'Reach out' list, so post-relaunch navigation goes via the full People directory, not Today." }
+    "home-title": {
+      "text": "Today",
+      "note": "TodayScreen header title (i18n today.title) \u2014 the default tab"
+    },
+    "seeded-person": {
+      "text": "Mom.*",
+      "note": "the seeded overdue person, shown under 'Reach out' on Today"
+    },
+    "reached-out-btn": {
+      "text": "I reached out",
+      "note": "primary button on PersonDetail (i18n person.reachedOut) \u2014 logs contact"
+    },
+    "reached-out-confirm": {
+      "text": "Reached out today",
+      "note": "status after logging contact (i18n person.lastReachedToday); absent before the tap, present after"
+    },
+    "people-tab": {
+      "text": "People",
+      "note": "the People bottom-tab (i18n nav.people). The T4 survival flow re-reaches the seeded person AFTER logging contact through here: once contacted, they drop off Today's 'Reach out' list, so post-relaunch navigation goes via the full People directory, not Today."
+    },
+    "cadence-row": {
+      "text": "How often: Weekly",
+      "note": "the cadence DrilldownRow a11y label on the seeded person (Mom, weekly) \u2014 `label: value`"
+    },
+    "cadence-sheet-title": {
+      "text": "How often do you want to reach out?",
+      "note": "CadenceSheet header title (i18n person.cadenceLabel) \u2014 proves the spoke sheet opens"
+    },
+    "cadence-monthly": {
+      "text": "Monthly",
+      "note": "the Monthly option in the cadence sheet (i18n person.cadenceMonthly); single-select, returns immediately"
+    },
+    "cadence-row-monthly": {
+      "text": ".*How often: Monthly.*",
+      "note": "the hub row after the pick \u2014 the Tier-2 outcome proof the spoke wrote through"
+    }
   }
 }
