@@ -270,6 +270,77 @@ export function upcomingDates(people: Person[], now: number, withinDays = UPCOMI
 }
 
 /**
+ * A single local reminder to arm with the OS. The scheduling layer
+ * (lib/notifications.ts) turns each into a dated notification; keeping the
+ * "when does it fire" decision here means it's pure and unit-tested directly.
+ */
+export interface PlannedReminder {
+  /** Stable per-reason id, e.g. `reachout:<personId>` or `date:<dateId>`. */
+  key: string;
+  /** Fire time, ms epoch. */
+  at: number;
+  kind: 'reachOut' | 'importantDate';
+  personName: string;
+  /** Present only for importantDate reminders. */
+  dateLabel?: string;
+}
+
+/** 9am local on the day of `dayMs` (a local-midnight ms from nextOccurrence). */
+function morningOf(dayMs: number): number {
+  const d = new Date(dayMs);
+  d.setHours(9, 0, 0, 0);
+  return d.getTime();
+}
+
+/**
+ * Decide which local reminders to arm, given the people and the "already nudged"
+ * marks from last time. THE FIX FOR RELIABLE DELIVERY lives here:
+ *
+ *   - A reach-out whose due moment is in the FUTURE is armed for that exact
+ *     moment. The OS holds it and delivers on time even if the app is never
+ *     reopened — this case must never depend on an app launch. (Re-arming an
+ *     unfired future alarm on each launch is harmless: it just replaces itself.)
+ *   - A reach-out ALREADY overdue when we plan (cadence set on a stale contact,
+ *     or permission granted late) gets one prompt catch-up nudge, then is
+ *     remembered so reopening the app can't re-fire the same due-cycle.
+ *   - Important dates fire the morning of the next occurrence.
+ *
+ * Pure + deterministic (now + marks passed in). Returns the reminders to arm and
+ * the marks to persist — auto-pruned to the people who still have a due cadence.
+ */
+export function planReminders(
+  people: Person[],
+  now: number,
+  marks: Record<string, number> = {},
+  overdueDelayMs = 60_000
+): { reminders: PlannedReminder[]; marks: Record<string, number> } {
+  const reminders: PlannedReminder[] = [];
+  const nextMarks: Record<string, number> = {};
+  for (const p of activePeople(people)) {
+    const name = p.name.trim();
+    const due = dueStatus(p, now);
+    if (due.dueAt != null) {
+      if (due.dueAt > now) {
+        // Future due moment: arm it exactly; the OS delivers with the app closed.
+        reminders.push({ key: `reachout:${p.id}`, at: due.dueAt, kind: 'reachOut', personName: name });
+      } else if (marks[p.id] !== due.dueAt) {
+        // Overdue and not yet nudged for this due-cycle: a single catch-up nudge.
+        reminders.push({ key: `reachout:${p.id}`, at: now + overdueDelayMs, kind: 'reachOut', personName: name });
+      }
+      // Remember this due-cycle either way, so a reopen never re-fires it.
+      nextMarks[p.id] = due.dueAt;
+    }
+    for (const d of p.importantDates) {
+      const at = morningOf(nextOccurrence(d, now));
+      if (at > now) {
+        reminders.push({ key: `date:${d.id}`, at, kind: 'importantDate', personName: name, dateLabel: d.label });
+      }
+    }
+  }
+  return { reminders, marks: nextMarks };
+}
+
+/**
  * Coerce one untrusted parsed object into a safe Person for additive import
  * (canon § Backup Layer 3). Fresh ids so an import never clobbers existing data;
  * unknown shapes are skipped, not crashed on. Pure — unit-tested.

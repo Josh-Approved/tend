@@ -12,7 +12,8 @@
 
 import { Platform } from 'react-native';
 import * as Notifications from 'expo-notifications';
-import { type Person, activePeople, dueStatus, nextOccurrence } from '../data/person';
+import { type Person, type PlannedReminder, planReminders } from '../data/person';
+import { getAppSetting, setAppSetting } from '../storage/kv';
 import { t } from '../i18n';
 
 // Show scheduled reminders even if the app is foregrounded when one fires.
@@ -78,33 +79,57 @@ async function scheduleAt(ms: number, title: string, body: string): Promise<void
   }
 }
 
+/** Copy for one planned reminder, resolved through i18n. */
+function copyFor(r: PlannedReminder): { title: string; body: string } {
+  const name = r.personName || t('person.untitled');
+  if (r.kind === 'importantDate') {
+    return { title: t('notify.dateTitle', { name, label: r.dateLabel ?? '' }), body: t('notify.dateBody') };
+  }
+  return { title: t('notify.reachOutTitle', { name }), body: t('notify.reachOutBody') };
+}
+
+// Which reach-out due-cycles we've already armed a nudge for, so reopening the
+// app can't re-fire an overdue nudge (persisted; keyed by person id → dueAt).
+const MARKS_KEY = 'reachoutNotifiedMarks';
+
+async function loadMarks(): Promise<Record<string, number>> {
+  try {
+    const raw = await getAppSetting(MARKS_KEY);
+    if (!raw) return {};
+    const parsed: unknown = JSON.parse(raw);
+    return parsed && typeof parsed === 'object' ? (parsed as Record<string, number>) : {};
+  } catch {
+    return {};
+  }
+}
+
+async function saveMarks(marks: Record<string, number>): Promise<void> {
+  try {
+    await setAppSetting(MARKS_KEY, JSON.stringify(marks));
+  } catch {
+    // best-effort; a lost mark can only cost one extra nudge, never a missed one
+  }
+}
+
 /**
- * Cancel all and re-schedule from the current people. Safe to call often.
- * Pass { prompt: true } only from an explicit opt-in; otherwise it reschedules
- * only when permission is already granted and never prompts.
+ * Cancel all and re-schedule from the current people. Safe to call often — the
+ * fire-time decisions (and the overdue-nudge dedup) live in the pure
+ * `planReminders`. Pass { prompt: true } only from an explicit opt-in; otherwise
+ * it reschedules only when permission is already granted and never prompts.
  */
 export async function rescheduleAll(people: Person[], opts: { prompt?: boolean } = {}): Promise<void> {
   try {
     const ok = opts.prompt ? await ensureNotificationPermission() : await hasPermission();
     if (!ok) return;
     await ensureChannel();
+    const prevMarks = await loadMarks();
+    const { reminders, marks } = planReminders(people, Date.now(), prevMarks);
     await Notifications.cancelAllScheduledNotificationsAsync();
-    const now = Date.now();
-    for (const p of activePeople(people)) {
-      const name = p.name.trim() || t('person.untitled');
-      const due = dueStatus(p, now);
-      if (due.dueAt != null) {
-        const when = Math.max(due.dueAt, now + 60_000); // never in the past
-        await scheduleAt(when, t('notify.reachOutTitle', { name }), t('notify.reachOutBody'));
-      }
-      for (const d of p.importantDates) {
-        const morning = new Date(nextOccurrence(d, now));
-        morning.setHours(9, 0, 0, 0);
-        if (morning.getTime() > now) {
-          await scheduleAt(morning.getTime(), t('notify.dateTitle', { name, label: d.label }), t('notify.dateBody'));
-        }
-      }
+    for (const r of reminders) {
+      const { title, body } = copyFor(r);
+      await scheduleAt(r.at, title, body);
     }
+    await saveMarks(marks);
   } catch {
     // never throw into the UI
   }
