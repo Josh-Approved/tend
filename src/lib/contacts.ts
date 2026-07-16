@@ -12,7 +12,13 @@
  * exported so they're unit-tested directly with no expo mocks.
  */
 
-import * as Contacts from 'expo-contacts';
+// SDK 56 moved the free-function API (getContactsAsync, Fields, SortTypes,
+// requestPermissionsAsync) to the `/legacy` entry. Importing them from the main
+// "expo-contacts" gives a shim whose getContactsAsync THROWS at runtime — the
+// permission prompt still appears, then the read fails and lands in the catch
+// below as { error: true } ("Couldn't read your contacts"). Pin to /legacy so
+// the whole functional API keeps working unchanged.
+import * as Contacts from 'expo-contacts/legacy';
 import { makePerson, makeImportantDate, type Person } from '../data/person';
 
 export type ContactImportResult =

@@ -43,9 +43,9 @@ jest.mock('../db', () => ({
 jest.mock('../../storage/kv', () => ({ putTombstone: jest.fn(async () => {}) }));
 jest.mock('../../lib/notifications', () => ({ rescheduleAll: jest.fn(async () => {}) }));
 // The store pulls in lib/contacts for the real dedupe (the thing under test),
-// which top-level imports expo-contacts — whose native module won't load under
-// jest. Stub the native surface; the pure dedupe never touches it.
-jest.mock('expo-contacts', () => ({
+// which top-level imports expo-contacts/legacy — whose native module won't load
+// under jest. Stub the native surface; the pure dedupe never touches it.
+jest.mock('expo-contacts/legacy', () => ({
   Fields: {},
   SortTypes: {},
   requestPermissionsAsync: jest.fn(),

@@ -12,7 +12,7 @@ import { describe, it, expect, jest } from '@jest/globals';
 // from ../contacts pulls in that module's top-level `import * as Contacts from
 // 'expo-contacts'`, whose native module won't load under jest. Stub the native
 // surface so the module loads; the pure functions never touch it.
-jest.mock('expo-contacts', () => ({
+jest.mock('expo-contacts/legacy', () => ({
   Fields: {},
   SortTypes: {},
   requestPermissionsAsync: jest.fn(),
