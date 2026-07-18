@@ -17,12 +17,16 @@ appId: com.joshapproved.tend
 - extendedWaitUntil:
     visible: { text: "Mom.*" }
     timeout: 15000
-- tapOn: { text: "Mom.*" }
+- tapOn:
+    text: "Mom.*"
+    retryTapIfNoChange: true
 - extendedWaitUntil:
     visible: { text: "I reached out" }
     timeout: 10000
 - assertNotVisible: { text: "Reached out today" }
-- tapOn: { text: "I reached out" }
+- tapOn:
+    text: "I reached out"
+    retryTapIfNoChange: true
 - assertVisible: { text: "Reached out today" }
 - waitForAnimationToEnd:
     timeout: 1500
@@ -43,11 +47,15 @@ appId: com.joshapproved.tend
 - extendedWaitUntil:
     visible: { text: "Today" }
     timeout: 30000
-- tapOn: { text: "People" }
+- tapOn:
+    text: "People"
+    retryTapIfNoChange: true
 - extendedWaitUntil:
     visible: { text: "Mom.*" }
     timeout: 10000
-- tapOn: { text: "Mom.*" }
+- tapOn:
+    text: "Mom.*"
+    retryTapIfNoChange: true
 - extendedWaitUntil:
     visible: { text: "I reached out" }
     timeout: 10000

@@ -21,19 +21,27 @@ appId: com.joshapproved.tend
     visible: { text: "Mom.*" }
     timeout: 15000
 - takeScreenshot: qa/captures/${STORE}/home
-- tapOn: { text: "Mom.*" }
+- tapOn:
+    text: "Mom.*"
+    retryTapIfNoChange: true
 - extendedWaitUntil:
     visible: { text: "I reached out" }
     timeout: 10000
 - takeScreenshot: qa/captures/${STORE}/person
 - assertNotVisible: { text: "Reached out today" }
-- tapOn: { text: "I reached out" }
+- tapOn:
+    text: "I reached out"
+    retryTapIfNoChange: true
 - assertVisible: { text: "Reached out today" }
-- tapOn: { text: "How often: Weekly" }
+- tapOn:
+    text: "How often: Weekly"
+    retryTapIfNoChange: true
 - extendedWaitUntil:
     visible: { text: "How often do you want to reach out?" }
     timeout: 10000
 - takeScreenshot: qa/captures/${STORE}/person-cadence
-- tapOn: { text: "Monthly" }
+- tapOn:
+    text: "Monthly"
+    retryTapIfNoChange: true
 - assertNotVisible: { text: "How often do you want to reach out?" }
 - assertVisible: { text: ".*How often: Monthly.*" }
