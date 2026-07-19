@@ -1,13 +1,14 @@
 /**
- * Cadence spoke: how often to reach out — the five presets as a full list
- * instead of a chip row on the person hub. Single select; choosing returns
- * immediately (hub-and-spoke pattern, canon proposal home-maintenance-20260710-1).
+ * Cadence spoke: how often to reach out — five short single-select presets,
+ * so they render as OptionChips (design system § Hub-and-spoke drill-downs).
+ * Choosing returns immediately.
  */
 
 import React from 'react';
-import { ScrollView, StyleSheet } from 'react-native';
+import { View, StyleSheet } from 'react-native';
 import { CADENCE_PRESETS } from '../data/person';
-import { DrilldownSheet, SheetOption } from './DrilldownSheet';
+import { DrilldownSheet } from './DrilldownSheet';
+import { OptionChips } from './OptionChips';
 import { t } from '../i18n';
 import { boundedContent, space } from '../theme';
 
@@ -24,25 +25,24 @@ type Props = {
 };
 
 export function CadenceSheet({ visible, value, onClose, onPick }: Props) {
+  const selected = CADENCE_PRESETS.find((p) => p.days === value)?.key ?? 'none';
   return (
     <DrilldownSheet visible={visible} title={t('person.cadenceLabel')} onClose={onClose}>
-      <ScrollView contentContainerStyle={s.list}>
-        {CADENCE_PRESETS.map((preset) => (
-          <SheetOption
-            key={preset.key}
-            label={cadenceLabel(preset.days)}
-            selected={value === preset.days}
-            onPress={() => {
-              onPick(preset.days);
-              onClose();
-            }}
-          />
-        ))}
-      </ScrollView>
+      <View style={s.body}>
+        <OptionChips
+          options={CADENCE_PRESETS.map((p) => ({ key: p.key, label: cadenceLabel(p.days) }))}
+          selectedKey={selected}
+          onPick={(key) => {
+            const preset = CADENCE_PRESETS.find((p) => p.key === key);
+            onPick(preset ? preset.days : null);
+            onClose();
+          }}
+        />
+      </View>
     </DrilldownSheet>
   );
 }
 
 const s = StyleSheet.create({
-  list: { ...boundedContent, paddingBottom: space.s9 },
+  body: { ...boundedContent, paddingHorizontal: space.s6, paddingTop: space.s5 },
 });
