@@ -280,6 +280,8 @@ export default function PersonDetailScreen({ route, navigation }: Props) {
             placeholder={t('person.logNotePlaceholder')}
             placeholderTextColor={c.fgSubtle}
             accessibilityLabel={t('person.logNotePlaceholder')}
+            multiline
+            textAlignVertical="top"
           />
           <Pressable
             onPress={onLog}
@@ -473,7 +475,12 @@ function makeStyles(c: Colors) {
       fontFamily: fontFamily.sans,
       color: c.fg,
     },
-    logNote: { marginTop: space.s3 },
+    logNote: {
+      marginTop: space.s3,
+      minHeight: target.min * 1.6,
+      paddingTop: space.s3,
+      paddingBottom: space.s3,
+    },
     primaryBtn: {
       flexDirection: 'row',
       alignItems: 'center',
