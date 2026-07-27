@@ -22,7 +22,7 @@
       "note": "the People bottom-tab (i18n nav.people). The T4 survival flow re-reaches the seeded person AFTER logging contact through here: once contacted, they drop off Today's 'Reach out' list, so post-relaunch navigation goes via the full People directory, not Today."
     },
     "cadence-row": {
-      "text": "How often: Weekly",
+      "text": "Reach-out reminder: Weekly",
       "note": "the cadence DrilldownRow a11y label on the seeded person (Mom, weekly) \u2014 `label: value`"
     },
     "cadence-sheet-title": {
@@ -34,7 +34,7 @@
       "note": "the Monthly option in the cadence sheet (i18n person.cadenceMonthly); single-select, returns immediately"
     },
     "cadence-row-monthly": {
-      "text": ".*How often: Monthly.*",
+      "text": ".*Reach-out reminder: Monthly.*",
       "note": "the hub row after the pick \u2014 the Tier-2 outcome proof the spoke wrote through"
     }
   }

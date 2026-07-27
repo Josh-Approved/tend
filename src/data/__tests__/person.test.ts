@@ -181,6 +181,57 @@ describe('planReminders — reliable scheduling', () => {
     expect(date?.at).toBeGreaterThan(now);
     expect(date?.dateLabel).toBe('Birthday');
   });
+
+  describe('birthday reminders on/off', () => {
+    const d = new Date(now);
+    const soonMonth = d.getMonth() + 1;
+    const soonDay = d.getDate() + 2;
+    const withDates = () =>
+      at('Both', {
+        importantDates: [
+          makeImportantDate('Birthday', soonMonth, soonDay),
+          makeImportantDate('Anniversary', soonMonth, soonDay),
+        ],
+      });
+    const dateLabels = (r: ReturnType<typeof planReminders>) =>
+      r.reminders.filter((x) => x.kind === 'importantDate').map((x) => x.dateLabel);
+
+    it('birthdays are planned by default (no opts, and opts omitted flag)', () => {
+      expect(dateLabels(planReminders([withDates()], now, {}))).toEqual(['Birthday', 'Anniversary']);
+      expect(dateLabels(planReminders([withDates()], now, {}, 60_000, {}))).toEqual([
+        'Birthday',
+        'Anniversary',
+      ]);
+      expect(dateLabels(planReminders([withDates()], now, {}, 60_000, { excludeBirthdays: false }))).toEqual([
+        'Birthday',
+        'Anniversary',
+      ]);
+    });
+
+    it('excludeBirthdays drops ONLY the birthday; other dates still plan', () => {
+      const r = planReminders([withDates()], now, {}, 60_000, { excludeBirthdays: true });
+      expect(dateLabels(r)).toEqual(['Anniversary']);
+    });
+
+    it('a lowercase "birthday" label is excluded too (same canonical concept)', () => {
+      const p = at('Lower', { importantDates: [makeImportantDate('  birthday ', soonMonth, soonDay)] });
+      expect(dateLabels(planReminders([p], now, {}, 60_000, { excludeBirthdays: true }))).toEqual([]);
+      expect(dateLabels(planReminders([p], now, {}))).toEqual(['birthday']);
+    });
+
+    it('never touches reach-out reminders or the marks', () => {
+      const p = at('Mom', {
+        cadenceDays: 7,
+        lastContactedAt: now - 2 * DAY_MS,
+        importantDates: [makeImportantDate('Birthday', soonMonth, soonDay)],
+      });
+      const due = now - 2 * DAY_MS + 7 * DAY_MS;
+      const off = planReminders([p], now, {}, 60_000, { excludeBirthdays: true });
+      expect(reachoutFor(p.id, off)?.at).toBe(due);
+      expect(off.marks[p.id]).toBe(due);
+      expect(dateLabels(off)).toEqual([]);
+    });
+  });
 });
 
 describe('daysSinceContact', () => {

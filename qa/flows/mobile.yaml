@@ -34,7 +34,7 @@ appId: com.joshapproved.tend
     retryTapIfNoChange: true
 - assertVisible: { text: "Reached out today" }
 - tapOn:
-    text: "How often: Weekly"
+    text: "Reach-out reminder: Weekly"
     retryTapIfNoChange: true
 - extendedWaitUntil:
     visible: { text: "How often do you want to reach out?" }
@@ -44,4 +44,4 @@ appId: com.joshapproved.tend
     text: "Monthly"
     retryTapIfNoChange: true
 - assertNotVisible: { text: "How often do you want to reach out?" }
-- assertVisible: { text: ".*How often: Monthly.*" }
+- assertVisible: { text: ".*Reach-out reminder: Monthly.*" }

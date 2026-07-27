@@ -229,14 +229,14 @@ describe('setHowWeMet', () => {
 
 // ── important dates ──────────────────────────────────────────────────────────
 describe('important dates', () => {
-  it('adds a date and re-syncs notifications', () => {
+  it('adds a date and reschedules WITH a prompt (adding a date is the opt-in)', () => {
     const id = store().createPerson('Ada');
     mReschedule.mockClear();
     store().addImportantDate(id, 'Birthday', 3, 14, 1990);
     const dates = store().getPerson(id)!.importantDates;
     expect(dates).toHaveLength(1);
     expect(dates[0]).toMatchObject({ label: 'Birthday', month: 3, day: 14, year: 1990 });
-    expect(mReschedule).toHaveBeenCalledWith(store().people);
+    expect(mReschedule).toHaveBeenCalledWith(store().people, { prompt: true });
   });
 
   it('removes exactly the targeted date, keeping the others', () => {
@@ -263,6 +263,13 @@ describe('important dates', () => {
     expect(births).toHaveLength(1);
     expect(births[0]).toMatchObject({ month: 4, day: 20 });
     expect(dates.some((d) => d.label === 'Anniversary')).toBe(true);
+  });
+
+  it('setBirthday reschedules WITH a prompt (saving a birthday is the opt-in)', () => {
+    const id = store().createPerson('Ada');
+    mReschedule.mockClear();
+    store().setBirthday(id, 3, 14);
+    expect(mReschedule).toHaveBeenCalledWith(store().people, { prompt: true });
   });
 
   it('clearBirthday removes the birthday but keeps other dates', () => {
@@ -375,10 +382,20 @@ describe('importPeople', () => {
     expect(mReschedule).not.toHaveBeenCalled();
   });
 
-  it('re-syncs notifications when it actually adds someone', () => {
+  it('re-syncs WITHOUT a prompt when the added people carry no dates', () => {
     mReschedule.mockClear();
     store().importPeople([makePerson('Ada')]);
-    expect(mReschedule).toHaveBeenCalledWith(store().people);
+    expect(mReschedule).toHaveBeenCalledWith(store().people, { prompt: false });
+  });
+
+  it('re-syncs WITH a prompt when the added people bring important dates', () => {
+    mReschedule.mockClear();
+    const withDate: Person = {
+      ...makePerson('Bo'),
+      importantDates: [{ id: 'd1', label: 'Birthday', month: 3, day: 14 }],
+    };
+    store().importPeople([withDate]);
+    expect(mReschedule).toHaveBeenCalledWith(store().people, { prompt: true });
   });
 });
 

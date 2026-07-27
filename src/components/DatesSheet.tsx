@@ -157,6 +157,8 @@ export function DatesSheet({
             {formatMonthDay(birthday.month, birthday.day)} · {relativeSuffix(birthday, now)}
           </Text>
         )}
+        {/* Says what saving a birthday actually does, and where to undo it. */}
+        <Text style={s.hint}>{t('person.birthdayReminderHint')}</Text>
 
         {/* Other dates — anniversaries, the day you met, anything else. */}
         <Text style={[s.sectionLabel, s.sectionLabelSpaced]}>{t('person.otherDatesLabel')}</Text>
@@ -235,6 +237,7 @@ function makeStyles(c: Colors) {
     },
     sectionLabelSpaced: { paddingTop: space.s7 },
     birthdayCurrent: { ...ty.sm, fontFamily: fontFamily.sans, color: c.fgMuted, paddingTop: space.s3 },
+    hint: { ...ty.sm, fontFamily: fontFamily.sans, color: c.fgMuted, paddingTop: space.s3 },
     listRow: {
       flexDirection: 'row',
       alignItems: 'center',

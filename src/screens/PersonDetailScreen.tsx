@@ -1,10 +1,11 @@
 /**
  * Person detail — the hub for one person. The ACTION (log a catch-up) stays
- * front and center with its history; everything you *know* about them —
- * cadence, how you met, notes, important dates, likes & gifts, personality —
- * is a summary row that opens its own focused sheet (hub-and-spoke, canon
- * proposal home-maintenance-20260710-1), so the hub reads as a receipt
- * instead of a wall of forms. Depth still accretes a little at a time.
+ * front and center with its history; below it the reminder machinery (how often
+ * to reach out, important dates) and then everything you *know* about them (how
+ * you met, notes, likes & gifts, personality). Each is a summary row that opens
+ * its own focused sheet (hub-and-spoke, canon proposal
+ * home-maintenance-20260710-1), so the hub reads as a receipt instead of a wall
+ * of forms. Depth still accretes a little at a time.
  */
 
 import React, { useEffect, useRef, useState } from 'react';
@@ -331,15 +332,25 @@ export default function PersonDetailScreen({ route, navigation }: Props) {
           )}
         </View>
 
-        {/* What you know about them — one summary row per dimension; each opens
-            its own focused sheet. */}
-        <Text style={s.sectionLabel}>{t('person.aboutSectionLabel')}</Text>
+        {/* When the app should nudge you — the reminder machinery, kept apart
+            from the facts below so "About them" is only what you know. */}
+        <Text style={s.sectionLabel}>{t('person.remindersSectionLabel')}</Text>
         <DrilldownRow
           label={t('person.cadenceRow')}
           value={cadenceLabel(person.cadenceDays)}
           placeholder={person.cadenceDays == null}
           onPress={() => setSheet('cadence')}
         />
+        <DrilldownRow
+          label={t('person.datesLabel')}
+          value={dateValue}
+          placeholder={!nextDate}
+          onPress={() => setSheet('dates')}
+        />
+
+        {/* What you know about them — one summary row per dimension; each opens
+            its own focused sheet. */}
+        <Text style={s.sectionLabel}>{t('person.aboutSectionLabel')}</Text>
         <DrilldownRow
           label={t('person.howWeMetLabel')}
           value={preview(person.howWeMet) || t('person.notSet')}
@@ -351,12 +362,6 @@ export default function PersonDetailScreen({ route, navigation }: Props) {
           value={preview(person.notes) || t('person.notSet')}
           placeholder={!person.notes.trim()}
           onPress={() => setSheet('notes')}
-        />
-        <DrilldownRow
-          label={t('person.datesLabel')}
-          value={dateValue}
-          placeholder={!nextDate}
-          onPress={() => setSheet('dates')}
         />
         <DrilldownRow
           label={t('person.prefsLabel')}

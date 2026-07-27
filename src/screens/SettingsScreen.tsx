@@ -1,12 +1,13 @@
 /**
- * Settings / About. App-specific settings (import from contacts + the "Your data"
- * export/import rows) sit ABOVE the canonical About block, which is the shared
+ * Settings / About. App-specific settings (the birthday-reminder toggle, import
+ * from contacts, and the "Your data" export/import rows) sit ABOVE the canonical
+ * About block, which is the shared
  * <SettingsAbout/> component — the canonical entries are the floor, not the
  * ceiling (canon § Settings / About).
  */
 
-import React, { useCallback, useState } from 'react';
-import { Text, ScrollView, StyleSheet } from 'react-native';
+import React, { useCallback, useEffect, useState } from 'react';
+import { View, Text, ScrollView, Switch, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Upload, Download, UserPlus } from 'lucide-react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -15,6 +16,11 @@ import { usePeopleStore } from '../store/people';
 import { useConversationsStore } from '../store/conversations';
 import { useMeStore } from '../store/me';
 import { exportData, pickAndParseData } from '../lib/transfer';
+import {
+  getBirthdayRemindersEnabled,
+  setBirthdayRemindersEnabled,
+  rescheduleAll,
+} from '../lib/notifications';
 import { ContactPicker } from '../components/ContactPicker';
 import type { Person } from '../data/person';
 import { AboutRow } from '../components/AboutRow';
@@ -25,7 +31,9 @@ import {
   useTheme,
   fontFamily,
   space,
+  target,
   type as ty,
+  hairline,
   boundedContent,
   type Colors,
   AppearanceToggle,
@@ -44,6 +52,30 @@ export default function SettingsScreen({ navigation }: Props) {
   const importMe = useMeStore((st) => st.importProfile);
   const [status, setStatus] = useState<string | null>(null);
   const [pickerOpen, setPickerOpen] = useState(false);
+  // Birthday reminders default ON; read the stored value once on mount.
+  const [birthdayReminders, setBirthdayReminders] = useState(true);
+
+  useEffect(() => {
+    let alive = true;
+    getBirthdayRemindersEnabled().then((v) => {
+      if (alive) setBirthdayReminders(v);
+    });
+    return () => {
+      alive = false;
+    };
+  }, []);
+
+  const onToggleBirthdayReminders = useCallback(
+    (next: boolean) => {
+      setBirthdayReminders(next);
+      setBirthdayRemindersEnabled(next)
+        // Apply immediately: turning it off cancels the armed birthday alarms,
+        // turning it back on re-arms them. Never prompts from here.
+        .then(() => rescheduleAll(usePeopleStore.getState().people))
+        .catch(() => {});
+    },
+    []
+  );
 
   const onPicked = useCallback(
     (chosen: Person[]) => {
@@ -85,6 +117,24 @@ export default function SettingsScreen({ navigation }: Props) {
           }}
         />
 
+        <Text style={s.sectionLabel}>{t('settings.reminders')}</Text>
+        <View style={s.toggleRow}>
+          <View style={s.toggleText} importantForAccessibility="no-hide-descendants">
+            <Text style={s.toggleTitle}>{t('settings.birthdayReminders')}</Text>
+            <Text style={s.toggleHint}>{t('settings.birthdayRemindersHint')}</Text>
+          </View>
+          <Switch
+            value={birthdayReminders}
+            onValueChange={onToggleBirthdayReminders}
+            trackColor={{ false: c.hairlineStrong, true: c.fg }}
+            thumbColor={c.bgElevated}
+            ios_backgroundColor={c.hairlineStrong}
+            accessibilityRole="switch"
+            accessibilityLabel={t('settings.birthdayReminders')}
+            accessibilityState={{ checked: birthdayReminders }}
+          />
+        </View>
+
         <Text style={s.sectionLabel}>{t('settings.yourData')}</Text>
         <AboutRow label={t('home.importContacts')} icon={UserPlus} onPress={() => setPickerOpen(true)} />
         <AboutRow label={t('settings.export')} icon={Upload} onPress={onExport} />
@@ -120,5 +170,20 @@ function makeStyles(c: Colors) {
       paddingHorizontal: space.s6,
       paddingTop: space.s4,
     },
+    // Same hairline row rhythm as AboutRow, with the native switch trailing —
+    // the platform metaphor for an on/off setting.
+    toggleRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: space.s4,
+      minHeight: target.min + 6,
+      paddingVertical: space.s3,
+      paddingHorizontal: space.s6,
+      borderBottomWidth: hairline,
+      borderBottomColor: c.hairline,
+    },
+    toggleText: { flex: 1, gap: 2 },
+    toggleTitle: { ...ty.base, fontFamily: fontFamily.sans, color: c.fg },
+    toggleHint: { ...ty.sm, fontFamily: fontFamily.sans, color: c.fgMuted },
   });
 }

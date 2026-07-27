@@ -331,6 +331,19 @@ function morningOf(dayMs: number): number {
 }
 
 /**
+ * Options for `planReminders`. Every field is optional and defaults to the
+ * previous behaviour, so existing call sites keep working unchanged.
+ */
+export interface PlanRemindersOptions {
+  /**
+   * Skip birthday-labeled important dates (the "Birthday reminders" setting is
+   * off). Non-birthday dates are always planned — the user typed those in one
+   * at a time, so each one is its own explicit opt-in. Default: false.
+   */
+  excludeBirthdays?: boolean;
+}
+
+/**
  * Decide which local reminders to arm, given the people and the "already nudged"
  * marks from last time. THE FIX FOR RELIABLE DELIVERY lives here:
  *
@@ -341,16 +354,20 @@ function morningOf(dayMs: number): number {
  *   - A reach-out ALREADY overdue when we plan (cadence set on a stale contact,
  *     or permission granted late) gets one prompt catch-up nudge, then is
  *     remembered so reopening the app can't re-fire the same due-cycle.
- *   - Important dates fire the morning of the next occurrence.
+ *   - Important dates fire the morning of the next occurrence. Birthdays are on
+ *     by default and can be switched off wholesale (`excludeBirthdays`); every
+ *     other date always plans.
  *
- * Pure + deterministic (now + marks passed in). Returns the reminders to arm and
- * the marks to persist — auto-pruned to the people who still have a due cadence.
+ * Pure + deterministic (now + marks + opts passed in). Returns the reminders to
+ * arm and the marks to persist — auto-pruned to the people who still have a due
+ * cadence.
  */
 export function planReminders(
   people: Person[],
   now: number,
   marks: Record<string, number> = {},
-  overdueDelayMs = 60_000
+  overdueDelayMs = 60_000,
+  opts: PlanRemindersOptions = {}
 ): { reminders: PlannedReminder[]; marks: Record<string, number> } {
   const reminders: PlannedReminder[] = [];
   const nextMarks: Record<string, number> = {};
@@ -369,6 +386,7 @@ export function planReminders(
       nextMarks[p.id] = due.dueAt;
     }
     for (const d of p.importantDates) {
+      if (opts.excludeBirthdays && isBirthday(d)) continue;
       const at = morningOf(nextOccurrence(d, now));
       if (at > now) {
         reminders.push({ key: `date:${d.id}`, at, kind: 'importantDate', personName: name, dateLabel: d.label });

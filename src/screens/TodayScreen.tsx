@@ -121,6 +121,8 @@ export default function TodayScreen({ navigation }: TabScreenProps<'Today'>) {
                       <Text style={s.rowTitle}>{displayName}</Text>
                       <Text style={s.rowSub}>{reachSubline(person, now)}</Text>
                     </Pressable>
+                    {/* A labeled pill, not a bare check — the one-tap action
+                        says what it does. Accent-outlined, ≥44pt tall. */}
                     <Pressable
                       onPress={() => onReachedOut(person.id)}
                       hitSlop={8}
@@ -128,7 +130,8 @@ export default function TodayScreen({ navigation }: TabScreenProps<'Today'>) {
                       accessibilityLabel={t('home.markReached', { name: displayName })}
                       style={({ pressed }) => [s.reachBtn, pressed && s.pressed]}
                     >
-                      <Check size={18} color={c.accent} strokeWidth={2} />
+                      <Check size={16} color={c.accent} strokeWidth={2} />
+                      <Text style={s.reachBtnText}>{t('today.reachedOut')}</Text>
                     </Pressable>
                   </View>
                 );
@@ -215,14 +218,17 @@ function makeStyles(c: Colors) {
     rowTitle: { ...ty.base, fontFamily: fontFamily.sans, color: c.fg },
     rowSub: { ...ty.sm, fontFamily: fontFamily.sansSemibold, color: c.appAccent },
     reachBtn: {
-      width: 40,
-      height: 40,
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: space.s2,
+      minHeight: target.min,
+      paddingHorizontal: space.s4,
       borderRadius: radius.pill,
       borderWidth: 1.5,
       borderColor: c.accent,
-      alignItems: 'center',
-      justifyContent: 'center',
     },
+    reachBtnText: { ...ty.sm, fontFamily: fontFamily.sansSemibold, color: c.fg },
     comingRow: { paddingVertical: space.s2 },
     comingText: { ...ty.sm, fontFamily: fontFamily.sans, color: c.appAccent },
     empty: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: space.s7, gap: space.s2 },

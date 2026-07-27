@@ -136,7 +136,10 @@ export const usePeopleStore = create<PeopleState>()((set, get) => {
         ...p,
         importantDates: [...p.importantDates, makeImportantDate(label, month, day, year)],
       }));
-      syncNotifications();
+      // Saving a date IS the point of value — the one moment it's fair to ask
+      // for notification permission (and rescheduleAll only asks if the date
+      // actually produces a reminder).
+      rescheduleAll(get().people, { prompt: true }).catch(() => {});
     },
 
     removeImportantDate: (id, dateId) => {
@@ -146,7 +149,9 @@ export const usePeopleStore = create<PeopleState>()((set, get) => {
 
     setBirthday: (id, month, day, year) => {
       mutate(id, (p) => ({ ...p, importantDates: withBirthday(p.importantDates, month, day, year) }));
-      syncNotifications();
+      // Same point-of-value opt-in as addImportantDate — saving a birthday is
+      // the user asking to be reminded of it.
+      rescheduleAll(get().people, { prompt: true }).catch(() => {});
     },
 
     clearBirthday: (id) => {
@@ -183,7 +188,11 @@ export const usePeopleStore = create<PeopleState>()((set, get) => {
       if (toAdd.length === 0) return 0;
       set((s) => ({ people: [...toAdd, ...s.people] }));
       for (const p of toAdd) persist(p);
-      syncNotifications();
+      // An import that brings in birthdays/anniversaries is the same point of
+      // value as typing one in — but only then. A plain name-only import never
+      // raises the permission dialog.
+      const broughtDates = toAdd.some((p) => p.importantDates.length > 0);
+      rescheduleAll(get().people, { prompt: broughtDates }).catch(() => {});
       return toAdd.length;
     },
   };

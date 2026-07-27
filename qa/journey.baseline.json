@@ -11,6 +11,14 @@
     "reached-out-confirm": {
       "text": "Reached out today",
       "id": null
+    },
+    "cadence-monthly": {
+      "text": "Reach-out reminder: Monthly",
+      "id": null
+    },
+    "cadence-row-monthly": {
+      "text": "Reach-out reminder: Monthly",
+      "id": null
     }
   }
 }

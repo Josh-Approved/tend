@@ -4,9 +4,10 @@
  *   - a "time to reach out" nudge when someone is due (per their cadence), and
  *   - a morning-of reminder for each upcoming important date.
  *
- * Permission is only ever *requested* on an explicit opt-in (setting a cadence) —
- * never on cold launch. Background re-syncs reschedule only if already granted, so
- * the app never nags. Everything is best-effort and defensive: if permission is
+ * Permission is only ever *requested* on an explicit opt-in (setting a cadence,
+ * or saving a birthday / important date) — never on cold launch, and only when
+ * the opt-in actually produces a reminder to arm. Background re-syncs reschedule
+ * only if already granted, so the app never nags. Everything is best-effort and defensive: if permission is
  * denied or the OS throws, it no-ops; the app never depends on it. Copy via t().
  */
 
@@ -112,18 +113,50 @@ async function saveMarks(marks: Record<string, number>): Promise<void> {
 }
 
 /**
+ * "Remind me about birthdays" — ON unless the user turned it off in Settings.
+ * A birthday you typed in is a thing you want to be reminded of, so the default
+ * is on; the permission ask still only happens at the point of value (saving a
+ * date), never at launch. Stored as a plain app setting so it survives restarts.
+ */
+export const BIRTHDAY_REMINDERS_KEY = 'birthdayRemindersEnabled';
+
+export async function getBirthdayRemindersEnabled(): Promise<boolean> {
+  try {
+    const raw = await getAppSetting(BIRTHDAY_REMINDERS_KEY);
+    // Unset = on. Only an explicit "0" turns them off.
+    return raw !== '0';
+  } catch {
+    return true;
+  }
+}
+
+export async function setBirthdayRemindersEnabled(enabled: boolean): Promise<void> {
+  try {
+    await setAppSetting(BIRTHDAY_REMINDERS_KEY, enabled ? '1' : '0');
+  } catch {
+    // best-effort; the toggle still reflects the session's choice
+  }
+}
+
+/**
  * Cancel all and re-schedule from the current people. Safe to call often — the
  * fire-time decisions (and the overdue-nudge dedup) live in the pure
  * `planReminders`. Pass { prompt: true } only from an explicit opt-in; otherwise
  * it reschedules only when permission is already granted and never prompts.
+ *
+ * The plan is computed BEFORE the permission ask so an opt-in that would arm
+ * nothing (a date already past for this year, birthdays switched off) never
+ * raises the OS dialog — canon § Notifications: ask at the point of value only.
  */
 export async function rescheduleAll(people: Person[], opts: { prompt?: boolean } = {}): Promise<void> {
   try {
-    const ok = opts.prompt ? await ensureNotificationPermission() : await hasPermission();
+    const excludeBirthdays = !(await getBirthdayRemindersEnabled());
+    const prevMarks = await loadMarks();
+    const { reminders, marks } = planReminders(people, Date.now(), prevMarks, undefined, { excludeBirthdays });
+    const ok =
+      opts.prompt && reminders.length > 0 ? await ensureNotificationPermission() : await hasPermission();
     if (!ok) return;
     await ensureChannel();
-    const prevMarks = await loadMarks();
-    const { reminders, marks } = planReminders(people, Date.now(), prevMarks);
     await Notifications.cancelAllScheduledNotificationsAsync();
     for (const r of reminders) {
       const { title, body } = copyFor(r);

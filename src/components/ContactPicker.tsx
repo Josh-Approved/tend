@@ -287,7 +287,7 @@ function makeStyles(c: Colors) {
     iconBtn: { width: target.min, height: target.min, alignItems: 'center', justifyContent: 'center' },
     listContent: { ...boundedContent, paddingHorizontal: space.s5, paddingBottom: space.s9 },
     guide: { ...ty.base, fontFamily: fontFamily.sans, color: c.fgMuted, lineHeight: 22, paddingBottom: space.s4 },
-    limitedNote: { ...ty.sm, fontFamily: fontFamily.sans, color: c.fgSubtle, paddingBottom: space.s4 },
+    limitedNote: { ...ty.sm, fontFamily: fontFamily.sans, color: c.fgMuted, paddingBottom: space.s4 },
     searchRow: {
       flexDirection: 'row',
       alignItems: 'center',
@@ -322,7 +322,7 @@ function makeStyles(c: Colors) {
     checkboxAdded: { borderColor: c.hairline, backgroundColor: c.bgSubtle },
     rowTitle: { flex: 1, ...ty.base, fontFamily: fontFamily.sans, color: c.fg, paddingVertical: space.s3 },
     rowTitleAdded: { color: c.fgMuted },
-    addedTag: { ...ty.sm, fontFamily: fontFamily.sans, color: c.fgSubtle },
+    addedTag: { ...ty.sm, fontFamily: fontFamily.sans, color: c.fgMuted },
     noResults: {
       ...ty.base,
       fontFamily: fontFamily.sans,

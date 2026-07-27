@@ -1,13 +1,16 @@
 /**
  * People — the full directory tab. Everyone you're tracking, A→Z, each with their
- * due status; tap to manage info + reminders. The + adds someone (and opens them);
- * the gear opens Settings; the empty state offers a contacts import.
+ * due status and the date you last checked in; tap to manage info + reminders.
+ * The directory is a REFERENCE surface, so the rows carry no action button (an
+ * ambiguous bare check used to sit here) — acting on a nudge belongs on Today.
+ * The + adds someone (and opens them); the gear opens Settings; the empty state
+ * offers a contacts import.
  */
 
 import React, { useState } from 'react';
 import { View, Text, Pressable, TextInput, FlatList, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Settings as SettingsIcon, Plus, Check, UserPlus, Search, X } from 'lucide-react-native';
+import { Settings as SettingsIcon, Plus, UserPlus, Search, X } from 'lucide-react-native';
 import type { TabScreenProps } from '../../App';
 import { usePeopleStore } from '../store/people';
 import { peopleByName, searchPeople, dueStatus, type Person } from '../data/person';
@@ -49,7 +52,6 @@ export default function PeopleScreen({ navigation }: TabScreenProps<'People'>) {
   const { c } = useTheme();
   const s = makeStyles(c);
   const people = usePeopleStore((st) => st.people);
-  const logContact = usePeopleStore((st) => st.logContact);
   const importPeople = usePeopleStore((st) => st.importPeople);
   const [status, setStatus] = useState<string | null>(null);
   const [pickerOpen, setPickerOpen] = useState(false);
@@ -160,27 +162,33 @@ export default function PeopleScreen({ navigation }: TabScreenProps<'People'>) {
           renderItem={({ item: person }) => {
             const sub = subline(person, now);
             const displayName = person.name.trim() || t('person.newPerson');
+            // Read straight off lastContactedAt — daysSinceContact falls back to
+            // createdAt, which would read as a check-in that never happened.
+            const lastCheckIn =
+              person.lastContactedAt == null
+                ? t('home.lastCheckInNever')
+                : new Date(person.lastContactedAt).toLocaleDateString(undefined, {
+                    month: 'short',
+                    day: 'numeric',
+                  });
             return (
-              <View style={s.row}>
-                <Pressable
-                  style={({ pressed }) => [s.rowMain, pressed && s.pressed]}
-                  onPress={() => navigation.navigate('PersonDetail', { personId: person.id })}
-                  accessibilityRole="button"
-                  accessibilityLabel={displayName}
-                >
+              <Pressable
+                style={({ pressed }) => [s.row, pressed && s.pressed]}
+                onPress={() => navigation.navigate('PersonDetail', { personId: person.id })}
+                accessibilityRole="button"
+                accessibilityLabel={`${displayName}, ${sub.text}, ${t('home.lastCheckInLabel')}: ${lastCheckIn}`}
+              >
+                <View style={s.rowMain}>
                   <Text style={s.rowTitle}>{displayName}</Text>
                   <Text style={[s.rowSub, sub.urgent && s.rowSubUrgent]}>{sub.text}</Text>
-                </Pressable>
-                <Pressable
-                  onPress={() => logContact(person.id)}
-                  hitSlop={8}
-                  accessibilityRole="button"
-                  accessibilityLabel={t('home.markReached', { name: displayName })}
-                  style={({ pressed }) => [s.reachBtn, pressed && s.pressed]}
-                >
-                  <Check size={18} color={c.accent} strokeWidth={2} />
-                </Pressable>
-              </View>
+                </View>
+                {/* Quiet receipt, not a control — the ambiguous green check is
+                    gone; Today is where you act. */}
+                <View style={s.lastCheckIn} importantForAccessibility="no-hide-descendants">
+                  <Text style={s.lastCheckInLabel}>{t('home.lastCheckInLabel')}</Text>
+                  <Text style={s.lastCheckInValue}>{lastCheckIn}</Text>
+                </View>
+              </Pressable>
             );
           }}
         />
@@ -251,14 +259,18 @@ function makeStyles(c: Colors) {
     rowTitle: { ...ty.base, fontFamily: fontFamily.sans, color: c.fg },
     rowSub: { ...ty.sm, fontFamily: fontFamily.sans, color: c.fgMuted },
     rowSubUrgent: { color: c.appAccent, fontFamily: fontFamily.sansSemibold },
-    reachBtn: {
-      width: 40,
-      height: 40,
-      borderRadius: radius.pill,
-      borderWidth: 1.5,
-      borderColor: c.accent,
-      alignItems: 'center',
-      justifyContent: 'center',
+    lastCheckIn: { alignItems: 'flex-end', gap: 2 },
+    lastCheckInLabel: {
+      ...ty.xs,
+      fontFamily: fontFamily.sans,
+      color: c.fgMuted,
+      textAlign: 'right',
+    },
+    lastCheckInValue: {
+      ...ty.sm,
+      fontFamily: fontFamily.sansSemibold,
+      color: c.fg,
+      textAlign: 'right',
     },
     emptyWrap: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: space.s6, gap: space.s5 },
     importBtn: {
