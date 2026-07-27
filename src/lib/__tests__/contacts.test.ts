@@ -19,7 +19,13 @@ jest.mock('expo-contacts/legacy', () => ({
   getContactsAsync: jest.fn(),
 }));
 
-import { contactsToPeople, dedupePeopleByName, type RawContact } from '../contacts';
+import {
+  contactsToPeople,
+  contactDisplayName,
+  toPickableContacts,
+  dedupePeopleByName,
+  type RawContact,
+} from '../contacts';
 import { makePerson } from '../../data/person';
 
 describe('contactsToPeople', () => {
@@ -75,6 +81,50 @@ describe('contactsToPeople', () => {
       { name: 'Month Only', birthday: { month: 4 } },
     ]);
     expect(people.every((p) => p.importantDates.length === 0)).toBe(true);
+  });
+});
+
+describe('contactDisplayName', () => {
+  it('prefers the full name, trimmed', () => {
+    expect(contactDisplayName({ name: '  Ada Lovelace  ', firstName: 'X' })).toBe('Ada Lovelace');
+  });
+
+  it('falls back to first + last, then to a lone part', () => {
+    expect(contactDisplayName({ firstName: 'Grace', lastName: 'Hopper' })).toBe('Grace Hopper');
+    expect(contactDisplayName({ firstName: 'Madonna' })).toBe('Madonna');
+    expect(contactDisplayName({ lastName: 'Beyoncé' })).toBe('Beyoncé');
+  });
+
+  it('returns empty string when nothing is usable', () => {
+    expect(contactDisplayName({})).toBe('');
+    expect(contactDisplayName({ name: '   ' })).toBe('');
+  });
+});
+
+describe('toPickableContacts', () => {
+  it('drops the nameless, sorts A→Z, and carries the raw record', () => {
+    const raw: RawContact[] = [
+      { id: '2', name: 'Zed' },
+      { id: '1', firstName: 'Ada', lastName: 'Lovelace', birthday: { month: 0, day: 1 } },
+      { id: '3', name: '   ' }, // nameless → dropped
+    ];
+    const rows = toPickableContacts(raw);
+    expect(rows.map((r) => r.name)).toEqual(['Ada Lovelace', 'Zed']);
+    expect(rows[0].id).toBe('1');
+    expect(rows[0].raw.birthday).toEqual({ month: 0, day: 1 });
+  });
+
+  it('keys off the display name when a contact has no id (stable, non-empty)', () => {
+    const rows = toPickableContacts([{ name: 'No Id Person' }]);
+    expect(rows[0].id).toBe('No Id Person');
+  });
+
+  it('breaks name ties deterministically by id', () => {
+    const rows = toPickableContacts([
+      { id: 'b', name: 'Sam' },
+      { id: 'a', name: 'Sam' },
+    ]);
+    expect(rows.map((r) => r.id)).toEqual(['a', 'b']);
   });
 });
 

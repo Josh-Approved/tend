@@ -58,7 +58,9 @@ const ja = {
     notesLabel: 'メモ',
     notesPlaceholder: '覚えておきたいことは？好きなもの、最近の様子、次に聞きたいこと…',
     datesLabel: '大切な日',
-    dateLabelPlaceholder: '誕生日、記念日…',
+    birthdayLabel: '誕生日',
+    otherDatesLabel: 'その他の日',
+    dateLabelPlaceholder: '記念日、出会った日…',
     monthPlaceholder: '月',
     dayPlaceholder: '日',
     addDate: '日付を追加',
@@ -278,6 +280,16 @@ const ja = {
     importNone: '追加できる連絡先が見つかりませんでした。',
     importLimited: '共有された連絡先から{count}件追加しました。',
     importError: '連絡先を読み取れませんでした。もう一度お試しください。',
+  },
+  contactPicker: {
+    title: '連絡先から追加',
+    guide: '連絡を取り合いたい人を選びましょう。ほとんどの人はまず数人から始めます。あとからいつでも追加できます。',
+    search: '連絡先を検索',
+    added: '追加済み',
+    addCount: '{count}人を追加',
+    noContacts: 'この端末に連絡先が見つかりませんでした。',
+    loading: '連絡先を読み込み中…',
+    limitedNote: '共有した連絡先を表示しています。',
   },
 };
 export default ja;

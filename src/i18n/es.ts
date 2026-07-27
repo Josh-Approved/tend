@@ -58,7 +58,9 @@ const es = {
     notesLabel: 'Notas',
     notesPlaceholder: '¿Qué quieres recordar? Lo que le gusta, cómo le va, qué preguntarle la próxima vez…',
     datesLabel: 'Fechas importantes',
-    dateLabelPlaceholder: 'Cumpleaños, aniversario…',
+    birthdayLabel: 'Cumpleaños',
+    otherDatesLabel: 'Otras fechas',
+    dateLabelPlaceholder: 'Aniversario, el día que se conocieron…',
     monthPlaceholder: 'MM',
     dayPlaceholder: 'DD',
     addDate: 'Añadir fecha',
@@ -278,6 +280,16 @@ const es = {
     importNone: 'No se encontraron contactos para añadir.',
     importLimited: '{count} añadidos de los contactos que compartiste.',
     importError: 'No se pudieron leer tus contactos. Inténtalo de nuevo.',
+  },
+  contactPicker: {
+    title: 'Añadir desde contactos',
+    guide: 'Elige las personas con las que quieres mantener el contacto. La mayoría empieza con unas pocas. Siempre puedes añadir más después.',
+    search: 'Buscar contactos',
+    added: 'Añadido',
+    addCount: 'Añadir {count}',
+    noContacts: 'No se encontraron contactos en este dispositivo.',
+    loading: 'Cargando contactos…',
+    limitedNote: 'Mostrando los contactos que compartiste.',
   },
 };
 export default es;

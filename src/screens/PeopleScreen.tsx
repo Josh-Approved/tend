@@ -11,7 +11,7 @@ import { Settings as SettingsIcon, Plus, Check, UserPlus, Search, X } from 'luci
 import type { TabScreenProps } from '../../App';
 import { usePeopleStore } from '../store/people';
 import { peopleByName, searchPeople, dueStatus, type Person } from '../data/person';
-import { importFromContacts } from '../lib/contacts';
+import { ContactPicker } from '../components/ContactPicker';
 import { EmptyState } from '../components/EmptyState';
 import { t } from '../i18n';
 import {
@@ -52,7 +52,7 @@ export default function PeopleScreen({ navigation }: TabScreenProps<'People'>) {
   const logContact = usePeopleStore((st) => st.logContact);
   const importPeople = usePeopleStore((st) => st.importPeople);
   const [status, setStatus] = useState<string | null>(null);
-  const [importing, setImporting] = useState(false);
+  const [pickerOpen, setPickerOpen] = useState(false);
   const [query, setQuery] = useState('');
 
   const now = Date.now();
@@ -66,29 +66,16 @@ export default function PeopleScreen({ navigation }: TabScreenProps<'People'>) {
     navigation.navigate('PersonDetail', {});
   };
 
-  const onImport = async () => {
-    if (importing) return; // guard double-tap
-    setImporting(true);
-    setStatus(t('home.importing'));
-    try {
-      const res = await importFromContacts();
-      if ('denied' in res) {
-        setStatus(t('data.importDenied'));
-        return;
-      }
-      if ('error' in res) {
-        setStatus(t('data.importError'));
-        return;
-      }
-      const n = importPeople(res.people);
-      if (n === 0) {
-        setStatus(t('data.importNone'));
-      } else {
-        setStatus(res.limited ? t('data.importLimited', { count: n }) : t('data.imported', { count: n }));
-      }
-    } finally {
-      setImporting(false);
-    }
+  const openPicker = () => {
+    setStatus(null);
+    setPickerOpen(true);
+  };
+
+  // The picker hands back the people the user chose; the store dedupes again and
+  // returns the count actually added so the status line can speak the truth.
+  const onPicked = (chosen: Person[]) => {
+    const n = importPeople(chosen);
+    setStatus(n === 0 ? t('data.importNone') : t('data.imported', { count: n }));
   };
 
   return (
@@ -97,12 +84,11 @@ export default function PeopleScreen({ navigation }: TabScreenProps<'People'>) {
         <Text style={s.title}>{t('home.title')}</Text>
         <View style={s.headerActions}>
           <Pressable
-            onPress={onImport}
-            disabled={importing}
+            onPress={openPicker}
             hitSlop={8}
             accessibilityRole="button"
             accessibilityLabel={t('home.importContacts')}
-            style={({ pressed }) => [s.iconBtn, pressed && s.pressed, importing && s.pressed]}
+            style={({ pressed }) => [s.iconBtn, pressed && s.pressed]}
           >
             <UserPlus size={22} color={c.fg} strokeWidth={1.5} />
           </Pressable>
@@ -122,14 +108,13 @@ export default function PeopleScreen({ navigation }: TabScreenProps<'People'>) {
         <View style={s.emptyWrap}>
           <EmptyState message={t('home.empty')} />
           <Pressable
-            onPress={onImport}
-            disabled={importing}
+            onPress={openPicker}
             accessibilityRole="button"
             accessibilityLabel={t('home.importContacts')}
-            style={({ pressed }) => [s.importBtn, pressed && s.pressed, importing && s.pressed]}
+            style={({ pressed }) => [s.importBtn, pressed && s.pressed]}
           >
             <UserPlus size={18} color={c.fg} strokeWidth={1.5} />
-            <Text style={s.importText}>{importing ? t('home.importing') : t('home.importContacts')}</Text>
+            <Text style={s.importText}>{t('home.importContacts')}</Text>
           </Pressable>
           {status ? <Text style={s.status}>{status}</Text> : null}
         </View>
@@ -209,6 +194,8 @@ export default function PeopleScreen({ navigation }: TabScreenProps<'People'>) {
       >
         <Plus size={24} color={c.inkButtonText} strokeWidth={2} />
       </Pressable>
+
+      <ContactPicker visible={pickerOpen} onClose={() => setPickerOpen(false)} onAdd={onPicked} />
     </SafeAreaView>
   );
 }

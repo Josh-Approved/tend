@@ -58,7 +58,9 @@ const de = {
     notesLabel: 'Notizen',
     notesPlaceholder: 'Was möchtest du dir merken? Ihre Vorlieben, was gerade los ist, wonach du nächstes Mal fragen kannst…',
     datesLabel: 'Wichtige Tage',
-    dateLabelPlaceholder: 'Geburtstag, Jahrestag…',
+    birthdayLabel: 'Geburtstag',
+    otherDatesLabel: 'Weitere Tage',
+    dateLabelPlaceholder: 'Jahrestag, der Tag eures Kennenlernens…',
     monthPlaceholder: 'MM',
     dayPlaceholder: 'TT',
     addDate: 'Tag hinzufügen',
@@ -278,6 +280,16 @@ const de = {
     importNone: 'Keine Kontakte zum Hinzufügen gefunden.',
     importLimited: '{count} aus den geteilten Kontakten hinzugefügt.',
     importError: 'Deine Kontakte konnten nicht gelesen werden. Bitte versuch es erneut.',
+  },
+  contactPicker: {
+    title: 'Aus Kontakten hinzufügen',
+    guide: 'Wähle die Menschen aus, mit denen du in Kontakt bleiben möchtest. Die meisten fangen mit ein paar an. Du kannst später jederzeit mehr hinzufügen.',
+    search: 'Kontakte suchen',
+    added: 'Hinzugefügt',
+    addCount: '{count} hinzufügen',
+    noContacts: 'Keine Kontakte auf diesem Gerät gefunden.',
+    loading: 'Kontakte werden geladen…',
+    limitedNote: 'Es werden die von dir freigegebenen Kontakte angezeigt.',
   },
 };
 export default de;
