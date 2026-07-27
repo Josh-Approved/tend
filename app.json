@@ -21,7 +21,9 @@
       "predictiveBackGestureEnabled": false,
       "package": "com.joshapproved.tend",
       "permissions": [
-        "android.permission.READ_CONTACTS",
+        "android.permission.READ_CONTACTS"
+      ],
+      "blockedPermissions": [
         "android.permission.WRITE_CONTACTS"
       ]
     },
