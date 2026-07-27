@@ -23,6 +23,9 @@ import {
   daysUntil,
   sortedInteractions,
   personalityValue,
+  getBirthday,
+  otherImportantDates,
+  isBirthday,
   INTERACTION_KINDS,
   type InteractionKind,
 } from '../data/person';
@@ -72,6 +75,8 @@ export default function PersonDetailScreen({ route, navigation }: Props) {
   const setHowWeMet = usePeopleStore((st) => st.setHowWeMet);
   const addImportantDate = usePeopleStore((st) => st.addImportantDate);
   const removeImportantDate = usePeopleStore((st) => st.removeImportantDate);
+  const setBirthday = usePeopleStore((st) => st.setBirthday);
+  const clearBirthday = usePeopleStore((st) => st.clearBirthday);
   const addPreference = usePeopleStore((st) => st.addPreference);
   const removePreference = usePeopleStore((st) => st.removePreference);
   const setPersonalityType = usePeopleStore((st) => st.setPersonalityType);
@@ -416,9 +421,18 @@ export default function PersonDetailScreen({ route, navigation }: Props) {
       />
       <DatesSheet
         visible={sheet === 'dates'}
-        dates={person.importantDates}
+        birthday={getBirthday(person)}
+        otherDates={otherImportantDates(person)}
         onClose={() => setSheet(null)}
-        onAdd={(label, month, day) => addImportantDate(person.id, label, month, day)}
+        onSetBirthday={(month, day) => setBirthday(person.id, month, day)}
+        onClearBirthday={() => clearBirthday(person.id)}
+        onAdd={(label, month, day) =>
+          // A "birthday" typed into the generic add is the canonical birthday, not
+          // a second date — route it so there's only ever one.
+          isBirthday({ id: '', label, month, day })
+            ? setBirthday(person.id, month, day)
+            : addImportantDate(person.id, label, month, day)
+        }
         onRemove={(id) => removeImportantDate(person.id, id)}
       />
       <PrefsSheet

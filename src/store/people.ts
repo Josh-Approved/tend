@@ -19,6 +19,8 @@ import {
   makeImportantDate,
   makeInteraction,
   setPersonalityValue,
+  withBirthday,
+  withoutBirthday,
 } from '../data/person';
 import { putTombstone } from '../storage/kv';
 import { dedupePeopleByName } from '../lib/contacts';
@@ -41,6 +43,8 @@ interface PeopleState {
   setHowWeMet: (id: string, howWeMet: string) => void;
   addImportantDate: (id: string, label: string, month: number, day: number, year?: number) => void;
   removeImportantDate: (id: string, dateId: string) => void;
+  setBirthday: (id: string, month: number, day: number, year?: number) => void;
+  clearBirthday: (id: string) => void;
   addPreference: (id: string, kind: PreferenceKind, text: string) => void;
   removePreference: (id: string, prefId: string) => void;
   setPersonalityType: (id: string, framework: PersonalityFramework, value: string | null) => void;
@@ -137,6 +141,16 @@ export const usePeopleStore = create<PeopleState>()((set, get) => {
 
     removeImportantDate: (id, dateId) => {
       mutate(id, (p) => ({ ...p, importantDates: p.importantDates.filter((d) => d.id !== dateId) }));
+      syncNotifications();
+    },
+
+    setBirthday: (id, month, day, year) => {
+      mutate(id, (p) => ({ ...p, importantDates: withBirthday(p.importantDates, month, day, year) }));
+      syncNotifications();
+    },
+
+    clearBirthday: (id) => {
+      mutate(id, (p) => ({ ...p, importantDates: withoutBirthday(p.importantDates) }));
       syncNotifications();
     },
 
