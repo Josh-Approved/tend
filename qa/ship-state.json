@@ -91,6 +91,26 @@
       "note": "android binary uploaded to the beta lane via submit-beta.mjs (non-interactive).",
       "at": "2026-07-03T16:30:38Z",
       "gitSha": "e023d63eb96426ccbbc36b63085f389db8b19752"
+    },
+    {
+      "stage": "beta-ios",
+      "platform": "ios",
+      "version": null,
+      "build": "26",
+      "source": "send-train",
+      "note": "ios binary uploaded to the beta lane via submit-beta.mjs (non-interactive).",
+      "at": "2026-07-27T23:13:40Z",
+      "gitSha": "f17814ab6acc18c07fb6bd274b5801f95992128c"
+    },
+    {
+      "stage": "beta-android",
+      "platform": "android",
+      "version": null,
+      "build": "13",
+      "source": "send-train",
+      "note": "android binary uploaded to the beta lane via submit-beta.mjs (non-interactive).",
+      "at": "2026-07-27T23:26:52Z",
+      "gitSha": "e4b0e04f8f68ac589dfcd152a1774aae837df2ef"
     }
   ]
 }
