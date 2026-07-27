@@ -27,6 +27,7 @@ import ConversationDetailScreen from './src/screens/ConversationDetailScreen';
 import MeScreen from './src/screens/MeScreen';
 import SettingsScreen from './src/screens/SettingsScreen';
 import Credits from './src/components/Credits';
+import { APP_NAME, IOS_APP_STORE_ID, ANDROID_PACKAGE } from './src/lib/links';
 import { t } from './src/i18n';
 import { QA_MODE } from './src/qa/qaMode';
 
@@ -60,6 +61,16 @@ export type TabScreenProps<T extends keyof TabParamList> = CompositeScreenProps<
 
 const Tab = createBottomTabNavigator<TabParamList>();
 const RootStack = createNativeStackNavigator<RootStackParamList>();
+
+// Store identity for the canonical review prompt. The shell owns the trigger
+// (session count, 3/15/30 schedule, cap of 3, the modal itself) — this object is
+// the app's entire contribution. Module scope on purpose: the shell's effect
+// keys off the prop, so an inline literal would be a new object every render.
+const REVIEW = {
+  appName: APP_NAME,
+  iosAppStoreId: IOS_APP_STORE_ID,
+  androidPackageName: ANDROID_PACKAGE,
+};
 
 function Tabs() {
   const { c } = useTheme();
@@ -130,7 +141,7 @@ export default function App() {
   const ready = fontsLoaded && peopleHydrated && conversationsHydrated && meHydrated;
 
   return (
-    <AppShell ready={ready}>
+    <AppShell ready={ready} review={REVIEW}>
       <RootStack.Navigator screenOptions={{ headerShown: false, animation: QA_MODE ? 'none' : undefined }}>
         <RootStack.Screen name="Tabs" component={Tabs} />
         <RootStack.Screen name="PersonDetail" component={PersonDetailScreen} />
