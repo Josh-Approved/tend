@@ -121,6 +121,16 @@
       "note": "ios binary built + submitted to the beta lane via ship-eas.sh (submission FINISHED).",
       "at": "2026-07-27T20:24:26Z",
       "gitSha": "688c68086bef230189a561b5b2643faa7a2210ac"
+    },
+    {
+      "stage": "beta-android",
+      "platform": "android",
+      "version": "1.0.0",
+      "build": null,
+      "source": "ship-eas",
+      "note": "android binary built + submitted to the beta lane via ship-eas.sh (submission FINISHED).",
+      "at": "2026-07-27T20:33:16Z",
+      "gitSha": "57bba12d1d6321a170d3b2f57bbdd02f3830ccbe"
     }
   ]
 }
