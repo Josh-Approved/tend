@@ -19,6 +19,8 @@ const de = {
     title: 'Menschen',
     empty: 'Noch niemand hier. Füge jemanden hinzu, mit dem du in Kontakt bleiben möchtest – oder hol Menschen aus deinen Kontakten dazu.',
     add: 'Person hinzufügen',
+    addMenuTitle: 'Person hinzufügen',
+    addManually: 'Neue Person eingeben',
     importContacts: 'Aus Kontakten importieren',
     overdueBy: 'Überfällig seit {days} T.',
     dueToday: 'Heute melden',

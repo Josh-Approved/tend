@@ -323,12 +323,13 @@
       "proof": {
         "kind": "none"
       },
-      "note": "Pressable · onPress"
+      "note": "Pressable · onPress",
+      "stale": true
     },
     {
       "id": "screens/PeopleScreen#settings.title",
       "label": "settings.title",
-      "where": "src/screens/PeopleScreen.tsx:109",
+      "where": "src/screens/PeopleScreen.tsx:101",
       "proof": {
         "kind": "none"
       },
@@ -341,12 +342,13 @@
       "proof": {
         "kind": "none"
       },
-      "note": "Pressable · onPress"
+      "note": "Pressable · onPress",
+      "stale": true
     },
     {
       "id": "screens/PeopleScreen#person.cancel",
       "label": "person.cancel",
-      "where": "src/screens/PeopleScreen.tsx:159",
+      "where": "src/screens/PeopleScreen.tsx:150",
       "proof": {
         "kind": "none"
       },
@@ -359,12 +361,13 @@
       "proof": {
         "kind": "none"
       },
-      "note": "Pressable · onPress · dynamic/child-text label"
+      "note": "Pressable · onPress · dynamic/child-text label",
+      "stale": true
     },
     {
       "id": "screens/PeopleScreen#home.markreached",
       "label": "home.markReached",
-      "where": "src/screens/PeopleScreen.tsx:189",
+      "where": "src/screens/PeopleScreen.tsx:180",
       "proof": {
         "kind": "none"
       },
@@ -373,7 +376,7 @@
     {
       "id": "screens/PeopleScreen#home.add",
       "label": "home.add",
-      "where": "src/screens/PeopleScreen.tsx:204",
+      "where": "src/screens/PeopleScreen.tsx:116",
       "proof": {
         "kind": "none"
       },
@@ -382,7 +385,7 @@
     {
       "id": "screens/PersonDetailScreen#person.nameplaceholder",
       "label": "person.namePlaceholder",
-      "where": "src/screens/PersonDetailScreen.tsx:125",
+      "where": "src/screens/PersonDetailScreen.tsx:130",
       "proof": {
         "kind": "none"
       },
@@ -401,7 +404,7 @@
     {
       "id": "screens/PersonDetailScreen#common.save",
       "label": "common.save",
-      "where": "src/screens/PersonDetailScreen.tsx:146",
+      "where": "src/screens/PersonDetailScreen.tsx:151",
       "proof": {
         "kind": "none"
       },
@@ -420,7 +423,7 @@
     {
       "id": "screens/PersonDetailScreen#person.reachedout",
       "label": "person.reachedOut",
-      "where": "src/screens/PersonDetailScreen.tsx:286",
+      "where": "src/screens/PersonDetailScreen.tsx:291",
       "proof": {
         "kind": "none"
       },
@@ -519,7 +522,7 @@
     {
       "id": "screens/PersonDetailScreen#htc.add",
       "label": "htc.add",
-      "where": "src/screens/PersonDetailScreen.tsx:372",
+      "where": "src/screens/PersonDetailScreen.tsx:377",
       "proof": {
         "kind": "none"
       },
@@ -528,7 +531,7 @@
     {
       "id": "screens/PersonDetailScreen#person.deleteperson",
       "label": "person.deletePerson",
-      "where": "src/screens/PersonDetailScreen.tsx:383",
+      "where": "src/screens/PersonDetailScreen.tsx:388",
       "proof": {
         "kind": "none"
       },
@@ -573,7 +576,7 @@
     {
       "id": "components/DatesSheet#person.remove",
       "label": "person.remove",
-      "where": "src/components/DatesSheet.tsx:69",
+      "where": "src/components/DatesSheet.tsx:144",
       "proof": {
         "kind": "none"
       },
@@ -582,7 +585,7 @@
     {
       "id": "components/DatesSheet#person.adddate",
       "label": "person.addDate",
-      "where": "src/components/DatesSheet.tsx:111",
+      "where": "src/components/DatesSheet.tsx:209",
       "proof": {
         "kind": "none"
       },
@@ -784,12 +787,104 @@
       "proof": {
         "kind": "none"
       },
-      "note": "Pressable · onPress · dynamic/child-text label"
+      "note": "Pressable · onPress · dynamic/child-text label",
+      "stale": true
     },
     {
       "id": "screens/PersonDetailScreen#pressable-359",
       "label": "Pressable (dynamic label)",
       "where": "src/screens/PersonDetailScreen.tsx:359",
+      "proof": {
+        "kind": "none"
+      },
+      "note": "Pressable · onPress · dynamic/child-text label",
+      "stale": true
+    },
+    {
+      "id": "components/ContactPicker#pressable-133",
+      "label": "Pressable (dynamic label)",
+      "where": "src/components/ContactPicker.tsx:133",
+      "proof": {
+        "kind": "none"
+      },
+      "note": "Pressable · onPress · dynamic/child-text label"
+    },
+    {
+      "id": "components/ContactPicker#common.cancel",
+      "label": "common.cancel",
+      "where": "src/components/ContactPicker.tsx:206",
+      "proof": {
+        "kind": "none"
+      },
+      "note": "Pressable · onPress"
+    },
+    {
+      "id": "components/ContactPicker#common.cancel-2",
+      "label": "common.cancel",
+      "where": "src/components/ContactPicker.tsx:240",
+      "proof": {
+        "kind": "none"
+      },
+      "note": "Pressable · onPress"
+    },
+    {
+      "id": "components/ContactPicker#pressable-256",
+      "label": "Pressable (dynamic label)",
+      "where": "src/components/ContactPicker.tsx:256",
+      "proof": {
+        "kind": "none"
+      },
+      "note": "Pressable · onPress · dynamic/child-text label"
+    },
+    {
+      "id": "components/DatesSheet#common.save",
+      "label": "common.save",
+      "where": "src/components/DatesSheet.tsx:130",
+      "proof": {
+        "kind": "none"
+      },
+      "note": "Pressable · onPress"
+    },
+    {
+      "id": "components/DatesSheet#person.remove-2",
+      "label": "person.remove",
+      "where": "src/components/DatesSheet.tsx:168",
+      "proof": {
+        "kind": "none"
+      },
+      "note": "Pressable · onPress"
+    },
+    {
+      "id": "screens/PeopleScreen#pressable-171",
+      "label": "Pressable (dynamic label)",
+      "where": "src/screens/PeopleScreen.tsx:171",
+      "proof": {
+        "kind": "none"
+      },
+      "note": "Pressable · onPress · dynamic/child-text label"
+    },
+    {
+      "id": "screens/PeopleScreen#home.add-2",
+      "label": "home.add",
+      "where": "src/screens/PeopleScreen.tsx:195",
+      "proof": {
+        "kind": "none"
+      },
+      "note": "Pressable · onPress"
+    },
+    {
+      "id": "screens/PersonDetailScreen#pressable-268",
+      "label": "Pressable (dynamic label)",
+      "where": "src/screens/PersonDetailScreen.tsx:268",
+      "proof": {
+        "kind": "none"
+      },
+      "note": "Pressable · onPress · dynamic/child-text label"
+    },
+    {
+      "id": "screens/PersonDetailScreen#pressable-364",
+      "label": "Pressable (dynamic label)",
+      "where": "src/screens/PersonDetailScreen.tsx:364",
       "proof": {
         "kind": "none"
       },

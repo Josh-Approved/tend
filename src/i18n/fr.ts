@@ -19,6 +19,8 @@ const fr = {
     title: 'Proches',
     empty: "Personne ici pour l'instant. Ajoute quelqu'un avec qui tu veux garder le lien — ou fais venir des gens depuis tes contacts.",
     add: 'Ajouter une personne',
+    addMenuTitle: 'Ajouter une personne',
+    addManually: 'Ajouter quelqu’un',
     importContacts: 'Importer depuis les contacts',
     overdueBy: 'En retard de {days} j',
     dueToday: "Prendre des nouvelles aujourd'hui",

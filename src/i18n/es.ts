@@ -19,6 +19,8 @@ const es = {
     title: 'Personas',
     empty: 'Aún no hay nadie aquí. Añade a alguien con quien quieras mantener el contacto, o trae personas desde tus contactos.',
     add: 'Añadir persona',
+    addMenuTitle: 'Añadir a alguien',
+    addManually: 'Añadir a alguien nuevo',
     importContacts: 'Importar desde contactos',
     overdueBy: 'Atrasado {days}d',
     dueToday: 'Ponte en contacto hoy',

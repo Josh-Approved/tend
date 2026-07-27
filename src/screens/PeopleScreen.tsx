@@ -1,17 +1,19 @@
 /**
  * People — the full directory tab. Everyone you're tracking, A→Z, each with their
- * due status; tap to manage info + reminders. The + adds someone (and opens them);
- * the gear opens Settings; the empty state offers a contacts import.
+ * due status; tap to manage info + reminders. The + is the single add affordance:
+ * it asks whether to add from contacts or enter someone yourself. The gear opens
+ * Settings.
  */
 
 import React, { useState } from 'react';
 import { View, Text, Pressable, TextInput, FlatList, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Settings as SettingsIcon, Plus, Check, UserPlus, Search, X } from 'lucide-react-native';
+import { Settings as SettingsIcon, Plus, Check, Search, X } from 'lucide-react-native';
 import type { TabScreenProps } from '../../App';
 import { usePeopleStore } from '../store/people';
 import { peopleByName, searchPeople, dueStatus, type Person } from '../data/person';
 import { ContactPicker } from '../components/ContactPicker';
+import { useActionMenu } from '../components/Dialogs';
 import { EmptyState } from '../components/EmptyState';
 import { t } from '../i18n';
 import {
@@ -51,6 +53,7 @@ export default function PeopleScreen({ navigation }: TabScreenProps<'People'>) {
   const people = usePeopleStore((st) => st.people);
   const logContact = usePeopleStore((st) => st.logContact);
   const importPeople = usePeopleStore((st) => st.importPeople);
+  const { open: openAddMenu, element: addMenu } = useActionMenu();
   const [status, setStatus] = useState<string | null>(null);
   const [pickerOpen, setPickerOpen] = useState(false);
   const [query, setQuery] = useState('');
@@ -78,20 +81,23 @@ export default function PeopleScreen({ navigation }: TabScreenProps<'People'>) {
     setStatus(n === 0 ? t('data.importNone') : t('data.imported', { count: n }));
   };
 
+  // The single add affordance: one FAB that asks how you want to add someone —
+  // from your contacts, or entered by hand — instead of two separate buttons.
+  const openAddChooser = () => {
+    openAddMenu({
+      title: t('home.addMenuTitle'),
+      options: [
+        { label: t('contactPicker.title'), onPress: openPicker },
+        { label: t('home.addManually'), onPress: onAdd },
+      ],
+    });
+  };
+
   return (
     <SafeAreaView style={s.safe} edges={['top', 'left', 'right']}>
       <View style={s.header}>
         <Text style={s.title}>{t('home.title')}</Text>
         <View style={s.headerActions}>
-          <Pressable
-            onPress={openPicker}
-            hitSlop={8}
-            accessibilityRole="button"
-            accessibilityLabel={t('home.importContacts')}
-            style={({ pressed }) => [s.iconBtn, pressed && s.pressed]}
-          >
-            <UserPlus size={22} color={c.fg} strokeWidth={1.5} />
-          </Pressable>
           <Pressable
             onPress={() => navigation.navigate('Settings')}
             hitSlop={8}
@@ -108,13 +114,13 @@ export default function PeopleScreen({ navigation }: TabScreenProps<'People'>) {
         <View style={s.emptyWrap}>
           <EmptyState message={t('home.empty')} />
           <Pressable
-            onPress={openPicker}
+            onPress={openAddChooser}
             accessibilityRole="button"
-            accessibilityLabel={t('home.importContacts')}
+            accessibilityLabel={t('home.add')}
             style={({ pressed }) => [s.importBtn, pressed && s.pressed]}
           >
-            <UserPlus size={18} color={c.fg} strokeWidth={1.5} />
-            <Text style={s.importText}>{t('home.importContacts')}</Text>
+            <Plus size={18} color={c.fg} strokeWidth={1.5} />
+            <Text style={s.importText}>{t('home.add')}</Text>
           </Pressable>
           {status ? <Text style={s.status}>{status}</Text> : null}
         </View>
@@ -188,13 +194,14 @@ export default function PeopleScreen({ navigation }: TabScreenProps<'People'>) {
 
       <Pressable
         style={({ pressed }) => [s.fab, pressed && s.fabPressed]}
-        onPress={onAdd}
+        onPress={openAddChooser}
         accessibilityRole="button"
         accessibilityLabel={t('home.add')}
       >
         <Plus size={24} color={c.inkButtonText} strokeWidth={2} />
       </Pressable>
 
+      {addMenu}
       <ContactPicker visible={pickerOpen} onClose={() => setPickerOpen(false)} onAdd={onPicked} />
     </SafeAreaView>
   );

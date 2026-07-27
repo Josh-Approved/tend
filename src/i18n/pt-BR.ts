@@ -19,6 +19,8 @@ const ptBR = {
     title: 'Pessoas',
     empty: 'Ninguém por aqui ainda. Adicione alguém com quem você quer manter contato — ou traga pessoas dos seus contatos.',
     add: 'Adicionar pessoa',
+    addMenuTitle: 'Adicionar alguém',
+    addManually: 'Adicionar alguém novo',
     importContacts: 'Importar dos contatos',
     overdueBy: 'Atrasado há {days}d',
     dueToday: 'Entre em contato hoje',

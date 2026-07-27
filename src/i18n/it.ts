@@ -19,6 +19,8 @@ const it = {
     title: 'Persone',
     empty: 'Ancora nessuno qui. Aggiungi qualcuno con cui vuoi restare in contatto — oppure portali dentro dai tuoi contatti.',
     add: 'Aggiungi persona',
+    addMenuTitle: 'Aggiungi una persona',
+    addManually: 'Aggiungi qualcuno di nuovo',
     importContacts: 'Importa dai contatti',
     overdueBy: 'In ritardo di {days}g',
     dueToday: 'Fatti sentire oggi',

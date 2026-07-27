@@ -19,6 +19,8 @@ const ja = {
     title: 'みんな',
     empty: 'まだ誰もいません。これからも大切にしたい人を追加するか、連絡先から取り込んでみましょう。',
     add: '人を追加',
+    addMenuTitle: '人を追加',
+    addManually: '新しい人を入力',
     importContacts: '連絡先から取り込む',
     overdueBy: '{days}日経過',
     dueToday: '今日連絡しましょう',

@@ -21,6 +21,8 @@ export const APP_STRINGS = {
     title: 'People',
     empty: 'No one here yet. Add someone you want to keep up with — or bring people in from your contacts.',
     add: 'Add person',
+    addMenuTitle: 'Add a person',
+    addManually: 'Add someone new',
     importContacts: 'Import from contacts',
     overdueBy: 'Overdue by {days}d',
     dueToday: 'Reach out today',
