@@ -37,6 +37,9 @@ import { PersonTextSheet } from '../components/PersonTextSheet';
 import { DatesSheet } from '../components/DatesSheet';
 import { PrefsSheet } from '../components/PrefsSheet';
 import { PersonalitySheet } from '../components/PersonalitySheet';
+import ReviewModal from '../components/ReviewModal';
+import { recordSuccessfulCompletion } from '../storage/reviewPrompt';
+import { APP_NAME, IOS_APP_STORE_ID, ANDROID_PACKAGE } from '../lib/links';
 import { t } from '../i18n';
 import {
   useTheme,
@@ -86,6 +89,7 @@ export default function PersonDetailScreen({ route, navigation }: Props) {
 
   const [logKind, setLogKind] = useState<InteractionKind>('call');
   const [logNote, setLogNote] = useState('');
+  const [reviewVisible, setReviewVisible] = useState(false);
   const [sheet, setSheet] = useState<SheetId>(null);
   // NEW-mode draft: a local cadence + name that aren't persisted until Save.
   const [draftName, setDraftName] = useState('');
@@ -217,6 +221,15 @@ export default function PersonDetailScreen({ route, navigation }: Props) {
   const onLog = () => {
     logContact(person.id, logKind, logNote);
     setLogNote('');
+    // The app's genuine success moment: they actually reached out, and said so.
+    // Not launch, not opening a sheet, not editing a note — the one thing this
+    // app exists to help you do. The canonical framework decides whether this
+    // completion is the one that prompts (2nd, then every 5th, cap 3).
+    recordSuccessfulCompletion()
+      .then((shouldPrompt) => {
+        if (shouldPrompt) setReviewVisible(true);
+      })
+      .catch(() => {});
   };
 
   const onStartConversation = () => {
@@ -447,6 +460,13 @@ export default function PersonDetailScreen({ route, navigation }: Props) {
         person={person}
         onClose={() => setSheet(null)}
         onPick={(framework, value) => setPersonalityType(person.id, framework, value)}
+      />
+      <ReviewModal
+        visible={reviewVisible}
+        onDismiss={() => setReviewVisible(false)}
+        appName={APP_NAME}
+        iosAppStoreId={IOS_APP_STORE_ID}
+        androidPackageName={ANDROID_PACKAGE}
       />
     </SafeAreaView>
   );

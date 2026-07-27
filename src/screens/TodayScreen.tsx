@@ -5,7 +5,7 @@
  * there's nothing, it says so plainly.
  */
 
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, Pressable, ScrollView, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { GestureDetector } from 'react-native-gesture-handler';
@@ -15,6 +15,9 @@ import { usePeopleStore } from '../store/people';
 import { actionablePeople, dueStatus, upcomingDates, type Person } from '../data/person';
 import { FundingFooter } from '../components/FundingFooter';
 import { usePullRevealFooter } from '../components/usePullRevealFooter';
+import ReviewModal from '../components/ReviewModal';
+import { recordSuccessfulCompletion } from '../storage/reviewPrompt';
+import { APP_NAME, IOS_APP_STORE_ID, ANDROID_PACKAGE } from '../lib/links';
 import { t } from '../i18n';
 import {
   useTheme,
@@ -42,6 +45,18 @@ export default function TodayScreen({ navigation }: TabScreenProps<'Today'>) {
   const s = makeStyles(c);
   const people = usePeopleStore((st) => st.people);
   const logContact = usePeopleStore((st) => st.logContact);
+  const [reviewVisible, setReviewVisible] = useState(false);
+  // Same success moment as Person detail's log action, reached the fast way:
+  // the user actually reached out to someone who was due. The canonical
+  // framework owns whether this completion is the one that prompts.
+  const onReachedOut = (personId: string) => {
+    logContact(personId);
+    recordSuccessfulCompletion()
+      .then((shouldPrompt) => {
+        if (shouldPrompt) setReviewVisible(true);
+      })
+      .catch(() => {});
+  };
   const now = Date.now();
   const actionable = actionablePeople(people, now);
   const upcoming = upcomingDates(people, now, 14);
@@ -107,7 +122,7 @@ export default function TodayScreen({ navigation }: TabScreenProps<'Today'>) {
                       <Text style={s.rowSub}>{reachSubline(person, now)}</Text>
                     </Pressable>
                     <Pressable
-                      onPress={() => logContact(person.id)}
+                      onPress={() => onReachedOut(person.id)}
                       hitSlop={8}
                       accessibilityRole="button"
                       accessibilityLabel={t('home.markReached', { name: displayName })}
@@ -149,6 +164,13 @@ export default function TodayScreen({ navigation }: TabScreenProps<'Today'>) {
         </ScrollView>
         </GestureDetector>
       )}
+      <ReviewModal
+        visible={reviewVisible}
+        onDismiss={() => setReviewVisible(false)}
+        appName={APP_NAME}
+        iosAppStoreId={IOS_APP_STORE_ID}
+        androidPackageName={ANDROID_PACKAGE}
+      />
     </SafeAreaView>
   );
 }
