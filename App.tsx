@@ -27,7 +27,7 @@ import ConversationDetailScreen from './src/screens/ConversationDetailScreen';
 import MeScreen from './src/screens/MeScreen';
 import SettingsScreen from './src/screens/SettingsScreen';
 import Credits from './src/components/Credits';
-import { APP_NAME, IOS_APP_STORE_ID, ANDROID_PACKAGE } from './src/lib/links';
+import { IOS_APP_STORE_ID, ANDROID_PACKAGE } from './src/lib/links';
 import { t } from './src/i18n';
 import { QA_MODE } from './src/qa/qaMode';
 
@@ -67,7 +67,7 @@ const RootStack = createNativeStackNavigator<RootStackParamList>();
 // the app's entire contribution. Module scope on purpose: the shell's effect
 // keys off the prop, so an inline literal would be a new object every render.
 const REVIEW = {
-  appName: APP_NAME,
+  appName: 'Relationships',
   iosAppStoreId: IOS_APP_STORE_ID,
   androidPackageName: ANDROID_PACKAGE,
 };
