@@ -25,10 +25,50 @@ import {
   upcomingDates,
   planReminders,
   sanitizeImportedPerson,
+  isBirthday,
+  getBirthday,
+  otherImportantDates,
+  withBirthday,
+  withoutBirthday,
   type Person,
 } from '../person';
 
 const at = (name: string, patch: Partial<Person> = {}): Person => ({ ...makePerson(name), ...patch });
+
+describe('birthday helpers', () => {
+  const bday = makeImportantDate('Birthday', 3, 3, 1990);
+  const anniv = makeImportantDate('Anniversary', 6, 1);
+
+  it('isBirthday matches the canonical label case-insensitively', () => {
+    expect(isBirthday(makeImportantDate('Birthday', 1, 1))).toBe(true);
+    expect(isBirthday(makeImportantDate('  birthday ', 1, 1))).toBe(true);
+    expect(isBirthday(anniv)).toBe(false);
+  });
+
+  it('getBirthday returns the birthday date; otherImportantDates excludes it', () => {
+    const p = at('Mom', { importantDates: [anniv, bday] });
+    expect(getBirthday(p)?.month).toBe(3);
+    expect(otherImportantDates(p).map((d) => d.label)).toEqual(['Anniversary']);
+  });
+
+  it('getBirthday is undefined when none is set', () => {
+    expect(getBirthday(at('Solo', { importantDates: [anniv] }))).toBeUndefined();
+  });
+
+  it('withBirthday replaces any existing birthday and keeps other dates', () => {
+    const next = withBirthday([anniv, bday], 12, 25);
+    const births = next.filter(isBirthday);
+    expect(births).toHaveLength(1);
+    expect(births[0]).toMatchObject({ month: 12, day: 25 });
+    expect(next.some((d) => d.label === 'Anniversary')).toBe(true);
+  });
+
+  it('withoutBirthday drops every birthday, keeps the rest', () => {
+    const next = withoutBirthday([bday, anniv]);
+    expect(next.some(isBirthday)).toBe(false);
+    expect(next).toHaveLength(1);
+  });
+});
 
 describe('constructors', () => {
   it('makePerson trims, starts with no cadence / never-contacted, empty history', () => {

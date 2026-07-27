@@ -15,7 +15,8 @@ import { usePeopleStore } from '../store/people';
 import { useConversationsStore } from '../store/conversations';
 import { useMeStore } from '../store/me';
 import { exportData, pickAndParseData } from '../lib/transfer';
-import { importFromContacts } from '../lib/contacts';
+import { ContactPicker } from '../components/ContactPicker';
+import type { Person } from '../data/person';
 import { AboutRow } from '../components/AboutRow';
 import { SettingsAbout } from '../components/SettingsAbout';
 import { ScreenHeader } from '../components/ScreenHeader';
@@ -42,16 +43,15 @@ export default function SettingsScreen({ navigation }: Props) {
   const me = useMeStore((st) => st.profile);
   const importMe = useMeStore((st) => st.importProfile);
   const [status, setStatus] = useState<string | null>(null);
+  const [pickerOpen, setPickerOpen] = useState(false);
 
-  const onImportContacts = useCallback(async () => {
-    const res = await importFromContacts();
-    if (res && 'denied' in res) {
-      setStatus(t('data.importDenied'));
-      return;
-    }
-    const n = res && 'people' in res ? importPeople(res.people) : 0;
-    setStatus(n > 0 ? t('data.imported', { count: n }) : t('data.importNone'));
-  }, [importPeople]);
+  const onPicked = useCallback(
+    (chosen: Person[]) => {
+      const n = importPeople(chosen);
+      setStatus(n > 0 ? t('data.imported', { count: n }) : t('data.importNone'));
+    },
+    [importPeople]
+  );
 
   const onExport = useCallback(() => {
     exportData(people, conversations, me).catch(() => setStatus(t('settings.couldntExport')));
@@ -86,13 +86,15 @@ export default function SettingsScreen({ navigation }: Props) {
         />
 
         <Text style={s.sectionLabel}>{t('settings.yourData')}</Text>
-        <AboutRow label={t('home.importContacts')} icon={UserPlus} onPress={onImportContacts} />
+        <AboutRow label={t('home.importContacts')} icon={UserPlus} onPress={() => setPickerOpen(true)} />
         <AboutRow label={t('settings.export')} icon={Upload} onPress={onExport} />
         <AboutRow label={t('settings.import')} icon={Download} onPress={onImport} />
         {status ? <Text style={s.status}>{status}</Text> : null}
 
         <SettingsAbout onAcknowledgements={() => navigation.navigate('Acknowledgements')} />
       </ScrollView>
+
+      <ContactPicker visible={pickerOpen} onClose={() => setPickerOpen(false)} onAdd={onPicked} />
     </SafeAreaView>
   );
 }

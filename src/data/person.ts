@@ -153,6 +153,44 @@ export function makeInteraction(kind: InteractionKind, note?: string, at = Date.
   return { id: makeId('int'), at, kind, note: trimmed ? trimmed : undefined };
 }
 
+/**
+ * Birthday is a first-class concept but stored as a canonical importantDate
+ * (label "Birthday") so it needs no schema change and rides the existing
+ * reminder + "Coming up" paths for free. These pure helpers give the UI a
+ * structured birthday field on top of that storage. The label match is
+ * case-insensitive so an imported "Birthday" and a hand-typed "birthday" are
+ * the same concept — at most one per person.
+ */
+export const BIRTHDAY_LABEL = 'Birthday';
+
+/** True when a date is the person's birthday (case-insensitive label match). Pure. */
+export function isBirthday(date: ImportantDate): boolean {
+  return date.label.trim().toLowerCase() === BIRTHDAY_LABEL.toLowerCase();
+}
+
+/** The person's birthday, if set (the first birthday-labeled date). Pure. */
+export function getBirthday(person: Person): ImportantDate | undefined {
+  return person.importantDates.find(isBirthday);
+}
+
+/** Every important date EXCEPT the birthday (which has its own field). Pure. */
+export function otherImportantDates(person: Person): ImportantDate[] {
+  return person.importantDates.filter((d) => !isBirthday(d));
+}
+
+/**
+ * Replace any existing birthday with a single canonical one — pure updater over
+ * a dates array (the store applies it). Non-birthday dates are untouched.
+ */
+export function withBirthday(dates: ImportantDate[], month: number, day: number, year?: number): ImportantDate[] {
+  return [...dates.filter((d) => !isBirthday(d)), makeImportantDate(BIRTHDAY_LABEL, month, day, year)];
+}
+
+/** Drop the birthday, keeping every other date. Pure. */
+export function withoutBirthday(dates: ImportantDate[]): ImportantDate[] {
+  return dates.filter((d) => !isBirthday(d));
+}
+
 export function activePeople(people: Person[]): Person[] {
   return people.filter((p) => p.deletedAt == null);
 }

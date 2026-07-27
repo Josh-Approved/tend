@@ -58,7 +58,9 @@ const fr = {
     notesLabel: 'Notes',
     notesPlaceholder: "Que veux-tu retenir ? Ses préférences, ce qui se passe pour elle, ce qu'il faudra lui demander la prochaine fois…",
     datesLabel: 'Dates importantes',
-    dateLabelPlaceholder: 'Anniversaire, date marquante…',
+    birthdayLabel: 'Anniversaire',
+    otherDatesLabel: 'Autres dates',
+    dateLabelPlaceholder: 'Jour de rencontre, date marquante…',
     monthPlaceholder: 'MM',
     dayPlaceholder: 'JJ',
     addDate: 'Ajouter une date',
@@ -278,6 +280,16 @@ const fr = {
     importNone: 'Aucun contact à ajouter trouvé.',
     importLimited: '{count} ajoutés parmi les contacts que tu as partagés.',
     importError: 'Impossible de lire tes contacts. Réessaie.',
+  },
+  contactPicker: {
+    title: 'Ajouter depuis les contacts',
+    guide: 'Choisis les personnes avec qui tu veux garder le contact. La plupart commencent avec quelques-unes. Tu peux toujours en ajouter plus tard.',
+    search: 'Rechercher des contacts',
+    added: 'Ajouté',
+    addCount: 'Ajouter {count}',
+    noContacts: 'Aucun contact trouvé sur cet appareil.',
+    loading: 'Chargement des contacts…',
+    limitedNote: 'Affichage des contacts que tu as partagés.',
   },
 };
 export default fr;

@@ -58,7 +58,9 @@ const ptBR = {
     notesLabel: 'Notas',
     notesPlaceholder: 'O que você quer lembrar? As preferências dela, o que está acontecendo, o que perguntar na próxima vez…',
     datesLabel: 'Datas importantes',
-    dateLabelPlaceholder: 'Aniversário, data especial…',
+    birthdayLabel: 'Aniversário',
+    otherDatesLabel: 'Outras datas',
+    dateLabelPlaceholder: 'Data especial, o dia em que se conheceram…',
     monthPlaceholder: 'MM',
     dayPlaceholder: 'DD',
     addDate: 'Adicionar data',
@@ -278,6 +280,16 @@ const ptBR = {
     importNone: 'Nenhum contato encontrado para adicionar.',
     importLimited: '{count} adicionados dos contatos que você compartilhou.',
     importError: 'Não foi possível ler seus contatos. Tente novamente.',
+  },
+  contactPicker: {
+    title: 'Adicionar dos contatos',
+    guide: 'Escolha as pessoas com quem você quer manter contato. A maioria começa com algumas. Você sempre pode adicionar mais depois.',
+    search: 'Buscar contatos',
+    added: 'Adicionado',
+    addCount: 'Adicionar {count}',
+    noContacts: 'Nenhum contato encontrado neste dispositivo.',
+    loading: 'Carregando contatos…',
+    limitedNote: 'Mostrando os contatos que você compartilhou.',
   },
 };
 export default ptBR;

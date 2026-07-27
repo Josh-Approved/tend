@@ -252,6 +252,30 @@ describe('important dates', () => {
     expect(remaining[0].label).toBe('Anniversary');
     expect(mReschedule).toHaveBeenCalledWith(store().people);
   });
+
+  it('setBirthday stores one canonical Birthday and replaces it on re-set', () => {
+    const id = store().createPerson('Ada');
+    store().addImportantDate(id, 'Anniversary', 6, 1);
+    store().setBirthday(id, 3, 14);
+    store().setBirthday(id, 4, 20); // re-set → replaces, never duplicates
+    const dates = store().getPerson(id)!.importantDates;
+    const births = dates.filter((d) => d.label.toLowerCase() === 'birthday');
+    expect(births).toHaveLength(1);
+    expect(births[0]).toMatchObject({ month: 4, day: 20 });
+    expect(dates.some((d) => d.label === 'Anniversary')).toBe(true);
+  });
+
+  it('clearBirthday removes the birthday but keeps other dates', () => {
+    const id = store().createPerson('Ada');
+    store().addImportantDate(id, 'Anniversary', 6, 1);
+    store().setBirthday(id, 3, 14);
+    mReschedule.mockClear();
+    store().clearBirthday(id);
+    const dates = store().getPerson(id)!.importantDates;
+    expect(dates.some((d) => d.label.toLowerCase() === 'birthday')).toBe(false);
+    expect(dates.map((d) => d.label)).toEqual(['Anniversary']);
+    expect(mReschedule).toHaveBeenCalledWith(store().people);
+  });
 });
 
 // ── preferences ──────────────────────────────────────────────────────────────
