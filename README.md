@@ -1,6 +1,6 @@
 # Relationships
 
-A calm, private way to keep up with the people you care about. No paywall, no ads, no tracking, no accounts. (This repository is named "tend"; the app itself is called Relationships on the App Store and Play Store.)
+A calm, private way to keep up with the people you care about. No paywall, no ads, no tracking, no accounts. (This repository is named "tend"; the app itself is called Relationships.)
 
 ## What it is
 
