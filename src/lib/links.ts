@@ -20,7 +20,6 @@ export const APP_NAME = 'Relationships - Josh Approved';
 export const IOS_APP_STORE_ID = '6785106429';
 export const ANDROID_PACKAGE = 'com.joshapproved.tend';
 
-export const BMAC_URL = 'https://buymeacoffee.com/jtysonwilliams';
 export const STUDIO_URL = 'https://joshapproved.com';
 export const REPO_URL = 'https://github.com/josh-approved/tend';
 export const PRIVACY_URL =
@@ -35,10 +34,6 @@ export function versionLabel(): string {
 
 export function openUrl(url: string): void {
   Linking.openURL(url).catch(() => {});
-}
-
-export function openBmac(): void {
-  openUrl(BMAC_URL);
 }
 
 export function openFeedbackMail(): void {

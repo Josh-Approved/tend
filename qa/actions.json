@@ -35,7 +35,8 @@
       "proof": {
         "kind": "none"
       },
-      "note": "Pressable · onPress"
+      "note": "Pressable · onPress",
+      "stale": true
     },
     {
       "id": "components/DonationModal#common.maybelater",
@@ -44,12 +45,13 @@
       "proof": {
         "kind": "none"
       },
-      "note": "Pressable · onPress"
+      "note": "Pressable · onPress",
+      "stale": true
     },
     {
       "id": "components/FundingFooter#about.support",
       "label": "about.support",
-      "where": "src/components/FundingFooter.tsx:78",
+      "where": "src/components/FundingFooter.tsx:80",
       "proof": {
         "kind": "none"
       },
@@ -58,7 +60,7 @@
     {
       "id": "components/FundingFooter#about.feedback",
       "label": "about.feedback",
-      "where": "src/components/FundingFooter.tsx:89",
+      "where": "src/components/FundingFooter.tsx:92",
       "proof": {
         "kind": "none"
       },
@@ -166,7 +168,7 @@
     {
       "id": "components/ReviewModal#review.leavea11y",
       "label": "review.leaveA11y",
-      "where": "src/components/ReviewModal.tsx:119",
+      "where": "src/components/ReviewModal.tsx:137",
       "proof": {
         "kind": "none"
       },
@@ -175,7 +177,7 @@
     {
       "id": "components/ReviewModal#common.notnow",
       "label": "common.notNow",
-      "where": "src/components/ReviewModal.tsx:127",
+      "where": "src/components/ReviewModal.tsx:145",
       "proof": {
         "kind": "none"
       },
@@ -193,7 +195,7 @@
     {
       "id": "components/SettingsAbout#about.learnmorea11y",
       "label": "about.learnMoreA11y",
-      "where": "src/components/SettingsAbout.tsx:68",
+      "where": "src/components/SettingsAbout.tsx:69",
       "proof": {
         "kind": "none"
       },
@@ -539,7 +541,7 @@
     {
       "id": "screens/TodayScreen#settings.title",
       "label": "settings.title",
-      "where": "src/screens/TodayScreen.tsx:62",
+      "where": "src/screens/TodayScreen.tsx:65",
       "proof": {
         "kind": "none"
       },
@@ -552,12 +554,13 @@
       "proof": {
         "kind": "none"
       },
-      "note": "Pressable · onPress · dynamic/child-text label"
+      "note": "Pressable · onPress · dynamic/child-text label",
+      "stale": true
     },
     {
       "id": "screens/TodayScreen#home.markreached",
       "label": "home.markReached",
-      "where": "src/screens/TodayScreen.tsx:111",
+      "where": "src/screens/TodayScreen.tsx:114",
       "proof": {
         "kind": "none"
       },
@@ -724,7 +727,8 @@
       "proof": {
         "kind": "none"
       },
-      "note": "Pressable · onPress · dynamic/child-text label"
+      "note": "Pressable · onPress · dynamic/child-text label",
+      "stale": true
     },
     {
       "id": "components/OptionChips#pressable-41",
@@ -894,6 +898,34 @@
       "id": "screens/TodayScreen#pressable-133",
       "label": "Pressable (dynamic label)",
       "where": "src/screens/TodayScreen.tsx:133",
+      "proof": {
+        "kind": "none"
+      },
+      "note": "Pressable · onPress · dynamic/child-text label",
+      "stale": true
+    },
+    {
+      "id": "components/DrilldownSheet#pressable-164",
+      "label": "Pressable (dynamic label)",
+      "where": "src/components/DrilldownSheet.tsx:164",
+      "proof": {
+        "kind": "none"
+      },
+      "note": "Pressable · onPress · dynamic/child-text label"
+    },
+    {
+      "id": "screens/TodayScreen#pressable-103",
+      "label": "Pressable (dynamic label)",
+      "where": "src/screens/TodayScreen.tsx:103",
+      "proof": {
+        "kind": "none"
+      },
+      "note": "Pressable · onPress · dynamic/child-text label"
+    },
+    {
+      "id": "screens/TodayScreen#pressable-136",
+      "label": "Pressable (dynamic label)",
+      "where": "src/screens/TodayScreen.tsx:136",
       "proof": {
         "kind": "none"
       },
