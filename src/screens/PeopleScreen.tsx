@@ -84,26 +84,18 @@ export default function PeopleScreen({ navigation }: TabScreenProps<'People'>) {
     <SafeAreaView style={s.safe} edges={['top', 'left', 'right']}>
       <View style={s.header}>
         <Text style={s.title}>{t('home.title')}</Text>
-        <View style={s.headerActions}>
-          <Pressable
-            onPress={openPicker}
-            hitSlop={8}
-            accessibilityRole="button"
-            accessibilityLabel={t('home.importContacts')}
-            style={({ pressed }) => [s.iconBtn, pressed && s.pressed]}
-          >
-            <UserPlus size={22} color={c.fg} strokeWidth={1.5} />
-          </Pressable>
-          <Pressable
-            onPress={() => navigation.navigate('Settings')}
-            hitSlop={8}
-            accessibilityRole="button"
-            accessibilityLabel={t('settings.title')}
-            style={({ pressed }) => [s.iconBtn, pressed && s.pressed]}
-          >
-            <SettingsIcon size={22} color={c.fg} strokeWidth={1.5} />
-          </Pressable>
-        </View>
+        {/* Gear only. A second "add" icon lived here for a while and read as a
+            rival + next to the FAB — one add affordance per surface. Adding more
+            people from contacts lives in the empty state and in Settings. */}
+        <Pressable
+          onPress={() => navigation.navigate('Settings')}
+          hitSlop={8}
+          accessibilityRole="button"
+          accessibilityLabel={t('settings.title')}
+          style={({ pressed }) => [s.iconBtn, pressed && s.pressed]}
+        >
+          <SettingsIcon size={22} color={c.fg} strokeWidth={1.5} />
+        </Pressable>
       </View>
 
       {directory.length === 0 ? (
@@ -221,7 +213,6 @@ function makeStyles(c: Colors) {
       paddingVertical: space.s4,
     },
     title: { ...ty.md, fontFamily: fontFamily.sansSemibold, color: c.fg },
-    headerActions: { flexDirection: 'row', alignItems: 'center' },
     iconBtn: { width: target.min, height: target.min, alignItems: 'center', justifyContent: 'center' },
     listContent: { ...boundedContent, paddingBottom: space.s9 },
     searchRow: {
