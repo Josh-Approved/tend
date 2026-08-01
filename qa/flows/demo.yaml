@@ -1,0 +1,53 @@
+# Hand-authored DEMO flow for the store/README GIF — Tend's core loop: Today
+# tells you who is due a nudge, you open them, and you log the catch-up in one
+# tap. NOT the generated screenshot journey (qa/flows/mobile.yaml), which is
+# paced for stills and traverses spokes a viewer does not need. Kept human-paced
+# and held on each state long enough to read. Driven headless by
+# josh-approved-factory/scripts/demo-capture.mjs (records the run + composites it
+# into the signature device frame). Runs against the QA_MODE build, which seeds
+# the overdue person "Mom" (src/qa/fixtures.ts: weekly cadence, 12 days since).
+appId: com.joshapproved.tend
+---
+- launchApp:
+    clearState: true
+- waitForAnimationToEnd:
+    timeout: 4000
+- extendedWaitUntil:
+    visible:
+      text: "Today"
+    timeout: 30000
+- extendedWaitUntil:
+    visible:
+      text: "Mom.*"
+    timeout: 15000
+# Hold on the triage list — this is the whole pitch: a short list of who needs
+# a nudge, not an inbox.
+- waitForAnimationToEnd:
+    timeout: 2200
+- tapOn:
+    text: "Mom.*"
+    retryTapIfNoChange: true
+- extendedWaitUntil:
+    visible:
+      text: "I reached out"
+    timeout: 10000
+# Hold on the person — the catch-up card and what you saved about them.
+- waitForAnimationToEnd:
+    timeout: 2600
+# Pick how you reached out (the chip switches off the default "Call"), then log
+# it. The status line under the button flips to "Reached out today".
+- tapOn:
+    text: "Text"
+    retryTapIfNoChange: true
+- waitForAnimationToEnd:
+    timeout: 1400
+- tapOn:
+    text: "I reached out"
+    retryTapIfNoChange: true
+- extendedWaitUntil:
+    visible:
+      text: "Reached out today"
+    timeout: 8000
+# Hold on the logged state so the payoff lands before the loop restarts.
+- waitForAnimationToEnd:
+    timeout: 3500
