@@ -75,7 +75,7 @@ export function PersonPicker({ visible, onClose, onSelect }: Props) {
         <Text style={s.rowTitle} numberOfLines={2}>
           {name}
         </Text>
-        <ChevronRight size={18} color={c.fgSubtle} strokeWidth={1.5} />
+        <ChevronRight size={18} color={c.fgMuted} strokeWidth={1.5} />
       </Pressable>
     );
   };
@@ -139,7 +139,7 @@ export function PersonPicker({ visible, onClose, onSelect }: Props) {
                           value={query}
                           onChangeText={setQuery}
                           placeholder={t('home.searchPlaceholder')}
-                          placeholderTextColor={c.fgSubtle}
+                          placeholderTextColor={c.fgMuted}
                           accessibilityLabel={t('home.searchPlaceholder')}
                           autoCorrect={false}
                           returnKeyType="search"

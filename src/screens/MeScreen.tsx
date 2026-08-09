@@ -65,7 +65,7 @@ export default function MeScreen({ navigation }: TabScreenProps<'Me'>) {
               value={profile[p.key] ?? ''}
               onChangeText={(v) => setField(p.key, v)}
               placeholder={t(mePromptPlaceholderKey(p.key))}
-              placeholderTextColor={c.fgSubtle}
+              placeholderTextColor={c.fgMuted}
               accessibilityLabel={t(mePromptLabelKey(p.key))}
               multiline
               textAlignVertical="top"

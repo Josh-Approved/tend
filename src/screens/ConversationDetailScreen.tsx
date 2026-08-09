@@ -158,7 +158,7 @@ export default function ConversationDetailScreen({ route, navigation }: Props) {
             value={conversation.personName}
             onChangeText={onChangeName}
             placeholder={t('htc.whoPlaceholder')}
-            placeholderTextColor={c.fgSubtle}
+            placeholderTextColor={c.fgMuted}
             accessibilityLabel={t('htc.whoLabel')}
           />
           {isLinked ? (
@@ -213,7 +213,7 @@ export default function ConversationDetailScreen({ route, navigation }: Props) {
           value={conversation.topic}
           onChangeText={(v) => setField(conversation.id, 'topic', v)}
           placeholder={t('htc.core.topicPlaceholder')}
-          placeholderTextColor={c.fgSubtle}
+          placeholderTextColor={c.fgMuted}
           accessibilityLabel={t('htc.core.topicLabel')}
           multiline
           textAlignVertical="top"
@@ -233,7 +233,7 @@ export default function ConversationDetailScreen({ route, navigation }: Props) {
               value={conversation.flavorFields[p.key] ?? ''}
               onChangeText={(v) => setFlavorField(conversation.id, p.key, v)}
               placeholder={t(promptPlaceholderKey(p.key))}
-              placeholderTextColor={c.fgSubtle}
+              placeholderTextColor={c.fgMuted}
               accessibilityLabel={t(promptLabelKey(p.key))}
               multiline={p.multiline}
               textAlignVertical={p.multiline ? 'top' : 'center'}
@@ -248,7 +248,7 @@ export default function ConversationDetailScreen({ route, navigation }: Props) {
           value={conversation.story}
           onChangeText={(v) => setField(conversation.id, 'story', v)}
           placeholder={t('htc.core.storyPlaceholder')}
-          placeholderTextColor={c.fgSubtle}
+          placeholderTextColor={c.fgMuted}
           accessibilityLabel={t('htc.core.storyLabel')}
           multiline
           textAlignVertical="top"
@@ -261,7 +261,7 @@ export default function ConversationDetailScreen({ route, navigation }: Props) {
           value={conversation.impact}
           onChangeText={(v) => setField(conversation.id, 'impact', v)}
           placeholder={t('htc.core.impactPlaceholder')}
-          placeholderTextColor={c.fgSubtle}
+          placeholderTextColor={c.fgMuted}
           accessibilityLabel={t('htc.core.impactLabel')}
           multiline
           textAlignVertical="top"
@@ -274,7 +274,7 @@ export default function ConversationDetailScreen({ route, navigation }: Props) {
           value={conversation.hope}
           onChangeText={(v) => setField(conversation.id, 'hope', v)}
           placeholder={t('htc.core.hopePlaceholder')}
-          placeholderTextColor={c.fgSubtle}
+          placeholderTextColor={c.fgMuted}
           accessibilityLabel={t('htc.core.hopeLabel')}
           multiline
           textAlignVertical="top"
@@ -293,7 +293,7 @@ export default function ConversationDetailScreen({ route, navigation }: Props) {
               value={conversation.reflection}
               onChangeText={(v) => setField(conversation.id, 'reflection', v)}
               placeholder={t('htc.reflectionPlaceholder')}
-              placeholderTextColor={c.fgSubtle}
+              placeholderTextColor={c.fgMuted}
               accessibilityLabel={t('htc.reflectionLabel')}
               multiline
               textAlignVertical="top"

@@ -47,7 +47,7 @@ export function PersonTextSheet({
           value={value}
           onChangeText={onChange}
           placeholder={placeholder}
-          placeholderTextColor={c.fgSubtle}
+          placeholderTextColor={c.fgMuted}
           accessibilityLabel={title}
           autoFocus
           multiline={multiline}

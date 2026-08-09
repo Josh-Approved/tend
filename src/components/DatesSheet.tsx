@@ -112,7 +112,7 @@ export function DatesSheet({
             value={bMonth}
             onChangeText={setBMonth}
             placeholder={t('person.monthPlaceholder')}
-            placeholderTextColor={c.fgSubtle}
+            placeholderTextColor={c.fgMuted}
             accessibilityLabel={`${t('person.birthdayLabel')} ${t('person.monthPlaceholder')}`}
             keyboardType="number-pad"
             maxLength={2}
@@ -122,7 +122,7 @@ export function DatesSheet({
             value={bDay}
             onChangeText={setBDay}
             placeholder={t('person.dayPlaceholder')}
-            placeholderTextColor={c.fgSubtle}
+            placeholderTextColor={c.fgMuted}
             accessibilityLabel={`${t('person.birthdayLabel')} ${t('person.dayPlaceholder')}`}
             keyboardType="number-pad"
             maxLength={2}
@@ -148,7 +148,7 @@ export function DatesSheet({
               accessibilityLabel={t('person.remove')}
               style={({ pressed }) => [s.iconBtn, pressed && s.pressed]}
             >
-              <Trash2 size={18} color={c.fgSubtle} strokeWidth={1.5} />
+              <Trash2 size={18} color={c.fgMuted} strokeWidth={1.5} />
             </Pressable>
           )}
         </View>
@@ -174,7 +174,7 @@ export function DatesSheet({
               accessibilityLabel={t('person.remove')}
               style={({ pressed }) => [s.iconBtn, pressed && s.pressed]}
             >
-              <Trash2 size={16} color={c.fgSubtle} strokeWidth={1.5} />
+              <Trash2 size={16} color={c.fgMuted} strokeWidth={1.5} />
             </Pressable>
           </View>
         ))}
@@ -185,7 +185,7 @@ export function DatesSheet({
             value={label}
             onChangeText={setLabel}
             placeholder={t('person.dateLabelPlaceholder')}
-            placeholderTextColor={c.fgSubtle}
+            placeholderTextColor={c.fgMuted}
             accessibilityLabel={t('person.dateLabelPlaceholder')}
           />
           <TextInput
@@ -193,7 +193,7 @@ export function DatesSheet({
             value={month}
             onChangeText={setMonth}
             placeholder={t('person.monthPlaceholder')}
-            placeholderTextColor={c.fgSubtle}
+            placeholderTextColor={c.fgMuted}
             accessibilityLabel={t('person.monthPlaceholder')}
             keyboardType="number-pad"
             maxLength={2}
@@ -203,7 +203,7 @@ export function DatesSheet({
             value={day}
             onChangeText={setDay}
             placeholder={t('person.dayPlaceholder')}
-            placeholderTextColor={c.fgSubtle}
+            placeholderTextColor={c.fgMuted}
             accessibilityLabel={t('person.dayPlaceholder')}
             keyboardType="number-pad"
             maxLength={2}

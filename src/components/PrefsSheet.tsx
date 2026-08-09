@@ -59,7 +59,7 @@ export function PrefsSheet({ visible, preferences, onClose, onAdd, onRemove }: P
               accessibilityLabel={t('person.remove')}
               style={({ pressed }) => [s.iconBtn, pressed && s.pressed]}
             >
-              <X size={16} color={c.fgSubtle} strokeWidth={1.5} />
+              <X size={16} color={c.fgMuted} strokeWidth={1.5} />
             </Pressable>
           </View>
         ))}
@@ -88,7 +88,7 @@ export function PrefsSheet({ visible, preferences, onClose, onAdd, onRemove }: P
             onChangeText={setText}
             onSubmitEditing={add}
             placeholder={t('person.prefPlaceholder')}
-            placeholderTextColor={c.fgSubtle}
+            placeholderTextColor={c.fgMuted}
             accessibilityLabel={t('person.prefPlaceholder')}
             returnKeyType="done"
           />

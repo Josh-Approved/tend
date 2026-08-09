@@ -128,7 +128,7 @@ export default function PeopleScreen({ navigation }: TabScreenProps<'People'>) {
                   value={query}
                   onChangeText={setQuery}
                   placeholder={t('home.searchPlaceholder')}
-                  placeholderTextColor={c.fgSubtle}
+                  placeholderTextColor={c.fgMuted}
                   accessibilityLabel={t('home.searchPlaceholder')}
                   autoCorrect={false}
                   returnKeyType="search"

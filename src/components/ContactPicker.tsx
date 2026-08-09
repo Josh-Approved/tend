@@ -122,7 +122,7 @@ export function ContactPicker({ visible, onClose, onAdd }: Props) {
       return (
         <View style={[s.row, s.rowDisabled]} accessible accessibilityLabel={`${item.name}, ${t('contactPicker.added')}`}>
           <View style={[s.checkbox, s.checkboxAdded]}>
-            <Check size={14} color={c.fgSubtle} strokeWidth={2.5} />
+            <Check size={14} color={c.fgMuted} strokeWidth={2.5} />
           </View>
           <Text style={[s.rowTitle, s.rowTitleAdded]} numberOfLines={2}>
             {item.name}
@@ -198,7 +198,7 @@ export function ContactPicker({ visible, onClose, onAdd }: Props) {
                       value={query}
                       onChangeText={setQuery}
                       placeholder={t('contactPicker.search')}
-                      placeholderTextColor={c.fgSubtle}
+                      placeholderTextColor={c.fgMuted}
                       accessibilityLabel={t('contactPicker.search')}
                       autoCorrect={false}
                       returnKeyType="search"

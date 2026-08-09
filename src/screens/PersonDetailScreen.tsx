@@ -134,7 +134,7 @@ export default function PersonDetailScreen({ route, navigation }: Props) {
             value={draftName}
             onChangeText={setDraftName}
             placeholder={t('person.namePlaceholder')}
-            placeholderTextColor={c.fgSubtle}
+            placeholderTextColor={c.fgMuted}
             accessibilityLabel={t('person.namePlaceholder')}
             autoFocus
             returnKeyType="done"
@@ -253,7 +253,7 @@ export default function PersonDetailScreen({ route, navigation }: Props) {
           value={person.name}
           onChangeText={(v) => renamePerson(person.id, v)}
           placeholder={t('person.namePlaceholder')}
-          placeholderTextColor={c.fgSubtle}
+          placeholderTextColor={c.fgMuted}
           accessibilityLabel={t('person.namePlaceholder')}
         />
 
@@ -284,7 +284,7 @@ export default function PersonDetailScreen({ route, navigation }: Props) {
             value={logNote}
             onChangeText={setLogNote}
             placeholder={t('person.logNotePlaceholder')}
-            placeholderTextColor={c.fgSubtle}
+            placeholderTextColor={c.fgMuted}
             accessibilityLabel={t('person.logNotePlaceholder')}
             multiline
             textAlignVertical="top"
@@ -376,7 +376,7 @@ export default function PersonDetailScreen({ route, navigation }: Props) {
             <Text style={s.listRowText} numberOfLines={2}>
               {conv.topic.trim() || t(flavorLabelKey(conv.flavor))}
             </Text>
-            <ChevronRight size={18} color={c.fgSubtle} strokeWidth={1.5} />
+            <ChevronRight size={18} color={c.fgMuted} strokeWidth={1.5} />
           </Pressable>
         ))}
         <Pressable
