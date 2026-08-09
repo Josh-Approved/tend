@@ -28,7 +28,7 @@ export const APP_STRINGS = {
     dueInDays: 'Due in {days}d',
     okInDays: 'Next check-in in {days}d',
     noReminder: 'No reminder set',
-    markReached: 'Mark reached out to {name}',
+    markReachedHint: 'Logs that you reached out to {name} today.',
     lastCheckInLabel: 'Last check-in',
     lastCheckInNever: 'Not yet',
     comingUp: 'Coming up',

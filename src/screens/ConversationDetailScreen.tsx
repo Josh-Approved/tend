@@ -152,7 +152,7 @@ export default function ConversationDetailScreen({ route, navigation }: Props) {
           keyboardDismissMode="on-drag"
         >
           {/* Who */}
-          <Text style={s.sectionLabel}>{t('htc.whoLabel')}</Text>
+          <Text style={s.sectionLabel} accessibilityRole="header">{t('htc.whoLabel')}</Text>
           <TextInput
             style={s.input}
             value={conversation.personName}
@@ -169,7 +169,7 @@ export default function ConversationDetailScreen({ route, navigation }: Props) {
               style={({ pressed }) => [s.linkRow, pressed && s.pressed]}
             >
               <Users size={16} color={c.appAccent} strokeWidth={1.75} />
-              <Text style={s.linkedText} numberOfLines={1}>
+              <Text style={s.linkedText} numberOfLines={2}>
                 {conversation.personName.trim() || t('htc.someone')}
               </Text>
               <Text style={s.changeText}>{t('htc.changePerson')}</Text>
@@ -187,7 +187,7 @@ export default function ConversationDetailScreen({ route, navigation }: Props) {
           )}
 
         {/* Flavor */}
-        <Text style={s.sectionLabel}>{t('htc.flavorLabel')}</Text>
+        <Text style={s.sectionLabel} accessibilityRole="header">{t('htc.flavorLabel')}</Text>
         <View style={s.chips}>
           {CONVERSATION_FLAVORS.map((f) => {
             const selected = conversation.flavor === f;
@@ -207,7 +207,7 @@ export default function ConversationDetailScreen({ route, navigation }: Props) {
         </View>
 
         {/* What to share */}
-        <Text style={s.sectionLabel}>{t('htc.core.topicLabel')}</Text>
+        <Text style={s.sectionLabel} accessibilityRole="header">{t('htc.core.topicLabel')}</Text>
         <TextInput
           style={s.notes}
           value={conversation.topic}
@@ -227,7 +227,7 @@ export default function ConversationDetailScreen({ route, navigation }: Props) {
         )}
         {def.prompts.map((p) => (
           <View key={p.key}>
-            <Text style={s.sectionLabel}>{t(promptLabelKey(p.key))}</Text>
+            <Text style={s.sectionLabel} accessibilityRole="header">{t(promptLabelKey(p.key))}</Text>
             <TextInput
               style={p.multiline ? s.notes : s.input}
               value={conversation.flavorFields[p.key] ?? ''}
@@ -242,7 +242,7 @@ export default function ConversationDetailScreen({ route, navigation }: Props) {
         ))}
 
         {/* The story I'm telling myself */}
-        <Text style={s.sectionLabel}>{t('htc.core.storyLabel')}</Text>
+        <Text style={s.sectionLabel} accessibilityRole="header">{t('htc.core.storyLabel')}</Text>
         <TextInput
           style={s.notes}
           value={conversation.story}
@@ -255,7 +255,7 @@ export default function ConversationDetailScreen({ route, navigation }: Props) {
         />
 
         {/* Impact */}
-        <Text style={s.sectionLabel}>{t('htc.core.impactLabel')}</Text>
+        <Text style={s.sectionLabel} accessibilityRole="header">{t('htc.core.impactLabel')}</Text>
         <TextInput
           style={s.notes}
           value={conversation.impact}
@@ -268,7 +268,7 @@ export default function ConversationDetailScreen({ route, navigation }: Props) {
         />
 
         {/* Hope */}
-        <Text style={s.sectionLabel}>{t('htc.core.hopeLabel')}</Text>
+        <Text style={s.sectionLabel} accessibilityRole="header">{t('htc.core.hopeLabel')}</Text>
         <TextInput
           style={s.notes}
           value={conversation.hope}
@@ -287,7 +287,7 @@ export default function ConversationDetailScreen({ route, navigation }: Props) {
               <Check size={18} color={c.accent} strokeWidth={2.5} />
               <Text style={s.hadBannerText}>{t('htc.hadOn')}</Text>
             </View>
-            <Text style={s.sectionLabel}>{t('htc.reflectionLabel')}</Text>
+            <Text style={s.sectionLabel} accessibilityRole="header">{t('htc.reflectionLabel')}</Text>
             <TextInput
               style={s.notes}
               value={conversation.reflection}
@@ -418,7 +418,7 @@ function makeStyles(c: Colors) {
       borderLeftWidth: 3,
       borderLeftColor: c.appAccent,
     },
-    noteText: { ...ty.sm, fontFamily: fontFamily.sans, color: c.fg, lineHeight: 20 },
+    noteText: { ...ty.sm, fontFamily: fontFamily.sans, color: c.fg },
     hadBtn: {
       flexDirection: 'row',
       alignItems: 'center',

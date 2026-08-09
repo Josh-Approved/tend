@@ -107,7 +107,7 @@ export default function SettingsScreen({ navigation }: Props) {
     <SafeAreaView style={s.safe} edges={['top', 'left', 'right', 'bottom']}>
       <ScreenHeader title={t('settings.title')} onBack={() => navigation.goBack()} />
       <ScrollView contentContainerStyle={s.content}>
-        <Text style={s.sectionLabel}>{t('settings.appearance')}</Text>
+        <Text style={s.sectionLabel} accessibilityRole="header">{t('settings.appearance')}</Text>
         <AppearanceToggle
           labels={{
             title: t('settings.appearance'),
@@ -117,7 +117,7 @@ export default function SettingsScreen({ navigation }: Props) {
           }}
         />
 
-        <Text style={s.sectionLabel}>{t('settings.reminders')}</Text>
+        <Text style={s.sectionLabel} accessibilityRole="header">{t('settings.reminders')}</Text>
         <View style={s.toggleRow}>
           <View style={s.toggleText} importantForAccessibility="no-hide-descendants">
             <Text style={s.toggleTitle}>{t('settings.birthdayReminders')}</Text>
@@ -135,7 +135,7 @@ export default function SettingsScreen({ navigation }: Props) {
           />
         </View>
 
-        <Text style={s.sectionLabel}>{t('settings.yourData')}</Text>
+        <Text style={s.sectionLabel} accessibilityRole="header">{t('settings.yourData')}</Text>
         <AboutRow label={t('home.importContacts')} icon={UserPlus} onPress={() => setPickerOpen(true)} />
         <AboutRow label={t('settings.export')} icon={Upload} onPress={onExport} />
         <AboutRow label={t('settings.import')} icon={Download} onPress={onImport} />

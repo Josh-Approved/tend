@@ -26,7 +26,7 @@ const de = {
     dueInDays: 'Fällig in {days} T.',
     okInDays: 'Nächster Kontakt in {days} T.',
     noReminder: 'Keine Erinnerung gesetzt',
-    markReached: 'Bei {name} gemeldet markieren',
+    markReachedHint: 'Speichert, dass du dich heute bei {name} gemeldet hast.',
     lastCheckInLabel: 'Letzter Kontakt',
     lastCheckInNever: 'Noch nie',
     comingUp: 'Steht bevor',

@@ -26,7 +26,7 @@ const fr = {
     dueInDays: 'À faire dans {days} j',
     okInDays: 'Prochain contact dans {days} j',
     noReminder: 'Aucun rappel défini',
-    markReached: 'Marquer que tu as pris des nouvelles de {name}',
+    markReachedHint: 'Enregistre que tu as pris des nouvelles de {name} aujourd’hui.',
     lastCheckInLabel: 'Dernier contact',
     lastCheckInNever: 'Pas encore',
     comingUp: 'À venir',

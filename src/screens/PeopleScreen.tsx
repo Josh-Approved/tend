@@ -83,7 +83,7 @@ export default function PeopleScreen({ navigation }: TabScreenProps<'People'>) {
   return (
     <SafeAreaView style={s.safe} edges={['top', 'left', 'right']}>
       <View style={s.header}>
-        <Text style={s.title}>{t('home.title')}</Text>
+        <Text style={s.title} accessibilityRole="header">{t('home.title')}</Text>
         {/* Gear only. A second "add" icon lived here for a while and read as a
             rival + next to the FAB — one add affordance per surface. Adding more
             people from contacts lives in the empty state and in Settings. */}

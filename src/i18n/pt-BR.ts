@@ -26,7 +26,7 @@ const ptBR = {
     dueInDays: 'Em {days}d',
     okInDays: 'Próximo contato em {days}d',
     noReminder: 'Sem lembrete definido',
-    markReached: 'Marcar contato com {name}',
+    markReachedHint: 'Salva que você entrou em contato com {name} hoje.',
     lastCheckInLabel: 'Último contato',
     lastCheckInNever: 'Ainda não',
     comingUp: 'Em breve',

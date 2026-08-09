@@ -15,6 +15,7 @@ import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { X, Search, UserPlus, ChevronRight } from 'lucide-react-native';
 import { usePeopleStore } from '../store/people';
 import { peopleByName, searchPeople, type Person } from '../data/person';
+import { useReducedMotion } from './Dialogs';
 import { t } from '../i18n';
 import {
   useTheme,
@@ -22,6 +23,7 @@ import {
   space,
   target,
   type as ty,
+  scaledLineHeight,
   hairline,
   radius,
   boundedContent,
@@ -42,6 +44,7 @@ interface Props {
 export function PersonPicker({ visible, onClose, onSelect }: Props) {
   const { c } = useTheme();
   const s = makeStyles(c);
+  const reduceMotion = useReducedMotion();
   const people = usePeopleStore((st) => st.people);
   const [query, setQuery] = useState('');
 
@@ -69,7 +72,7 @@ export function PersonPicker({ visible, onClose, onSelect }: Props) {
         accessibilityRole="button"
         accessibilityLabel={name}
       >
-        <Text style={s.rowTitle} numberOfLines={1}>
+        <Text style={s.rowTitle} numberOfLines={2}>
           {name}
         </Text>
         <ChevronRight size={18} color={c.fgSubtle} strokeWidth={1.5} />
@@ -78,11 +81,18 @@ export function PersonPicker({ visible, onClose, onSelect }: Props) {
   };
 
   return (
-    <Modal visible={visible} animationType="slide" transparent={false} onRequestClose={close}>
+    <Modal
+      visible={visible}
+      // animationType is a prop, not a hook — nothing else in the app guards it,
+      // so a literal here would slide in regardless of the OS Reduce Motion setting.
+      animationType={reduceMotion ? 'none' : 'slide'}
+      transparent={false}
+      onRequestClose={close}
+    >
       <SafeAreaProvider>
         <SafeAreaView style={s.safe} edges={['top', 'bottom', 'left', 'right']}>
           <View style={s.header}>
-            <Text style={s.title}>{t('htc.pickPersonTitle')}</Text>
+            <Text style={s.title} accessibilityRole="header">{t('htc.pickPersonTitle')}</Text>
             <Pressable
               onPress={close}
               hitSlop={8}
@@ -120,7 +130,7 @@ export function PersonPicker({ visible, onClose, onSelect }: Props) {
                   <Text style={s.emptyText}>{t('htc.noPeopleYet')}</Text>
                 ) : (
                   <>
-                    <Text style={s.sectionLabel}>{t('htc.chooseExisting')}</Text>
+                    <Text style={s.sectionLabel} accessibilityRole="header">{t('htc.chooseExisting')}</Text>
                     {showSearch && (
                       <View style={s.searchRow}>
                         <Search size={18} color={c.fgMuted} strokeWidth={1.5} />
@@ -230,7 +240,7 @@ function makeStyles(c: Colors) {
       fontFamily: fontFamily.sans,
       color: c.fgMuted,
       paddingTop: space.s6,
-      lineHeight: 24,
+      lineHeight: scaledLineHeight(24),
     },
     noResults: {
       ...ty.base,

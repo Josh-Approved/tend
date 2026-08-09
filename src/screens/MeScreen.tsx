@@ -42,7 +42,7 @@ export default function MeScreen({ navigation }: TabScreenProps<'Me'>) {
   return (
     <SafeAreaView style={s.safe} edges={['top', 'left', 'right']}>
       <View style={s.header}>
-        <Text style={s.title}>{t('me.title')}</Text>
+        <Text style={s.title} accessibilityRole="header">{t('me.title')}</Text>
         <Pressable
           onPress={() => navigation.navigate('Settings')}
           hitSlop={8}
@@ -59,7 +59,7 @@ export default function MeScreen({ navigation }: TabScreenProps<'Me'>) {
 
         {ME_PROMPTS.map((p) => (
           <View key={p.key}>
-            <Text style={s.sectionLabel}>{t(mePromptLabelKey(p.key))}</Text>
+            <Text style={s.sectionLabel} accessibilityRole="header">{t(mePromptLabelKey(p.key))}</Text>
             <TextInput
               style={s.notes}
               value={profile[p.key] ?? ''}
@@ -103,7 +103,7 @@ function makeStyles(c: Colors) {
     title: { ...ty.md, fontFamily: fontFamily.sansSemibold, color: c.fg },
     iconBtn: { width: target.min, height: target.min, alignItems: 'center', justifyContent: 'center' },
     content: { ...boundedContent, paddingHorizontal: space.s5, paddingBottom: space.s9 },
-    intro: { ...ty.sm, fontFamily: fontFamily.sans, color: c.fgMuted, lineHeight: 20, paddingTop: space.s2, paddingBottom: space.s2 },
+    intro: { ...ty.sm, fontFamily: fontFamily.sans, color: c.fgMuted, paddingTop: space.s2, paddingBottom: space.s2 },
     sectionLabel: {
       ...ty.xs,
       fontFamily: fontFamily.sansSemibold,

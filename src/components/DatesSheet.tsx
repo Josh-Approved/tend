@@ -105,7 +105,7 @@ export function DatesSheet({
     <DrilldownSheet visible={visible} title={t('person.datesLabel')} onClose={onClose}>
       <ScrollView contentContainerStyle={s.body} keyboardShouldPersistTaps="handled">
         {/* Birthday — first-class, pinned, at most one. */}
-        <Text style={s.sectionLabel}>{t('person.birthdayLabel')}</Text>
+        <Text style={s.sectionLabel} accessibilityRole="header">{t('person.birthdayLabel')}</Text>
         <View style={s.addRow}>
           <TextInput
             style={[s.input, s.numInput]}
@@ -161,7 +161,7 @@ export function DatesSheet({
         <Text style={s.hint}>{t('person.birthdayReminderHint')}</Text>
 
         {/* Other dates — anniversaries, the day you met, anything else. */}
-        <Text style={[s.sectionLabel, s.sectionLabelSpaced]}>{t('person.otherDatesLabel')}</Text>
+        <Text style={[s.sectionLabel, s.sectionLabelSpaced]} accessibilityRole="header">{t('person.otherDatesLabel')}</Text>
         {otherDates.map((d) => (
           <View key={d.id} style={s.listRow}>
             <Text style={s.listRowText}>

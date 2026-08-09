@@ -12,21 +12,30 @@ import React from 'react';
 import { Modal, View, Text, Pressable, ScrollView, StyleSheet } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { MessageCircleHeart } from 'lucide-react-native';
+import { useReducedMotion } from './Dialogs';
 import { t } from '../i18n';
-import { useTheme, fontFamily, space, target, type as ty, radius, type Colors } from '../theme';
+import { useTheme, fontFamily, space, target, type as ty, scaledLineHeight, radius, type Colors } from '../theme';
 
 export function HTCIntro({ visible, onClose }: { visible: boolean; onClose: () => void }) {
   const { c } = useTheme();
   const s = makeStyles(c);
+  const reduceMotion = useReducedMotion();
   return (
-    <Modal visible={visible} animationType="slide" transparent={false} onRequestClose={onClose}>
+    <Modal
+      visible={visible}
+      // animationType is a prop, not a hook — nothing else in the app guards it,
+      // so a literal here would slide in regardless of the OS Reduce Motion setting.
+      animationType={reduceMotion ? 'none' : 'slide'}
+      transparent={false}
+      onRequestClose={onClose}
+    >
       <SafeAreaProvider>
         <SafeAreaView style={s.safe} edges={['top', 'bottom', 'left', 'right']}>
           <ScrollView contentContainerStyle={s.content}>
             <View style={s.glyph}>
               <MessageCircleHeart size={28} color={c.appAccent} strokeWidth={1.5} />
             </View>
-            <Text style={s.title}>{t('htc.introTitle')}</Text>
+            <Text style={s.title} accessibilityRole="header">{t('htc.introTitle')}</Text>
             <Text style={s.body}>{t('htc.introBody1')}</Text>
             <Text style={s.body}>{t('htc.introBody2')}</Text>
             <Text style={s.body}>{t('htc.introBody3')}</Text>
@@ -62,7 +71,7 @@ function makeStyles(c: Colors) {
       marginBottom: space.s2,
     },
     title: { ...ty.md, fontFamily: fontFamily.sansSemibold, color: c.fg },
-    body: { ...ty.base, fontFamily: fontFamily.sans, color: c.fg, lineHeight: 24 },
+    body: { ...ty.base, fontFamily: fontFamily.sans, color: c.fg, lineHeight: scaledLineHeight(24) },
     privacy: { ...ty.sm, fontFamily: fontFamily.sans, color: c.fgMuted, paddingTop: space.s3 },
     footer: { paddingHorizontal: space.s6, paddingBottom: space.s5, paddingTop: space.s3 },
     btn: {

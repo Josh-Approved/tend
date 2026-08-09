@@ -46,22 +46,30 @@ export function PersonalitySheet({ visible, person, onClose, onPick }: Props) {
           const selected = personalityValue(person, cat.framework);
           return (
             <View key={cat.framework} style={s.block}>
-              <Text style={s.subLabel}>{t(frameworkLabelKey(cat.framework))}</Text>
+              <Text style={s.subLabel} accessibilityRole="header">
+                {t(frameworkLabelKey(cat.framework))}
+              </Text>
               <View style={s.chips}>
                 {cat.values.map((v) => {
                   const on = selected === v;
+                  // The chip shows the short form ("1", "Secure"); the label used to
+                  // be the long one ("Type 1 · The Improver"), which left a Voice
+                  // Control user unable to speak the name they can see. The name is
+                  // now what's printed on the chip, and the long form — where it
+                  // adds anything — moves to the hint, which Voice Control ignores.
+                  const short = t(optionShortKey(cat.framework, v));
+                  const full = t(optionLabelKey(cat.framework, v));
                   return (
                     <Pressable
                       key={v}
                       onPress={() => onPick(cat.framework, on ? null : v)}
                       accessibilityRole="button"
                       accessibilityState={{ selected: on }}
-                      accessibilityLabel={t(optionLabelKey(cat.framework, v))}
+                      accessibilityLabel={short}
+                      accessibilityHint={full === short ? undefined : full}
                       style={({ pressed }) => [s.chip, on && s.chipOn, pressed && s.pressed]}
                     >
-                      <Text style={[s.chipText, on && s.chipTextOn]}>
-                        {t(optionShortKey(cat.framework, v))}
-                      </Text>
+                      <Text style={[s.chipText, on && s.chipTextOn]}>{short}</Text>
                     </Pressable>
                   );
                 })}
@@ -110,6 +118,6 @@ function makeStyles(c: Colors) {
       gap: space.s2,
     },
     relateTitle: { ...ty.sm, fontFamily: fontFamily.sansSemibold, color: c.appAccent },
-    relateBody: { ...ty.sm, fontFamily: fontFamily.sans, color: c.fg, lineHeight: 20 },
+    relateBody: { ...ty.sm, fontFamily: fontFamily.sans, color: c.fg },
   });
 }

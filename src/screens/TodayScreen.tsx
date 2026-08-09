@@ -61,7 +61,7 @@ export default function TodayScreen({ navigation }: TabScreenProps<'Today'>) {
   return (
     <SafeAreaView style={s.safe} edges={['top', 'left', 'right']}>
       <View style={s.header}>
-        <Text style={s.title}>{t('today.title')}</Text>
+        <Text style={s.title} accessibilityRole="header">{t('today.title')}</Text>
         <Pressable
           onPress={() => navigation.navigate('Settings')}
           hitSlop={8}
@@ -95,7 +95,7 @@ export default function TodayScreen({ navigation }: TabScreenProps<'Today'>) {
         >
           {actionable.length > 0 && (
             <>
-              <Text style={s.sectionLabel}>{t('today.reachOut')}</Text>
+              <Text style={s.sectionLabel} accessibilityRole="header">{t('today.reachOut')}</Text>
               {actionable.map((person) => {
                 const displayName = person.name.trim() || t('person.newPerson');
                 return (
@@ -115,7 +115,14 @@ export default function TodayScreen({ navigation }: TabScreenProps<'Today'>) {
                       onPress={() => onReachedOut(person.id)}
                       hitSlop={8}
                       accessibilityRole="button"
-                      accessibilityLabel={t('home.markReached', { name: displayName })}
+                      // The accessible name has to BE the visible name: Voice Control
+                      // matches what a person can read on the button. "Mark reached out
+                      // to {name}" buried the visible word mid-phrase in English and
+                      // last in German and Japanese, so the pill was unspeakable. The
+                      // person's name lives in the hint, which Voice Control ignores and
+                      // VoiceOver still reads.
+                      accessibilityLabel={t('today.reachedOut')}
+                      accessibilityHint={t('home.markReachedHint', { name: displayName })}
                       style={({ pressed }) => [s.reachBtn, pressed && s.pressed]}
                     >
                       <Check size={16} color={c.accent} strokeWidth={2} />
@@ -129,7 +136,7 @@ export default function TodayScreen({ navigation }: TabScreenProps<'Today'>) {
 
           {upcoming.length > 0 && (
             <>
-              <Text style={s.sectionLabel}>{t('home.comingUp')}</Text>
+              <Text style={s.sectionLabel} accessibilityRole="header">{t('home.comingUp')}</Text>
               {upcoming.map((u) => {
                 const name = u.person.name.trim() || t('person.newPerson');
                 return (

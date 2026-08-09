@@ -26,7 +26,7 @@ const es = {
     dueInDays: 'En {days}d',
     okInDays: 'Próximo contacto en {days}d',
     noReminder: 'Sin recordatorio',
-    markReached: 'Marcar que contactaste con {name}',
+    markReachedHint: 'Guarda que contactaste con {name} hoy.',
     lastCheckInLabel: 'Último contacto',
     lastCheckInNever: 'Aún no',
     comingUp: 'Próximamente',

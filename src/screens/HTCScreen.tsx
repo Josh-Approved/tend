@@ -83,7 +83,7 @@ export default function HTCScreen({ navigation }: TabScreenProps<'HTC'>) {
       >
         <View style={s.rowMain}>
           <Text style={[s.rowTitle, muted && s.rowTitleMuted]}>{name}</Text>
-          <Text style={s.rowSub} numberOfLines={1}>
+          <Text style={s.rowSub} numberOfLines={2}>
             {secondary}
           </Text>
         </View>
@@ -95,7 +95,7 @@ export default function HTCScreen({ navigation }: TabScreenProps<'HTC'>) {
   return (
     <SafeAreaView style={s.safe} edges={['top', 'left', 'right']}>
       <View style={s.header}>
-        <Text style={s.title}>{t('htc.title')}</Text>
+        <Text style={s.title} accessibilityRole="header">{t('htc.title')}</Text>
         <View style={s.headerActions}>
           <Pressable
             onPress={() => setIntroVisible(true)}
@@ -126,13 +126,13 @@ export default function HTCScreen({ navigation }: TabScreenProps<'HTC'>) {
         <ScrollView contentContainerStyle={s.content}>
           {open.length > 0 && (
             <>
-              <Text style={s.sectionLabel}>{t('htc.toHave')}</Text>
+              <Text style={s.sectionLabel} accessibilityRole="header">{t('htc.toHave')}</Text>
               {open.map((item) => renderRow(item, false))}
             </>
           )}
           {had.length > 0 && (
             <>
-              <Text style={s.sectionLabel}>{t('htc.had')}</Text>
+              <Text style={s.sectionLabel} accessibilityRole="header">{t('htc.had')}</Text>
               {had.map((item) => renderRow(item, true))}
             </>
           )}

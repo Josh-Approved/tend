@@ -26,7 +26,7 @@ const it = {
     dueInDays: 'Tra {days}g',
     okInDays: 'Prossimo contatto tra {days}g',
     noReminder: 'Nessun promemoria impostato',
-    markReached: 'Segna che ti sei fatto sentire con {name}',
+    markReachedHint: 'Salva che ti sei fatto sentire con {name} oggi.',
     lastCheckInLabel: 'Ultimo contatto',
     lastCheckInNever: 'Non ancora',
     comingUp: 'In arrivo',

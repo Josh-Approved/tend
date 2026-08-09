@@ -22,6 +22,7 @@ import {
   type PickableContact,
   type ContactFetchResult,
 } from '../lib/contacts';
+import { useReducedMotion } from './Dialogs';
 import { t } from '../i18n';
 import {
   useTheme,
@@ -54,6 +55,7 @@ interface Props {
 export function ContactPicker({ visible, onClose, onAdd }: Props) {
   const { c } = useTheme();
   const s = makeStyles(c);
+  const reduceMotion = useReducedMotion();
   const people = usePeopleStore((st) => st.people);
 
   const [load, setLoad] = useState<LoadState>({ phase: 'loading' });
@@ -122,7 +124,7 @@ export function ContactPicker({ visible, onClose, onAdd }: Props) {
           <View style={[s.checkbox, s.checkboxAdded]}>
             <Check size={14} color={c.fgSubtle} strokeWidth={2.5} />
           </View>
-          <Text style={[s.rowTitle, s.rowTitleAdded]} numberOfLines={1}>
+          <Text style={[s.rowTitle, s.rowTitleAdded]} numberOfLines={2}>
             {item.name}
           </Text>
           <Text style={s.addedTag}>{t('contactPicker.added')}</Text>
@@ -140,7 +142,7 @@ export function ContactPicker({ visible, onClose, onAdd }: Props) {
         <View style={[s.checkbox, isSelected && s.checkboxOn]}>
           {isSelected && <Check size={14} color={c.inkButtonText} strokeWidth={3} />}
         </View>
-        <Text style={s.rowTitle} numberOfLines={1}>
+        <Text style={s.rowTitle} numberOfLines={2}>
           {item.name}
         </Text>
       </Pressable>
@@ -232,11 +234,18 @@ export function ContactPicker({ visible, onClose, onAdd }: Props) {
   const addLabel = selected.size > 0 ? t('contactPicker.addCount', { count: selected.size }) : t('common.add');
 
   return (
-    <Modal visible={visible} animationType="slide" transparent={false} onRequestClose={close}>
+    <Modal
+      visible={visible}
+      // animationType is a prop, not a hook — nothing else in the app guards it,
+      // so a literal here would slide in regardless of the OS Reduce Motion setting.
+      animationType={reduceMotion ? 'none' : 'slide'}
+      transparent={false}
+      onRequestClose={close}
+    >
       <SafeAreaProvider>
         <SafeAreaView style={s.safe} edges={['top', 'bottom', 'left', 'right']}>
           <View style={s.header}>
-            <Text style={s.title}>{t('contactPicker.title')}</Text>
+            <Text style={s.title} accessibilityRole="header">{t('contactPicker.title')}</Text>
             <Pressable
               onPress={close}
               hitSlop={8}
@@ -286,7 +295,7 @@ function makeStyles(c: Colors) {
     title: { ...ty.md, fontFamily: fontFamily.sansSemibold, color: c.fg, flex: 1 },
     iconBtn: { width: target.min, height: target.min, alignItems: 'center', justifyContent: 'center' },
     listContent: { ...boundedContent, paddingHorizontal: space.s5, paddingBottom: space.s9 },
-    guide: { ...ty.base, fontFamily: fontFamily.sans, color: c.fgMuted, lineHeight: 22, paddingBottom: space.s4 },
+    guide: { ...ty.base, fontFamily: fontFamily.sans, color: c.fgMuted, paddingBottom: space.s4 },
     limitedNote: { ...ty.sm, fontFamily: fontFamily.sans, color: c.fgMuted, paddingBottom: space.s4 },
     searchRow: {
       flexDirection: 'row',
@@ -331,7 +340,7 @@ function makeStyles(c: Colors) {
       paddingTop: space.s6,
     },
     centered: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: space.s3, paddingHorizontal: space.s6 },
-    centeredText: { ...ty.base, fontFamily: fontFamily.sans, color: c.fgMuted, textAlign: 'center', lineHeight: 22 },
+    centeredText: { ...ty.base, fontFamily: fontFamily.sans, color: c.fgMuted, textAlign: 'center' },
     footer: {
       ...boundedContent,
       paddingHorizontal: space.s5,

@@ -260,7 +260,7 @@ export default function PersonDetailScreen({ route, navigation }: Props) {
         {/* The ACTION — logging a catch-up — set apart from the information below.
             Grouped in its own card under a clear header so it reads as "do this",
             not as more facts about the person. */}
-        <Text style={s.sectionLabel}>{t('person.logSectionLabel')}</Text>
+        <Text style={s.sectionLabel} accessibilityRole="header">{t('person.logSectionLabel')}</Text>
         <View style={s.actionCard}>
           <View style={s.chips}>
             {INTERACTION_KINDS.map((k) => {
@@ -321,7 +321,7 @@ export default function PersonDetailScreen({ route, navigation }: Props) {
 
         {/* When the app should nudge you — the reminder machinery, kept apart
             from the facts below so "About them" is only what you know. */}
-        <Text style={s.sectionLabel}>{t('person.remindersSectionLabel')}</Text>
+        <Text style={s.sectionLabel} accessibilityRole="header">{t('person.remindersSectionLabel')}</Text>
         <DrilldownRow
           label={t('person.cadenceRow')}
           value={cadenceLabel(person.cadenceDays)}
@@ -337,7 +337,7 @@ export default function PersonDetailScreen({ route, navigation }: Props) {
 
         {/* What you know about them — one summary row per dimension; each opens
             its own focused sheet. */}
-        <Text style={s.sectionLabel}>{t('person.aboutSectionLabel')}</Text>
+        <Text style={s.sectionLabel} accessibilityRole="header">{t('person.aboutSectionLabel')}</Text>
         <DrilldownRow
           label={t('person.howWeMetLabel')}
           value={preview(person.howWeMet) || t('person.notSet')}
@@ -364,7 +364,7 @@ export default function PersonDetailScreen({ route, navigation }: Props) {
         />
 
         {/* Conversations to have (Have the Conversation) */}
-        <Text style={s.sectionLabel}>{t('htc.personSection')}</Text>
+        <Text style={s.sectionLabel} accessibilityRole="header">{t('htc.personSection')}</Text>
         {personConversations.map((conv) => (
           <Pressable
             key={conv.id}
@@ -373,7 +373,7 @@ export default function PersonDetailScreen({ route, navigation }: Props) {
             accessibilityLabel={conv.topic.trim() || t(flavorLabelKey(conv.flavor))}
             style={({ pressed }) => [s.listRow, pressed && s.pressed]}
           >
-            <Text style={s.listRowText} numberOfLines={1}>
+            <Text style={s.listRowText} numberOfLines={2}>
               {conv.topic.trim() || t(flavorLabelKey(conv.flavor))}
             </Text>
             <ChevronRight size={18} color={c.fgSubtle} strokeWidth={1.5} />

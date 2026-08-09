@@ -26,7 +26,7 @@ const ja = {
     dueInDays: 'あと{days}日',
     okInDays: '次の連絡まであと{days}日',
     noReminder: 'リマインダーは未設定',
-    markReached: '{name}に連絡したことを記録',
+    markReachedHint: '{name}に今日連絡したことを記録します。',
     lastCheckInLabel: '前回の連絡',
     lastCheckInNever: 'まだ',
     comingUp: 'もうすぐ',
