@@ -64,7 +64,7 @@ export const APP_STRINGS = {
     notesPlaceholder: "What do you want to remember? Their favorites, what's going on, what to ask about next time…",
     datesLabel: 'Important dates',
     birthdayLabel: 'Birthday',
-    birthdayReminderHint: 'Relationships reminds you the morning of. You can turn that off in Settings.',
+    birthdayReminderHint: 'Relationships reminds you on the day. You can turn that off in Settings.',
     otherDatesLabel: 'Other dates',
     dateLabelPlaceholder: 'Anniversary, the day you met…',
     monthPlaceholder: 'MM',
@@ -278,7 +278,7 @@ export const APP_STRINGS = {
   settings: {
     reminders: 'Reminders',
     birthdayReminders: 'Birthday reminders',
-    birthdayRemindersHint: 'A nudge on the morning of each birthday you have saved.',
+    birthdayRemindersHint: 'A nudge on each birthday you have saved.',
     notifyTime: 'Notification time',
   },
   notify: {

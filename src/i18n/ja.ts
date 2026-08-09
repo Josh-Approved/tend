@@ -62,7 +62,7 @@ const ja = {
     notesPlaceholder: '覚えておきたいことは？好きなもの、最近の様子、次に聞きたいこと…',
     datesLabel: '大切な日',
     birthdayLabel: '誕生日',
-    birthdayReminderHint: 'Relationships が当日の朝にお知らせします。設定でオフにできます。',
+    birthdayReminderHint: 'Relationships が当日にお知らせします。設定でオフにできます。',
     otherDatesLabel: 'その他の日',
     dateLabelPlaceholder: '記念日、出会った日…',
     monthPlaceholder: '月',
@@ -276,7 +276,7 @@ const ja = {
   settings: {
     reminders: 'リマインダー',
     birthdayReminders: '誕生日リマインダー',
-    birthdayRemindersHint: '保存した誕生日の朝にお知らせします。',
+    birthdayRemindersHint: '保存した誕生日の当日にお知らせします。',
     notifyTime: '通知時刻',
   },
   notify: {

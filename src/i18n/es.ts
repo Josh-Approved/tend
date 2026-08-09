@@ -62,7 +62,7 @@ const es = {
     notesPlaceholder: '¿Qué quieres recordar? Lo que le gusta, cómo le va, qué preguntarle la próxima vez…',
     datesLabel: 'Fechas importantes',
     birthdayLabel: 'Cumpleaños',
-    birthdayReminderHint: 'Relationships te avisa esa misma mañana. Puedes desactivarlo en Ajustes.',
+    birthdayReminderHint: 'Relationships te avisa ese mismo día. Puedes desactivarlo en Ajustes.',
     otherDatesLabel: 'Otras fechas',
     dateLabelPlaceholder: 'Aniversario, el día que se conocieron…',
     monthPlaceholder: 'MM',
@@ -276,7 +276,7 @@ const es = {
   settings: {
     reminders: 'Recordatorios',
     birthdayReminders: 'Recordatorios de cumpleaños',
-    birthdayRemindersHint: 'Un aviso la mañana de cada cumpleaños que hayas guardado.',
+    birthdayRemindersHint: 'Un aviso el día de cada cumpleaños que hayas guardado.',
     notifyTime: 'Hora de las notificaciones',
   },
   notify: {

@@ -62,7 +62,7 @@ const de = {
     notesPlaceholder: 'Was möchtest du dir merken? Ihre Vorlieben, was gerade los ist, wonach du nächstes Mal fragen kannst…',
     datesLabel: 'Wichtige Tage',
     birthdayLabel: 'Geburtstag',
-    birthdayReminderHint: 'Relationships erinnert dich am Morgen des Tages. In den Einstellungen kannst du das ausschalten.',
+    birthdayReminderHint: 'Relationships erinnert dich an dem Tag. In den Einstellungen kannst du das ausschalten.',
     otherDatesLabel: 'Weitere Tage',
     dateLabelPlaceholder: 'Jahrestag, der Tag eures Kennenlernens…',
     monthPlaceholder: 'MM',
@@ -276,7 +276,7 @@ const de = {
   settings: {
     reminders: 'Erinnerungen',
     birthdayReminders: 'Geburtstagserinnerungen',
-    birthdayRemindersHint: 'Ein Hinweis am Morgen jedes gespeicherten Geburtstags.',
+    birthdayRemindersHint: 'Ein Hinweis an jedem gespeicherten Geburtstag.',
     notifyTime: 'Uhrzeit der Benachrichtigungen',
   },
   notify: {

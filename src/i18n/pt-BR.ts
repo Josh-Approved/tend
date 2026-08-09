@@ -62,7 +62,7 @@ const ptBR = {
     notesPlaceholder: 'O que você quer lembrar? As preferências dela, o que está acontecendo, o que perguntar na próxima vez…',
     datesLabel: 'Datas importantes',
     birthdayLabel: 'Aniversário',
-    birthdayReminderHint: 'O Relationships avisa você na manhã do dia. Dá para desativar nas Configurações.',
+    birthdayReminderHint: 'O Relationships avisa você no dia. Dá para desativar nas Configurações.',
     otherDatesLabel: 'Outras datas',
     dateLabelPlaceholder: 'Data especial, o dia em que se conheceram…',
     monthPlaceholder: 'MM',
@@ -276,7 +276,7 @@ const ptBR = {
   settings: {
     reminders: 'Lembretes',
     birthdayReminders: 'Lembretes de aniversário',
-    birthdayRemindersHint: 'Um aviso na manhã de cada aniversário que você salvou.',
+    birthdayRemindersHint: 'Um aviso no dia de cada aniversário que você salvou.',
     notifyTime: 'Horário das notificações',
   },
   notify: {
