@@ -277,8 +277,10 @@ const fr = {
     reminders: 'Rappels',
     birthdayReminders: 'Rappels d’anniversaire',
     birthdayRemindersHint: 'Un rappel le matin de chaque anniversaire enregistré.',
+    notifyTime: 'Heure des notifications',
   },
   notify: {
+    channelName: 'Rappels',
     reachOutTitle: 'Il est temps de prendre des nouvelles de {name}',
     reachOutBody: "Ça fait un moment — un petit bonjour fait beaucoup de bien.",
     dateTitle: 'Le {label} de {name} approche',

@@ -277,8 +277,10 @@ const ja = {
     reminders: 'リマインダー',
     birthdayReminders: '誕生日リマインダー',
     birthdayRemindersHint: '保存した誕生日の朝にお知らせします。',
+    notifyTime: '通知時刻',
   },
   notify: {
+    channelName: 'リマインダー',
     reachOutTitle: '{name}に連絡する頃です',
     reachOutBody: 'しばらく経ちました。短いひと言でも、ずっと届きます。',
     dateTitle: '{name}の{label}が近づいています',

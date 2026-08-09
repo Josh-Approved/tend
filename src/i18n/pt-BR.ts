@@ -277,8 +277,10 @@ const ptBR = {
     reminders: 'Lembretes',
     birthdayReminders: 'Lembretes de aniversário',
     birthdayRemindersHint: 'Um aviso na manhã de cada aniversário que você salvou.',
+    notifyTime: 'Horário das notificações',
   },
   notify: {
+    channelName: 'Lembretes',
     reachOutTitle: 'Hora de entrar em contato com {name}',
     reachOutBody: 'Já faz um tempo — um oi rápido faz toda a diferença.',
     dateTitle: '{label} de {name} está chegando',

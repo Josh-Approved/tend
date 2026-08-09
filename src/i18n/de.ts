@@ -277,8 +277,10 @@ const de = {
     reminders: 'Erinnerungen',
     birthdayReminders: 'Geburtstagserinnerungen',
     birthdayRemindersHint: 'Ein Hinweis am Morgen jedes gespeicherten Geburtstags.',
+    notifyTime: 'Uhrzeit der Benachrichtigungen',
   },
   notify: {
+    channelName: 'Erinnerungen',
     reachOutTitle: 'Zeit, dich bei {name} zu melden',
     reachOutBody: 'Es ist eine Weile her – ein kurzes Hallo bewirkt viel.',
     dateTitle: '{name}: {label} steht bevor',

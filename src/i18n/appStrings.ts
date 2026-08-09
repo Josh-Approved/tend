@@ -279,8 +279,10 @@ export const APP_STRINGS = {
     reminders: 'Reminders',
     birthdayReminders: 'Birthday reminders',
     birthdayRemindersHint: 'A nudge on the morning of each birthday you have saved.',
+    notifyTime: 'Notification time',
   },
   notify: {
+    channelName: 'Reminders',
     reachOutTitle: 'Time to reach out to {name}',
     reachOutBody: "It's been a while — a quick hello goes a long way.",
     dateTitle: "{name}'s {label} is coming up",

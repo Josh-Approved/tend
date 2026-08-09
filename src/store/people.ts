@@ -25,7 +25,7 @@ import {
 import { putTombstone } from '../storage/kv';
 import { dedupePeopleByName } from '../lib/contacts';
 import { loadAllPeople, savePerson, deletePersonFromDb } from './db';
-import { rescheduleAll } from '../lib/notifications';
+import { optInToReminders, syncAppReminders } from '../lib/reminderAdapter';
 import { logEvent, logError } from '../feedback/log';
 import { QA_MODE } from '../qa/qaMode';
 import { qaPeople } from '../qa/fixtures';
@@ -59,7 +59,12 @@ function persist(person: Person): void {
 
 export const usePeopleStore = create<PeopleState>()((set, get) => {
   function syncNotifications(): void {
-    rescheduleAll(get().people).catch(() => {});
+    syncAppReminders(get().people).catch(() => {});
+  }
+
+  /** The explicit opt-in — the one path allowed to raise the OS dialog. */
+  function optIn(): void {
+    optInToReminders(get().people).catch(() => {});
   }
 
   function mutate(id: string, fn: (p: Person) => Person): void {
@@ -113,7 +118,8 @@ export const usePeopleStore = create<PeopleState>()((set, get) => {
       mutate(id, (p) => ({ ...p, cadenceDays }));
       // Setting a cadence is the explicit opt-in: this is the only place that may
       // prompt for notification permission. Skip the prompt when clearing it.
-      rescheduleAll(get().people, { prompt: cadenceDays != null }).catch(() => {});
+      if (cadenceDays != null) optIn();
+      else syncNotifications();
     },
 
     logContact: (id, kind = 'other', note) => {
@@ -141,9 +147,9 @@ export const usePeopleStore = create<PeopleState>()((set, get) => {
         importantDates: [...p.importantDates, makeImportantDate(label, month, day, year)],
       }));
       // Saving a date IS the point of value — the one moment it's fair to ask
-      // for notification permission (and rescheduleAll only asks if the date
+      // for notification permission (and the opt-in only asks if the date
       // actually produces a reminder).
-      rescheduleAll(get().people, { prompt: true }).catch(() => {});
+      optIn();
     },
 
     removeImportantDate: (id, dateId) => {
@@ -155,7 +161,7 @@ export const usePeopleStore = create<PeopleState>()((set, get) => {
       mutate(id, (p) => ({ ...p, importantDates: withBirthday(p.importantDates, month, day, year) }));
       // Same point-of-value opt-in as addImportantDate — saving a birthday is
       // the user asking to be reminded of it.
-      rescheduleAll(get().people, { prompt: true }).catch(() => {});
+      optIn();
     },
 
     clearBirthday: (id) => {
@@ -196,7 +202,8 @@ export const usePeopleStore = create<PeopleState>()((set, get) => {
       // value as typing one in — but only then. A plain name-only import never
       // raises the permission dialog.
       const broughtDates = toAdd.some((p) => p.importantDates.length > 0);
-      rescheduleAll(get().people, { prompt: broughtDates }).catch(() => {});
+      if (broughtDates) optIn();
+      else syncNotifications();
       return toAdd.length;
     },
   };

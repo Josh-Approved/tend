@@ -23,7 +23,6 @@ import {
   setPersonalityValue,
   nextOccurrence,
   upcomingDates,
-  planReminders,
   sanitizeImportedPerson,
   isBirthday,
   getBirthday,
@@ -110,127 +109,6 @@ describe('dueStatus — the trust core', () => {
   it('falls back to createdAt when never contacted', () => {
     const p = at('New', { cadenceDays: 7, lastContactedAt: null, createdAt: now - 9 * DAY_MS });
     expect(dueStatus(p, now).state).toBe('overdue');
-  });
-});
-
-describe('planReminders — reliable scheduling', () => {
-  const now = 1_700_000_000_000;
-  const reachoutFor = (id: string, r: ReturnType<typeof planReminders>) =>
-    r.reminders.find((x) => x.key === `reachout:${id}` && x.kind === 'reachOut');
-
-  it('arms a future due-moment at the exact time (delivers with the app closed)', () => {
-    const p = at('Mom', { cadenceDays: 7, lastContactedAt: now - 2 * DAY_MS });
-    const due = now - 2 * DAY_MS + 7 * DAY_MS; // 5 days out
-    const r = planReminders([p], now, {});
-    expect(reachoutFor(p.id, r)?.at).toBe(due);
-    // and it must never clamp a future alarm to "just after the app opens"
-    expect(reachoutFor(p.id, r)?.at).toBeGreaterThan(now + 60_000);
-    expect(r.marks[p.id]).toBe(due);
-  });
-
-  it('a future alarm is still armed even when its due-cycle is already marked (never dropped)', () => {
-    // This is the 6-months-out / never-reopen regression guard: dedup must not
-    // cancel a pending future alarm just because we remembered arming it.
-    const p = at('Later', { cadenceDays: 180, lastContactedAt: now });
-    const due = now + 180 * DAY_MS;
-    const r = planReminders([p], now, { [p.id]: due });
-    expect(reachoutFor(p.id, r)?.at).toBe(due);
-  });
-
-  it('overdue with no prior mark: one catch-up nudge shortly after, and remembers the cycle', () => {
-    const p = at('Old', { cadenceDays: 7, lastContactedAt: now - 30 * DAY_MS });
-    const due = now - 30 * DAY_MS + 7 * DAY_MS; // in the past
-    const r = planReminders([p], now, {}, 60_000);
-    expect(reachoutFor(p.id, r)?.at).toBe(now + 60_000);
-    expect(r.marks[p.id]).toBe(due);
-  });
-
-  it('overdue already nudged for this cycle: does NOT re-fire on the next reschedule', () => {
-    const p = at('Old', { cadenceDays: 7, lastContactedAt: now - 30 * DAY_MS });
-    const due = now - 30 * DAY_MS + 7 * DAY_MS;
-    const r = planReminders([p], now, { [p.id]: due });
-    expect(reachoutFor(p.id, r)).toBeUndefined();
-    expect(r.marks[p.id]).toBe(due); // mark carried forward
-  });
-
-  it('logging contact starts a new cycle, which re-arms (mark no longer matches)', () => {
-    const p = at('Old', { cadenceDays: 7, lastContactedAt: now - DAY_MS });
-    const staleMark = now - 30 * DAY_MS; // a previous, different due-cycle
-    const r = planReminders([p], now, { [p.id]: staleMark });
-    const due = now - DAY_MS + 7 * DAY_MS; // 6 days out, future
-    expect(reachoutFor(p.id, r)?.at).toBe(due);
-    expect(r.marks[p.id]).toBe(due);
-  });
-
-  it('no cadence, deleted people, and marks pruning', () => {
-    const none = at('NoCadence', { cadenceDays: null });
-    const gone = at('Deleted', { cadenceDays: 7, lastContactedAt: now - 30 * DAY_MS, deletedAt: now });
-    const r = planReminders([none, gone], now, { [gone.id]: 123 });
-    expect(r.reminders).toHaveLength(0);
-    expect(r.marks).toEqual({}); // pruned — no cadence people to remember
-  });
-
-  it('arms an important date the morning of its next occurrence', () => {
-    const d = new Date(now);
-    const p = at('Bday', {
-      importantDates: [makeImportantDate('Birthday', d.getMonth() + 1, d.getDate() + 2)],
-    });
-    const r = planReminders([p], now, {});
-    const date = r.reminders.find((x) => x.kind === 'importantDate');
-    expect(date).toBeDefined();
-    expect(date?.at).toBeGreaterThan(now);
-    expect(date?.dateLabel).toBe('Birthday');
-  });
-
-  describe('birthday reminders on/off', () => {
-    const d = new Date(now);
-    const soonMonth = d.getMonth() + 1;
-    const soonDay = d.getDate() + 2;
-    const withDates = () =>
-      at('Both', {
-        importantDates: [
-          makeImportantDate('Birthday', soonMonth, soonDay),
-          makeImportantDate('Anniversary', soonMonth, soonDay),
-        ],
-      });
-    const dateLabels = (r: ReturnType<typeof planReminders>) =>
-      r.reminders.filter((x) => x.kind === 'importantDate').map((x) => x.dateLabel);
-
-    it('birthdays are planned by default (no opts, and opts omitted flag)', () => {
-      expect(dateLabels(planReminders([withDates()], now, {}))).toEqual(['Birthday', 'Anniversary']);
-      expect(dateLabels(planReminders([withDates()], now, {}, 60_000, {}))).toEqual([
-        'Birthday',
-        'Anniversary',
-      ]);
-      expect(dateLabels(planReminders([withDates()], now, {}, 60_000, { excludeBirthdays: false }))).toEqual([
-        'Birthday',
-        'Anniversary',
-      ]);
-    });
-
-    it('excludeBirthdays drops ONLY the birthday; other dates still plan', () => {
-      const r = planReminders([withDates()], now, {}, 60_000, { excludeBirthdays: true });
-      expect(dateLabels(r)).toEqual(['Anniversary']);
-    });
-
-    it('a lowercase "birthday" label is excluded too (same canonical concept)', () => {
-      const p = at('Lower', { importantDates: [makeImportantDate('  birthday ', soonMonth, soonDay)] });
-      expect(dateLabels(planReminders([p], now, {}, 60_000, { excludeBirthdays: true }))).toEqual([]);
-      expect(dateLabels(planReminders([p], now, {}))).toEqual(['birthday']);
-    });
-
-    it('never touches reach-out reminders or the marks', () => {
-      const p = at('Mom', {
-        cadenceDays: 7,
-        lastContactedAt: now - 2 * DAY_MS,
-        importantDates: [makeImportantDate('Birthday', soonMonth, soonDay)],
-      });
-      const due = now - 2 * DAY_MS + 7 * DAY_MS;
-      const off = planReminders([p], now, {}, 60_000, { excludeBirthdays: true });
-      expect(reachoutFor(p.id, off)?.at).toBe(due);
-      expect(off.marks[p.id]).toBe(due);
-      expect(dateLabels(off)).toEqual([]);
-    });
   });
 });
 

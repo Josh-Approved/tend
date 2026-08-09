@@ -8,6 +8,11 @@
  * The load-bearing logic is `dueStatus` ("who should I reach out to, and how does
  * that read?") and `upcomingDates` (birthdays/anniversaries coming up). Both pure
  * and heavily tested.
+ *
+ * Reminder scheduling is NOT here. It lives in the canonical factory module —
+ * the pure planner `data/reminderPlan.ts` decides what to arm, `lib/reminderScheduler.ts`
+ * arms it, and `lib/reminderAdapter.ts` maps a Person's cadence and dates onto
+ * the planner's neutral item shape.
  */
 
 import { makeId } from '../lib/id';
@@ -305,95 +310,6 @@ export function upcomingDates(people: Person[], now: number, withinDays = UPCOMI
     }
   }
   return out.sort((a, b) => a.days - b.days);
-}
-
-/**
- * A single local reminder to arm with the OS. The scheduling layer
- * (lib/notifications.ts) turns each into a dated notification; keeping the
- * "when does it fire" decision here means it's pure and unit-tested directly.
- */
-export interface PlannedReminder {
-  /** Stable per-reason id, e.g. `reachout:<personId>` or `date:<dateId>`. */
-  key: string;
-  /** Fire time, ms epoch. */
-  at: number;
-  kind: 'reachOut' | 'importantDate';
-  personName: string;
-  /** Present only for importantDate reminders. */
-  dateLabel?: string;
-}
-
-/** 9am local on the day of `dayMs` (a local-midnight ms from nextOccurrence). */
-function morningOf(dayMs: number): number {
-  const d = new Date(dayMs);
-  d.setHours(9, 0, 0, 0);
-  return d.getTime();
-}
-
-/**
- * Options for `planReminders`. Every field is optional and defaults to the
- * previous behaviour, so existing call sites keep working unchanged.
- */
-export interface PlanRemindersOptions {
-  /**
-   * Skip birthday-labeled important dates (the "Birthday reminders" setting is
-   * off). Non-birthday dates are always planned — the user typed those in one
-   * at a time, so each one is its own explicit opt-in. Default: false.
-   */
-  excludeBirthdays?: boolean;
-}
-
-/**
- * Decide which local reminders to arm, given the people and the "already nudged"
- * marks from last time. THE FIX FOR RELIABLE DELIVERY lives here:
- *
- *   - A reach-out whose due moment is in the FUTURE is armed for that exact
- *     moment. The OS holds it and delivers on time even if the app is never
- *     reopened — this case must never depend on an app launch. (Re-arming an
- *     unfired future alarm on each launch is harmless: it just replaces itself.)
- *   - A reach-out ALREADY overdue when we plan (cadence set on a stale contact,
- *     or permission granted late) gets one prompt catch-up nudge, then is
- *     remembered so reopening the app can't re-fire the same due-cycle.
- *   - Important dates fire the morning of the next occurrence. Birthdays are on
- *     by default and can be switched off wholesale (`excludeBirthdays`); every
- *     other date always plans.
- *
- * Pure + deterministic (now + marks + opts passed in). Returns the reminders to
- * arm and the marks to persist — auto-pruned to the people who still have a due
- * cadence.
- */
-export function planReminders(
-  people: Person[],
-  now: number,
-  marks: Record<string, number> = {},
-  overdueDelayMs = 60_000,
-  opts: PlanRemindersOptions = {}
-): { reminders: PlannedReminder[]; marks: Record<string, number> } {
-  const reminders: PlannedReminder[] = [];
-  const nextMarks: Record<string, number> = {};
-  for (const p of activePeople(people)) {
-    const name = p.name.trim();
-    const due = dueStatus(p, now);
-    if (due.dueAt != null) {
-      if (due.dueAt > now) {
-        // Future due moment: arm it exactly; the OS delivers with the app closed.
-        reminders.push({ key: `reachout:${p.id}`, at: due.dueAt, kind: 'reachOut', personName: name });
-      } else if (marks[p.id] !== due.dueAt) {
-        // Overdue and not yet nudged for this due-cycle: a single catch-up nudge.
-        reminders.push({ key: `reachout:${p.id}`, at: now + overdueDelayMs, kind: 'reachOut', personName: name });
-      }
-      // Remember this due-cycle either way, so a reopen never re-fires it.
-      nextMarks[p.id] = due.dueAt;
-    }
-    for (const d of p.importantDates) {
-      if (opts.excludeBirthdays && isBirthday(d)) continue;
-      const at = morningOf(nextOccurrence(d, now));
-      if (at > now) {
-        reminders.push({ key: `date:${d.id}`, at, kind: 'importantDate', personName: name, dateLabel: d.label });
-      }
-    }
-  }
-  return { reminders, marks: nextMarks };
 }
 
 /**

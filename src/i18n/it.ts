@@ -277,8 +277,10 @@ const it = {
     reminders: 'Promemoria',
     birthdayReminders: 'Promemoria dei compleanni',
     birthdayRemindersHint: 'Un avviso la mattina di ogni compleanno che hai salvato.',
+    notifyTime: 'Orario delle notifiche',
   },
   notify: {
+    channelName: 'Promemoria',
     reachOutTitle: 'È ora di farti sentire con {name}',
     reachOutBody: 'È passato un po’ — un saluto veloce vale tanto.',
     dateTitle: '{label} di {name} è in arrivo',

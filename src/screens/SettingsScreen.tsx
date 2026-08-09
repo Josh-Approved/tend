@@ -19,9 +19,11 @@ import { exportData, pickAndParseData } from '../lib/transfer';
 import {
   getBirthdayRemindersEnabled,
   setBirthdayRemindersEnabled,
-  rescheduleAll,
-} from '../lib/notifications';
+  syncAppReminders,
+} from '../lib/reminderAdapter';
 import { ContactPicker } from '../components/ContactPicker';
+import { DrilldownRow } from '../components/DrilldownRow';
+import { NotifyTimePane, hourText, useNotifyHour } from '../components/NotifyTimeSetting';
 import type { Person } from '../data/person';
 import { AboutRow } from '../components/AboutRow';
 import { SettingsAbout } from '../components/SettingsAbout';
@@ -60,6 +62,9 @@ export default function SettingsScreen({ navigation }: Props) {
   const [tipVisible, setTipVisible] = useState(false);
   // Birthday reminders default ON; read the stored value once on mount.
   const [birthdayReminders, setBirthdayReminders] = useState(true);
+  // One app-wide hour for every day-shaped reminder (birthdays, other dates).
+  const [notifyHour, pickNotifyHour] = useNotifyHour();
+  const [notifyTimeOpen, setNotifyTimeOpen] = useState(false);
 
   useEffect(() => {
     let alive = true;
@@ -77,7 +82,7 @@ export default function SettingsScreen({ navigation }: Props) {
       setBirthdayRemindersEnabled(next)
         // Apply immediately: turning it off cancels the armed birthday alarms,
         // turning it back on re-arms them. Never prompts from here.
-        .then(() => rescheduleAll(usePeopleStore.getState().people))
+        .then(() => syncAppReminders(usePeopleStore.getState().people))
         .catch(() => {});
     },
     []
@@ -140,6 +145,13 @@ export default function SettingsScreen({ navigation }: Props) {
             accessibilityState={{ checked: birthdayReminders }}
           />
         </View>
+        <View style={s.drilldownRow}>
+          <DrilldownRow
+            label={t('settings.notifyTime')}
+            value={hourText(notifyHour)}
+            onPress={() => setNotifyTimeOpen(true)}
+          />
+        </View>
 
         <Text style={s.sectionLabel} accessibilityRole="header">{t('settings.yourData')}</Text>
         <AboutRow label={t('home.importContacts')} icon={UserPlus} onPress={() => setPickerOpen(true)} />
@@ -162,6 +174,18 @@ export default function SettingsScreen({ navigation }: Props) {
           onSupport={TIP_JAR_ENABLED ? () => setTipVisible(true) : undefined}
         />
       </ScrollView>
+
+      {/* Pane, not a Modal, and rendered at the SCREEN ROOT — the drill-down
+          placement contract (design system § Hub-and-spoke drill-downs). */}
+      <NotifyTimePane
+        visible={notifyTimeOpen}
+        hour={notifyHour}
+        onClose={() => setNotifyTimeOpen(false)}
+        onPick={(h) => {
+          pickNotifyHour(h);
+          setNotifyTimeOpen(false);
+        }}
+      />
 
       <ContactPicker visible={pickerOpen} onClose={() => setPickerOpen(false)} onAdd={onPicked} />
       {tipVisible && (
@@ -204,6 +228,9 @@ function makeStyles(c: Colors) {
       borderBottomWidth: hairline,
       borderBottomColor: c.hairline,
     },
+    // DrilldownRow brings no horizontal padding of its own (it's designed for a
+    // padded hub scroll), so match the surrounding rows' gutter here.
+    drilldownRow: { paddingHorizontal: space.s6 },
     toggleText: { flex: 1, gap: 2 },
     toggleTitle: { ...ty.base, fontFamily: fontFamily.sans, color: c.fg },
     toggleHint: { ...ty.sm, fontFamily: fontFamily.sans, color: c.fgMuted },

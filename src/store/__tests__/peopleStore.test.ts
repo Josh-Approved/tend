@@ -16,7 +16,10 @@ jest.mock('../db', () => ({
   deletePersonFromDb: jest.fn(async () => {}),
 }));
 jest.mock('../../storage/kv', () => ({ putTombstone: jest.fn(async () => {}) }));
-jest.mock('../../lib/notifications', () => ({ rescheduleAll: jest.fn(async () => {}) }));
+jest.mock('../../lib/reminderAdapter', () => ({
+  syncAppReminders: jest.fn(async () => {}),
+  optInToReminders: jest.fn(async () => {}),
+}));
 // The store pulls in lib/contacts (for the real dedupe), which top-level imports
 // expo-contacts/legacy — a native module that won't load under jest. Stub it.
 jest.mock('expo-contacts/legacy', () => ({
@@ -31,14 +34,15 @@ jest.mock('../../qa/fixtures', () => ({ qaPeople: () => [] }));
 import { usePeopleStore } from '../people';
 import { savePerson, loadAllPeople, deletePersonFromDb } from '../db';
 import { putTombstone } from '../../storage/kv';
-import { rescheduleAll } from '../../lib/notifications';
+import { optInToReminders, syncAppReminders } from '../../lib/reminderAdapter';
 import { makePerson, type Person } from '../../data/person';
 
 const mSave = savePerson as jest.Mock;
 const mLoad = loadAllPeople as jest.Mock;
 const mDelete = deletePersonFromDb as jest.Mock;
 const mTombstone = putTombstone as jest.Mock;
-const mReschedule = rescheduleAll as jest.Mock;
+const mSync = syncAppReminders as jest.Mock;
+const mOptIn = optInToReminders as jest.Mock;
 
 /** Let fire-and-forget persist/delete `.catch` handlers run. */
 const flush = () => new Promise((r) => setImmediate(r));
@@ -156,19 +160,23 @@ describe('getPerson', () => {
 describe('setCadence', () => {
   it('sets the cadence and reschedules WITH a prompt when non-null', () => {
     const id = store().createPerson('Ada');
-    mReschedule.mockClear();
+    mSync.mockClear();
+    mOptIn.mockClear();
     store().setCadence(id, 7);
     expect(store().getPerson(id)!.cadenceDays).toBe(7);
-    expect(mReschedule).toHaveBeenCalledWith(expect.any(Array), { prompt: true });
+    expect(mOptIn).toHaveBeenCalledWith(expect.any(Array));
+    expect(mSync).not.toHaveBeenCalled();
   });
 
   it('clears the cadence and reschedules WITHOUT a prompt when null', () => {
     const id = store().createPerson('Ada');
     store().setCadence(id, 30);
-    mReschedule.mockClear();
+    mSync.mockClear();
+    mOptIn.mockClear();
     store().setCadence(id, null);
     expect(store().getPerson(id)!.cadenceDays).toBeNull();
-    expect(mReschedule).toHaveBeenCalledWith(expect.any(Array), { prompt: false });
+    expect(mSync).toHaveBeenCalledWith(expect.any(Array));
+    expect(mOptIn).not.toHaveBeenCalled();
   });
 });
 
@@ -177,7 +185,8 @@ describe('logContact', () => {
   it('prepends an interaction, sets lastContactedAt, and re-syncs notifications', () => {
     const id = store().createPerson('Ada');
     nowValue = 5_000_000;
-    mReschedule.mockClear();
+    mSync.mockClear();
+    mOptIn.mockClear();
     store().logContact(id, 'call', 'caught up');
     const p = store().getPerson(id)!;
     expect(p.interactions).toHaveLength(1);
@@ -185,7 +194,7 @@ describe('logContact', () => {
     expect(p.interactions[0].note).toBe('caught up');
     expect(p.lastContactedAt).toBe(p.interactions[0].at);
     // notifications re-synced with the current people list
-    expect(mReschedule).toHaveBeenCalledWith(store().people);
+    expect(mSync).toHaveBeenCalledWith(store().people);
   });
 
   it('prepends newer interactions in front of older ones', () => {
@@ -231,12 +240,14 @@ describe('setHowWeMet', () => {
 describe('important dates', () => {
   it('adds a date and reschedules WITH a prompt (adding a date is the opt-in)', () => {
     const id = store().createPerson('Ada');
-    mReschedule.mockClear();
+    mSync.mockClear();
+    mOptIn.mockClear();
     store().addImportantDate(id, 'Birthday', 3, 14, 1990);
     const dates = store().getPerson(id)!.importantDates;
     expect(dates).toHaveLength(1);
     expect(dates[0]).toMatchObject({ label: 'Birthday', month: 3, day: 14, year: 1990 });
-    expect(mReschedule).toHaveBeenCalledWith(store().people, { prompt: true });
+    expect(mOptIn).toHaveBeenCalledWith(store().people);
+    expect(mSync).not.toHaveBeenCalled();
   });
 
   it('removes exactly the targeted date, keeping the others', () => {
@@ -244,13 +255,14 @@ describe('important dates', () => {
     store().addImportantDate(id, 'Birthday', 3, 14);
     store().addImportantDate(id, 'Anniversary', 6, 1);
     const [first, second] = store().getPerson(id)!.importantDates;
-    mReschedule.mockClear();
+    mSync.mockClear();
+    mOptIn.mockClear();
     store().removeImportantDate(id, first.id);
     const remaining = store().getPerson(id)!.importantDates;
     expect(remaining).toHaveLength(1);
     expect(remaining[0].id).toBe(second.id);
     expect(remaining[0].label).toBe('Anniversary');
-    expect(mReschedule).toHaveBeenCalledWith(store().people);
+    expect(mSync).toHaveBeenCalledWith(store().people);
   });
 
   it('setBirthday stores one canonical Birthday and replaces it on re-set', () => {
@@ -267,21 +279,24 @@ describe('important dates', () => {
 
   it('setBirthday reschedules WITH a prompt (saving a birthday is the opt-in)', () => {
     const id = store().createPerson('Ada');
-    mReschedule.mockClear();
+    mSync.mockClear();
+    mOptIn.mockClear();
     store().setBirthday(id, 3, 14);
-    expect(mReschedule).toHaveBeenCalledWith(store().people, { prompt: true });
+    expect(mOptIn).toHaveBeenCalledWith(store().people);
+    expect(mSync).not.toHaveBeenCalled();
   });
 
   it('clearBirthday removes the birthday but keeps other dates', () => {
     const id = store().createPerson('Ada');
     store().addImportantDate(id, 'Anniversary', 6, 1);
     store().setBirthday(id, 3, 14);
-    mReschedule.mockClear();
+    mSync.mockClear();
+    mOptIn.mockClear();
     store().clearBirthday(id);
     const dates = store().getPerson(id)!.importantDates;
     expect(dates.some((d) => d.label.toLowerCase() === 'birthday')).toBe(false);
     expect(dates.map((d) => d.label)).toEqual(['Anniversary']);
-    expect(mReschedule).toHaveBeenCalledWith(store().people);
+    expect(mSync).toHaveBeenCalledWith(store().people);
   });
 });
 
@@ -332,13 +347,14 @@ describe('deletePerson', () => {
   it('removes exactly the target, tombstones it, and re-syncs notifications', () => {
     const idA = store().createPerson('Ada');
     const idB = store().createPerson('Bo');
-    mReschedule.mockClear();
+    mSync.mockClear();
+    mOptIn.mockClear();
     store().deletePerson(idA);
     const ids = store().people.map((p) => p.id);
     expect(ids).toEqual([idB]);
     expect(mDelete).toHaveBeenCalledWith(idA);
     expect(mTombstone).toHaveBeenCalledWith(idA, expect.any(Number));
-    expect(mReschedule).toHaveBeenCalledWith(store().people);
+    expect(mSync).toHaveBeenCalledWith(store().people);
   });
 
   it('keeps the state change but warns when the disk delete rejects', async () => {
@@ -375,27 +391,33 @@ describe('importPeople', () => {
 
   it('returns 0 and does not mutate when there is nothing to add', () => {
     const before = store().people;
-    mReschedule.mockClear();
+    mSync.mockClear();
+    mOptIn.mockClear();
     const added = store().importPeople([]);
     expect(added).toBe(0);
     expect(store().people).toBe(before);
-    expect(mReschedule).not.toHaveBeenCalled();
+    expect(mSync).not.toHaveBeenCalled();
+    expect(mOptIn).not.toHaveBeenCalled();
   });
 
   it('re-syncs WITHOUT a prompt when the added people carry no dates', () => {
-    mReschedule.mockClear();
+    mSync.mockClear();
+    mOptIn.mockClear();
     store().importPeople([makePerson('Ada')]);
-    expect(mReschedule).toHaveBeenCalledWith(store().people, { prompt: false });
+    expect(mSync).toHaveBeenCalledWith(store().people);
+    expect(mOptIn).not.toHaveBeenCalled();
   });
 
   it('re-syncs WITH a prompt when the added people bring important dates', () => {
-    mReschedule.mockClear();
+    mSync.mockClear();
+    mOptIn.mockClear();
     const withDate: Person = {
       ...makePerson('Bo'),
       importantDates: [{ id: 'd1', label: 'Birthday', month: 3, day: 14 }],
     };
     store().importPeople([withDate]);
-    expect(mReschedule).toHaveBeenCalledWith(store().people, { prompt: true });
+    expect(mOptIn).toHaveBeenCalledWith(store().people);
+    expect(mSync).not.toHaveBeenCalled();
   });
 });
 
@@ -407,7 +429,7 @@ describe('hydrate', () => {
     await store().hydrate();
     expect(store().people).toEqual(loaded);
     expect(store().hydrated).toBe(true);
-    expect(mReschedule).toHaveBeenCalledWith(store().people);
+    expect(mSync).toHaveBeenCalledWith(store().people);
   });
 
   it('stays empty but marks hydrated when disk has no people (QA_MODE off)', async () => {
@@ -467,7 +489,10 @@ function requireQaStore(opts: { loaded: Person[]; fixtures: Person[] }) {
     deletePersonFromDb: jest.fn(async () => {}),
   }));
   jest.doMock('../../storage/kv', () => ({ putTombstone: jest.fn(async () => {}) }));
-  jest.doMock('../../lib/notifications', () => ({ rescheduleAll: jest.fn(async () => {}) }));
+  jest.doMock('../../lib/reminderAdapter', () => ({
+    syncAppReminders: jest.fn(async () => {}),
+    optInToReminders: jest.fn(async () => {}),
+  }));
   jest.doMock('expo-contacts/legacy', () => ({
     Fields: {},
     SortTypes: {},

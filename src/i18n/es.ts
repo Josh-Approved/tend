@@ -277,8 +277,10 @@ const es = {
     reminders: 'Recordatorios',
     birthdayReminders: 'Recordatorios de cumpleaños',
     birthdayRemindersHint: 'Un aviso la mañana de cada cumpleaños que hayas guardado.',
+    notifyTime: 'Hora de las notificaciones',
   },
   notify: {
+    channelName: 'Recordatorios',
     reachOutTitle: 'Es buen momento para contactar con {name}',
     reachOutBody: 'Hace tiempo: un saludo rápido vale mucho.',
     dateTitle: 'Se acerca {label} de {name}',
