@@ -28,6 +28,7 @@ import MeScreen from './src/screens/MeScreen';
 import SettingsScreen from './src/screens/SettingsScreen';
 import Credits from './src/components/Credits';
 import { IOS_APP_STORE_ID, ANDROID_PACKAGE } from './src/lib/links';
+import { LAUNCHED_AT } from './src/constants/launch';
 import { t } from './src/i18n';
 import { QA_MODE } from './src/qa/qaMode';
 
@@ -141,7 +142,7 @@ export default function App() {
   const ready = fontsLoaded && peopleHydrated && conversationsHydrated && meHydrated;
 
   return (
-    <AppShell ready={ready} review={REVIEW}>
+    <AppShell ready={ready} review={REVIEW} launchedAt={LAUNCHED_AT}>
       <RootStack.Navigator screenOptions={{ headerShown: false, animation: QA_MODE ? 'none' : undefined }}>
         <RootStack.Screen name="Tabs" component={Tabs} />
         <RootStack.Screen name="PersonDetail" component={PersonDetailScreen} />

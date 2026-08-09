@@ -28,6 +28,8 @@ import { SettingsAbout } from '../components/SettingsAbout';
 import { ScreenHeader } from '../components/ScreenHeader';
 import TipJarSheet from '../components/TipJarSheet';
 import { TIP_PRODUCT_IDS } from '../constants/tipProducts';
+import { LAUNCHED_AT } from '../constants/launch';
+import { isWithinLaunchWindow } from '../storage/launchNotice';
 import { TIP_JAR_ENABLED } from '../lib/links';
 import { t } from '../i18n';
 import {
@@ -145,6 +147,16 @@ export default function SettingsScreen({ navigation }: Props) {
         <AboutRow label={t('settings.import')} icon={Download} onPress={onImport} />
         {status ? <Text style={s.status}>{status}</Text> : null}
 
+        {/* Launch-window note. Keeps the "we just launched, tell us what broke"
+            signal available after the launch-notice card stops interrupting,
+            and disappears on its own when the window closes. */}
+        {isWithinLaunchWindow(LAUNCHED_AT) ? (
+          <View style={s.launchNote}>
+            <Text style={s.launchNoteTitle}>{t('launchNotice.settingsRow')}</Text>
+            <Text style={s.launchNoteHint}>{t('launchNotice.settingsHint')}</Text>
+          </View>
+        ) : null}
+
         <SettingsAbout
           onAcknowledgements={() => navigation.navigate('Acknowledgements')}
           onSupport={TIP_JAR_ENABLED ? () => setTipVisible(true) : undefined}
@@ -195,5 +207,12 @@ function makeStyles(c: Colors) {
     toggleText: { flex: 1, gap: 2 },
     toggleTitle: { ...ty.base, fontFamily: fontFamily.sans, color: c.fg },
     toggleHint: { ...ty.sm, fontFamily: fontFamily.sans, color: c.fgMuted },
+    launchNote: {
+      gap: 2,
+      paddingHorizontal: space.s6,
+      paddingTop: space.s7,
+    },
+    launchNoteTitle: { ...ty.base, fontFamily: fontFamily.sansSemibold, color: c.fg },
+    launchNoteHint: { ...ty.sm, fontFamily: fontFamily.sans, color: c.fgMuted },
   });
 }
