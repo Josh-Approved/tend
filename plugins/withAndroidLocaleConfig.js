@@ -1,61 +1,80 @@
+const { withAndroidManifest, withDangerousMod, AndroidConfig } = require('expo/config-plugins');
 const fs = require('fs');
 const path = require('path');
-const { withAndroidManifest, withDangerousMod, AndroidConfig } = require('expo/config-plugins');
 
-// Declares the app's translated locales to Android (canon § Translations —
-// "Declare localizations in the build"). Without this, the OS per-app language
-// screen and the Play listing's Languages field see English only, because our
-// translations are runtime-only (a JS dictionary), not Android resource folders
-// the platform can discover on its own.
+// Declare the app's translated languages to Android (canon § Translations,
+// "Declare localizations in the build").
 //
-// Expo SDK 56 has no `expo.android.localeConfig` config key (verified against
-// @expo/config-types — the android object has no locale field at all), so
-// writing one into app.json would be a no-op that silently reads as done. This
-// plugin does the real work at prebuild instead: it writes
-// res/xml/locales_config.xml and points the manifest's <application> at it via
-// android:localeConfig, which is what Android 13+ (API 33) per-app language
-// preferences read.
+// Our translations are runtime-only — the i18n dictionary swaps inside the JS
+// bundle — so the OS has no way to know the app speaks seven languages. Two
+// user-visible surfaces depend on the declaration: Android 13+'s per-app
+// language screen (Settings > Apps > <App> > Language), and the Play listing's
+// Languages field. Without it the app looks English-only in both places.
 //
-// Keep LOCALES matched to src/i18n/locales.ts and to
-// ios.infoPlist.CFBundleLocalizations in app.json — the two platforms must
-// claim the same set. BCP-47 tags; Android wants the region separated with
-// "-" here (pt-BR), which it maps to its own values-b+pt+BR resource form.
+// Android reads this from a `res/xml/locales_config.xml` resource referenced by
+// `android:localeConfig` on <application>. Expo's app config has NO
+// `android.localeConfig` key — verified against @expo/config-types on both SDK
+// 56 and SDK 57; the Android interface carries no locale field at all, so
+// writing one into app.json is a silent no-op that reads as done. (`expo.locales`
+// is a different feature: it localizes permission prompt strings, not the
+// language set.) Hence this config plugin, matching the withGradleJvmArgs
+// pattern: it writes the resource and sets the attribute at prebuild, so both
+// survive CNG regeneration.
+//
+// The iOS half of the same requirement is `ios.infoPlist.CFBundleLocalizations`
+// in app.json, which Expo does support directly. Both platforms must claim the
+// same set — keep LOCALES here, that array, and the app's src/i18n locale list
+// in step.
+
+/** en is the build language; the rest are the canon § Translations locale set.
+ *  BCP-47 tags, the form both locales_config.xml and CFBundleLocalizations take.
+ *  Android maps the region form ("pt-BR") to its own values-b+pt+BR resource. */
 const LOCALES = ['en', 'es', 'de', 'fr', 'it', 'pt-BR', 'ja'];
 
-const RES_XML_DIR = ['app', 'src', 'main', 'res', 'xml'];
-const FILE_NAME = 'locales_config.xml';
+const RESOURCE_NAME = 'locales_config';
 
-function localesConfigXml(locales) {
+/** Pure: the locales_config.xml body. Exported so a drift test can read it
+ *  without running a prebuild. */
+function buildLocalesConfigXml(locales) {
   const entries = locales.map((l) => `    <locale android:name="${l}"/>`).join('\n');
-  return [
-    '<?xml version="1.0" encoding="utf-8"?>',
-    '<locale-config xmlns:android="http://schemas.android.com/apk/res/android">',
-    entries,
-    '</locale-config>',
-    '',
-  ].join('\n');
+  return (
+    '<?xml version="1.0" encoding="utf-8"?>\n' +
+    '<locale-config xmlns:android="http://schemas.android.com/apk/res/android">\n' +
+    `${entries}\n` +
+    '</locale-config>\n'
+  );
 }
 
-module.exports = function withAndroidLocaleConfig(config) {
-  // 1. Write res/xml/locales_config.xml.
-  config = withDangerousMod(config, [
+function withLocalesConfigResource(config, locales) {
+  return withDangerousMod(config, [
     'android',
     async (cfg) => {
-      const dir = path.join(cfg.modRequest.platformProjectRoot, ...RES_XML_DIR);
-      fs.mkdirSync(dir, { recursive: true });
-      fs.writeFileSync(path.join(dir, FILE_NAME), localesConfigXml(LOCALES), 'utf8');
+      const xmlDir = path.join(
+        cfg.modRequest.platformProjectRoot,
+        'app',
+        'src',
+        'main',
+        'res',
+        'xml'
+      );
+      fs.mkdirSync(xmlDir, { recursive: true });
+      fs.writeFileSync(path.join(xmlDir, `${RESOURCE_NAME}.xml`), buildLocalesConfigXml(locales));
       return cfg;
     },
   ]);
+}
 
-  // 2. Point <application android:localeConfig> at it.
+function withLocaleConfigAttribute(config) {
   return withAndroidManifest(config, (cfg) => {
     const application = AndroidConfig.Manifest.getMainApplicationOrThrow(cfg.modResults);
-    application.$['android:localeConfig'] = '@xml/locales_config';
+    application.$['android:localeConfig'] = `@xml/${RESOURCE_NAME}`;
     return cfg;
   });
+}
+
+module.exports = function withAndroidLocaleConfig(config, { locales = LOCALES } = {}) {
+  return withLocaleConfigAttribute(withLocalesConfigResource(config, locales));
 };
 
-// Exported for the unit test — the generated XML is the whole contract.
 module.exports.LOCALES = LOCALES;
-module.exports.localesConfigXml = localesConfigXml;
+module.exports.buildLocalesConfigXml = buildLocalesConfigXml;

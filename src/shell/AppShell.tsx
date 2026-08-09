@@ -52,8 +52,8 @@ import { shouldShowLaunchNotice } from '../storage/launchNotice';
 import { logEvent, logNav } from '../feedback/log';
 import { QA_MODE } from '../qa/qaMode';
 
-/** Beat between the splash finishing and a shell card appearing, so it fades in
- *  on a settled screen instead of racing the splash out. */
+/** Beat between the splash finishing and the review prompt appearing, so the
+ *  card fades in on a settled screen instead of racing the splash out. */
 const REVIEW_PROMPT_DELAY_MS = 800;
 
 /**
@@ -102,22 +102,15 @@ type Props = {
     androidPackageName: string;
   };
   /**
-   * The app's real public launch date as an ISO date ("2026-08-09") — the day
-   * its store listing went live, not the build or submission date. Pass it and
-   * the shell owns the launch-notice card: the sessions-1-to-3 cap, the 60-day
-   * window, and mounting <LaunchNoticeModal>. Apps carry no trigger code
-   * (templates/launch-notice/README.md). Omit it and the card never shows.
+   * The app's public launch date as an ISO date string ("2026-08-09"). Pass it
+   * and the shell owns the launch notice too — the window, the 3-session cap,
+   * and mounting <LaunchNoticeModal> (canon / templates/launch-notice). Omit it
+   * and no notice is ever shown. Apps carry no trigger code for this either.
    */
   launchedAt?: string;
 };
 
-export function AppShell({
-  ready,
-  children,
-  navigationRef,
-  review,
-  launchedAt,
-}: Props) {
+export function AppShell({ ready, children, navigationRef, review, launchedAt }: Props) {
   // Restore + apply the saved appearance preference (System/Light/Dark) once,
   // before first paint. Drives useColorScheme() below and in every screen.
   useApplyThemePreference();
@@ -130,28 +123,6 @@ export function AppShell({
   const isDark = useColorScheme() === 'dark';
   const [splashDone, setSplashDone] = useState(false);
 
-  // ---- Review prompt (canon § Review prompt) -------------------------------
-  // The trigger is a SESSION — one app cold start, i.e. one JS boot — so this
-  // effect must count exactly once per boot no matter how many times the shell
-  // re-renders. The ref is that guard; state can't be (a re-render reads the
-  // stale value before the async resolve lands).
-  //
-  // Two hard rules, both encoded below:
-  //   1. Never under QA_MODE. The deterministic capture pipeline must never
-  //      meet a surprise modal, and a capture run must not burn a session
-  //      either — so QA_MODE doesn't even count the boot.
-  //   2. Never over the splash. The prompt waits for `splashDone && ready`,
-  //      then a short beat, so it lands on a settled first screen.
-  //
-  // PRECEDENCE — one shell modal per session. If the launch-notice card
-  // (templates/launch-notice) is showing this session, the review prompt does
-  // NOT show: two cards stacked on a cold start is exactly the "vies for the
-  // user's attention" pattern tenet 5 forbids, and the launch notice is the
-  // more time-sensitive of the two (it has a 60-day window; the review ask does
-  // not). Nothing is lost by yielding — eligibility is a `>=` check on the
-  // session count, so the review prompt simply re-fires the next session. That
-  // is why the session is still COUNTED below even when the prompt yields.
-  // The launch-notice effect resolves first and the review effect waits on it.
   // ---- Breadcrumbs (feedback/log.ts) --------------------------------------
   // A bug report is only triageable if it says what the app was doing. The shell
   // is the one place that sees every screen change, so it owns the trail; screens
@@ -164,73 +135,70 @@ export function AppShell({
     logEvent('app', 'ready', { theme: isDark ? 'dark' : 'light' });
   }, [ready, isDark]);
 
-  // ---- Launch notice (templates/launch-notice) -----------------------------
-  // Same two hard rules as the review prompt: never under QA_MODE, never over
-  // the splash. Resolved once per boot; `launchNoticeSettled` is what the
-  // review effect waits on, so the precedence call is made before either card
-  // can appear rather than raced between two async reads.
-  const [showLaunchNotice, setShowLaunchNotice] = useState(false);
-  const [launchNoticeSettled, setLaunchNoticeSettled] = useState(false);
-  const launchNoticeChecked = useRef(false);
-  const launchNoticeShowing = useRef(false);
-  const hasLaunchNotice = !!launchedAt;
-  useEffect(() => {
-    if (!ready || !splashDone) return;
-    if (launchNoticeChecked.current) return;
-    launchNoticeChecked.current = true;
-    if (!hasLaunchNotice || QA_MODE) {
-      setLaunchNoticeSettled(true);
-      return;
-    }
-    let cancelled = false;
-    shouldShowLaunchNotice(launchedAt as string)
-      .then((show) => {
-        if (cancelled) return;
-        if (show) {
-          launchNoticeShowing.current = true;
-          logEvent('launch-notice', 'card shown');
-          setShowLaunchNotice(true);
-        }
-        setLaunchNoticeSettled(true);
-      })
-      .catch(() => {
-        if (!cancelled) setLaunchNoticeSettled(true);
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, [hasLaunchNotice, launchedAt, ready, splashDone]);
-
+  // ---- One shell modal per session -----------------------------------------
+  // Two cards can want this cold start: the launch notice (canon /
+  // templates/launch-notice — sessions 1-3 inside a 60-day launch window) and
+  // the review prompt (canon § Review prompt — sessions 3/15/30, capped at 3
+  // per install). Both triggers are a SESSION, one app cold start i.e. one JS
+  // boot, so this effect must run exactly once per boot no matter how many
+  // times the shell re-renders. The ref is that guard; state can't be (a
+  // re-render reads the stale value before the async resolve lands).
+  //
+  // Three hard rules, all encoded below:
+  //   1. Never under QA_MODE. The deterministic capture pipeline must never
+  //      meet a surprise modal, and a capture run must not burn a session
+  //      either — so QA_MODE doesn't even count the boot.
+  //   2. Never over the splash. A card waits for `splashDone && ready`, so it
+  //      lands on a settled first screen (the review one after a short beat).
+  //   3. PRECEDENCE: the launch notice wins. Stacking two cards on a cold
+  //      start is exactly the "vies for the user's attention" pattern tenet 5
+  //      forbids, and the notice is the more time-sensitive of the two (it has
+  //      a 60-day window; the review ask does not). Nothing is lost by
+  //      yielding — the session is still counted, and eligibility is a `>=`
+  //      check on that count, so the review prompt simply re-fires the next
+  //      session.
   const [showReview, setShowReview] = useState(false);
+  const [showLaunchNotice, setShowLaunchNotice] = useState(false);
   const sessionCounted = useRef(false);
   // Depend on the BOOLEAN, never the `review` object: apps pass it as an inline
   // literal, so its identity changes on every render — depending on it would
   // re-run the effect, and the cleanup would cancel the pending prompt forever.
   const hasReview = !!review;
   useEffect(() => {
-    if (!hasReview || QA_MODE) return;
+    if (QA_MODE) return;
+    if (!hasReview && !launchedAt) return;
     if (!ready || !splashDone) return;
-    if (!launchNoticeSettled) return;
     if (sessionCounted.current) return;
     sessionCounted.current = true;
     let cancelled = false;
     let timer: ReturnType<typeof setTimeout> | undefined;
-    // The session is counted either way — yielding to the launch notice must
-    // not stall the schedule, it just skips this session's display.
-    recordSessionStart().then((shouldPrompt) => {
-      if (cancelled || !shouldPrompt) return;
-      if (launchNoticeShowing.current) return;
+
+    (async () => {
+      // Resolve BOTH before showing anything. recordSessionStart() counts the
+      // boot, so it must run even when the notice pre-empts the prompt —
+      // otherwise a user inside the launch window never accrues sessions and
+      // the review ask is deferred forever, not by one session.
+      const noticeDue = launchedAt ? await shouldShowLaunchNotice(launchedAt) : false;
+      const reviewDue = hasReview ? await recordSessionStart() : false;
+      if (cancelled) return;
+      if (noticeDue) {
+        logEvent('launchNotice', 'notice shown');
+        setShowLaunchNotice(true);
+        return;
+      }
+      if (!reviewDue) return;
       timer = setTimeout(() => {
         if (cancelled) return;
         logEvent('review', 'prompt shown');
         setShowReview(true);
       }, REVIEW_PROMPT_DELAY_MS);
-    });
+    })();
+
     return () => {
       cancelled = true;
       if (timer) clearTimeout(timer);
     };
-  }, [hasReview, ready, splashDone, launchNoticeSettled]);
+  }, [hasReview, launchedAt, ready, splashDone]);
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
@@ -253,6 +221,12 @@ export function AppShell({
               <FeedbackProvider>{children}</FeedbackProvider>
             </NavigationContainer>
           )}
+          {launchedAt && (
+            <LaunchNoticeModal
+              visible={showLaunchNotice}
+              onDismiss={() => setShowLaunchNotice(false)}
+            />
+          )}
           {review && (
             <ReviewModal
               visible={showReview}
@@ -260,15 +234,6 @@ export function AppShell({
               appName={review.appName}
               iosAppStoreId={review.iosAppStoreId}
               androidPackageName={review.androidPackageName}
-            />
-          )}
-          {launchedAt && (
-            <LaunchNoticeModal
-              visible={showLaunchNotice}
-              onDismiss={() => {
-                launchNoticeShowing.current = false;
-                setShowLaunchNotice(false);
-              }}
             />
           )}
           {!QA_MODE && !splashDone && (
