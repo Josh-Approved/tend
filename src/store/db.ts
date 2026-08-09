@@ -1,5 +1,5 @@
 /**
- * Domain SQLite persistence for Tend. Opens the SAME connection the shell's
+ * Domain SQLite persistence for Relationships. Opens the SAME connection the shell's
  * storage/kv.ts owns (one file, one backup unit — canon § Backup Layer 1: the DB
  * lives in Documents and rides OS auto-backup) and adds the one domain table.
  *

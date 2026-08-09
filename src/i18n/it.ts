@@ -62,7 +62,7 @@ const it = {
     notesPlaceholder: 'Cosa vuoi ricordare? I suoi gusti, cosa sta vivendo, cosa chiedere la prossima volta…',
     datesLabel: 'Date importanti',
     birthdayLabel: 'Compleanno',
-    birthdayReminderHint: 'Tend ti avvisa la mattina stessa. Puoi disattivarlo nelle Impostazioni.',
+    birthdayReminderHint: 'Relationships ti avvisa la mattina stessa. Puoi disattivarlo nelle Impostazioni.',
     otherDatesLabel: 'Altre date',
     dateLabelPlaceholder: 'Anniversario, il giorno in cui vi siete conosciuti…',
     monthPlaceholder: 'MM',

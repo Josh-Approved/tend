@@ -1,5 +1,5 @@
 /**
- * App-specific copy for Tend. APP-OWNED — every user-facing string in the domain
+ * App-specific copy for Relationships. APP-OWNED — every user-facing string in the domain
  * screens (and the local-reminder copy) lives here (canon § Translations);
  * reference it via t('home.…') / t('person.…') / t('notify.…') from ../i18n.
  */
@@ -64,7 +64,7 @@ export const APP_STRINGS = {
     notesPlaceholder: "What do you want to remember? Their favorites, what's going on, what to ask about next time…",
     datesLabel: 'Important dates',
     birthdayLabel: 'Birthday',
-    birthdayReminderHint: 'Tend reminds you the morning of. You can turn that off in Settings.',
+    birthdayReminderHint: 'Relationships reminds you the morning of. You can turn that off in Settings.',
     otherDatesLabel: 'Other dates',
     dateLabelPlaceholder: 'Anniversary, the day you met…',
     monthPlaceholder: 'MM',

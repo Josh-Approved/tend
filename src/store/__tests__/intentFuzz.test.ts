@@ -1,7 +1,7 @@
 /**
- * Intent fuzzer — the adversarial gate for Tend's trust core (Uplevel 3 / T1).
+ * Intent fuzzer — the adversarial gate for the Relationships trust core (Uplevel 3 / T1).
  *
- * WHAT'S THE TRUST CORE. Tend keeps the practical memory you hold about the
+ * WHAT'S THE TRUST CORE. Relationships keeps the practical memory you hold about the
  * people you want to stay close to: their name, notes, how you met, cadence,
  * important dates, preferences, personality read, and the running history of
  * your catch-ups — plus the reminder ("who's due?") derived from that, and the
@@ -11,7 +11,7 @@
  *
  * (The spec bullet says "encrypted-export round-trip". Reality: the export is a
  * plain JSON envelope — the E2E-encryption tenet is about data we might operate,
- * and Tend operates none; the file never leaves the device unless the user
+ * and Relationships operates none; the file never leaves the device unless the user
  * shares it. The oracle tests what actually ships: sanitize(export(person))
  * restores every field. Noted in the stage STATUS.)
  *

@@ -1,6 +1,6 @@
 # Privacy
 
-Tend keeps your data on your device.
+Your data stays with you.
 
 Your data is stored in a local database on the phone itself. That’s the only copy this app creates. There are no accounts, no sign-in, and no analytics. The app doesn’t track what you do.
 

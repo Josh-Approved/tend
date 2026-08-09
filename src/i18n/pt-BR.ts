@@ -62,7 +62,7 @@ const ptBR = {
     notesPlaceholder: 'O que você quer lembrar? As preferências dela, o que está acontecendo, o que perguntar na próxima vez…',
     datesLabel: 'Datas importantes',
     birthdayLabel: 'Aniversário',
-    birthdayReminderHint: 'O Tend avisa você na manhã do dia. Dá para desativar nas Configurações.',
+    birthdayReminderHint: 'O Relationships avisa você na manhã do dia. Dá para desativar nas Configurações.',
     otherDatesLabel: 'Outras datas',
     dateLabelPlaceholder: 'Data especial, o dia em que se conheceram…',
     monthPlaceholder: 'MM',

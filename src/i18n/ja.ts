@@ -62,7 +62,7 @@ const ja = {
     notesPlaceholder: '覚えておきたいことは？好きなもの、最近の様子、次に聞きたいこと…',
     datesLabel: '大切な日',
     birthdayLabel: '誕生日',
-    birthdayReminderHint: '当日の朝にお知らせします。設定でオフにできます。',
+    birthdayReminderHint: 'Relationships が当日の朝にお知らせします。設定でオフにできます。',
     otherDatesLabel: 'その他の日',
     dateLabelPlaceholder: '記念日、出会った日…',
     monthPlaceholder: '月',

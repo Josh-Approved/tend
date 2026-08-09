@@ -1,5 +1,5 @@
 /**
- * Domain model for Tend: a person you want to keep up with, the practical memory
+ * Domain model for Relationships: a person you want to keep up with, the practical memory
  * you keep about them, and the history of your catch-ups. THIS IS THE APP'S OWN
  * CODE (the trust core) — kept pure (no expo / RN imports) so jest-expo tests it
  * directly (src/data/__tests__/person.test.ts), and lib/transfer.ts reuses

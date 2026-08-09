@@ -1,5 +1,5 @@
 /**
- * App root for Tend. The shell (<AppShell/>) owns the chrome — gesture root, safe
+ * App root for Relationships. The shell (<AppShell/>) owns the chrome — gesture root, safe
  * area, error boundary, themed NavigationContainer, status bar, cold-start splash.
  *
  * Navigation: a bottom-tab navigator (Today | People) for the day-to-day surfaces,

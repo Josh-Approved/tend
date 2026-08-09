@@ -1,5 +1,5 @@
 /**
- * Personality catalog for Tend — the value sets per framework (in display order)
+ * Personality catalog for Relationships — the value sets per framework (in display order)
  * and the i18n key helpers the detail screen renders through. PURE, app-owned,
  * no RN imports.
  *

@@ -1,5 +1,5 @@
 /**
- * Manual export / import (canon § Backup & restore Layer 3) for Tend. The generic
+ * Manual export / import (canon § Backup & restore Layer 3) for Relationships. The generic
  * file/share/pick plumbing lives in the shell's lib/backup.ts; this file owns the
  * domain part — what goes in the payload and how an imported payload is sanitized
  * (additive, never destructive: a colliding id is re-minted by the per-record

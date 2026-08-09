@@ -1,5 +1,5 @@
 /**
- * Trust-core unit tests (canon § QA & testing Tier 1) for Tend. The trust core
+ * Trust-core unit tests (canon § QA & testing Tier 1) for Relationships. The trust core
  * is the pure data layer in ../person — above all `dueStatus` (who's due to reach
  * out to) and `upcomingDates` (birthdays/anniversaries coming up), plus the date
  * math and additive, crash-proof import sanitization.

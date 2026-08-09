@@ -62,7 +62,7 @@ const fr = {
     notesPlaceholder: "Que veux-tu retenir ? Ses préférences, ce qui se passe pour elle, ce qu'il faudra lui demander la prochaine fois…",
     datesLabel: 'Dates importantes',
     birthdayLabel: 'Anniversaire',
-    birthdayReminderHint: 'Tend te prévient le matin même. Tu peux le désactiver dans les Réglages.',
+    birthdayReminderHint: 'Relationships te prévient le matin même. Tu peux le désactiver dans les Réglages.',
     otherDatesLabel: 'Autres dates',
     dateLabelPlaceholder: 'Jour de rencontre, date marquante…',
     monthPlaceholder: 'MM',

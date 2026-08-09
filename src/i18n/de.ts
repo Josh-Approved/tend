@@ -62,7 +62,7 @@ const de = {
     notesPlaceholder: 'Was möchtest du dir merken? Ihre Vorlieben, was gerade los ist, wonach du nächstes Mal fragen kannst…',
     datesLabel: 'Wichtige Tage',
     birthdayLabel: 'Geburtstag',
-    birthdayReminderHint: 'Tend erinnert dich am Morgen des Tages. In den Einstellungen kannst du das ausschalten.',
+    birthdayReminderHint: 'Relationships erinnert dich am Morgen des Tages. In den Einstellungen kannst du das ausschalten.',
     otherDatesLabel: 'Weitere Tage',
     dateLabelPlaceholder: 'Jahrestag, der Tag eures Kennenlernens…',
     monthPlaceholder: 'MM',

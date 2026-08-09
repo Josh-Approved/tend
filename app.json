@@ -42,7 +42,7 @@
       [
         "expo-contacts",
         {
-          "contactsPermission": "Relationships uses your contacts only to let you add the people you choose. Nothing leaves your device."
+          "contactsPermission": "Relationships uses your contacts only to let you add the people you choose. Your data stays with you."
         }
       ],
       "expo-mail-composer",
