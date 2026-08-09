@@ -5,7 +5,7 @@
  * there's nothing, it says so plainly.
  */
 
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, Pressable, ScrollView, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { GestureDetector } from 'react-native-gesture-handler';
@@ -15,6 +15,9 @@ import { usePeopleStore } from '../store/people';
 import { actionablePeople, dueStatus, upcomingDates, type Person } from '../data/person';
 import { FundingFooter } from '../components/FundingFooter';
 import { usePullRevealFooter } from '../components/usePullRevealFooter';
+import TipJarSheet from '../components/TipJarSheet';
+import { TIP_PRODUCT_IDS } from '../constants/tipProducts';
+import { TIP_JAR_ENABLED } from '../lib/links';
 import { t } from '../i18n';
 import {
   useTheme,
@@ -49,6 +52,8 @@ export default function TodayScreen({ navigation }: TabScreenProps<'Today'>) {
   const actionable = actionablePeople(people, now);
   const upcoming = upcomingDates(people, now, 14);
   const nothing = actionable.length === 0 && upcoming.length === 0;
+  const [tipVisible, setTipVisible] = useState(false);
+  const onSupport = TIP_JAR_ENABLED ? () => setTipVisible(true) : undefined;
   const {
     pullToReveal,
     reveal,
@@ -79,7 +84,7 @@ export default function TodayScreen({ navigation }: TabScreenProps<'Today'>) {
             <Text style={s.emptyTitle}>{t('today.caughtUp')}</Text>
             <Text style={s.emptySub}>{t('today.caughtUpSub')}</Text>
           </View>
-          <FundingFooter />
+          <FundingFooter onSupport={onSupport} />
         </>
       ) : (
         <GestureDetector gesture={gesture}>
@@ -157,10 +162,13 @@ export default function TodayScreen({ navigation }: TabScreenProps<'Today'>) {
             </>
           )}
           <View style={s.footerHolder}>
-            <FundingFooter reveal={reveal} pullToReveal={pullToReveal} />
+            <FundingFooter reveal={reveal} pullToReveal={pullToReveal} onSupport={onSupport} />
           </View>
         </ScrollView>
         </GestureDetector>
+      )}
+      {tipVisible && (
+        <TipJarSheet visible onDismiss={() => setTipVisible(false)} productIds={TIP_PRODUCT_IDS} />
       )}
     </SafeAreaView>
   );

@@ -14,6 +14,7 @@
     "expo-document-picker": "~56.0.4",
     "expo-file-system": "~56.0.8",
     "expo-font": "~56.0.7",
+    "expo-iap": "5.2.0",
     "expo-mail-composer": "~56.0.4",
     "expo-notifications": "~56.0.18",
     "expo-sharing": "~56.0.18",
@@ -35,6 +36,7 @@
   "devDependencies": {
     "@stryker-mutator/core": "^9.6.1",
     "@stryker-mutator/jest-runner": "^9.6.1",
+    "@testing-library/react-native": "^14.0.1",
     "@types/jest": "^30.0.0",
     "@types/react": "~19.2.2",
     "fast-check": "^3.23.0",
@@ -42,9 +44,8 @@
     "jest-expo": "^56.0.5",
     "pixelmatch": "^7.2.0",
     "pngjs": "^7.0.0",
-    "typescript": "~6.0.3",
-    "@testing-library/react-native": "^14.0.1",
-    "test-renderer": "^1.2.0"
+    "test-renderer": "^1.2.0",
+    "typescript": "~6.0.3"
   },
   "scripts": {
     "start": "expo start --port 8408",

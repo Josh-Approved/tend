@@ -20,6 +20,14 @@ export const APP_NAME = 'Relationships - Josh Approved';
 export const IOS_APP_STORE_ID = '6785106429';
 export const ANDROID_PACKAGE = 'com.joshapproved.tend';
 
+/**
+ * TIP_JAR_ENABLED gates every support surface (the Settings row, the
+ * FundingFooter button) — each opens the canonical TipJarSheet. Apple rejects
+ * external donation links for a for-profit app (guideline 3.1.1), so the IAP
+ * tip jar is the only support surface; there is no external link-out to gate.
+ */
+export const TIP_JAR_ENABLED: boolean = true;
+
 export const STUDIO_URL = 'https://joshapproved.com';
 export const REPO_URL = 'https://github.com/josh-approved/tend';
 export const PRIVACY_URL =

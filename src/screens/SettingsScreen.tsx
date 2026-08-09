@@ -26,6 +26,9 @@ import type { Person } from '../data/person';
 import { AboutRow } from '../components/AboutRow';
 import { SettingsAbout } from '../components/SettingsAbout';
 import { ScreenHeader } from '../components/ScreenHeader';
+import TipJarSheet from '../components/TipJarSheet';
+import { TIP_PRODUCT_IDS } from '../constants/tipProducts';
+import { TIP_JAR_ENABLED } from '../lib/links';
 import { t } from '../i18n';
 import {
   useTheme,
@@ -52,6 +55,7 @@ export default function SettingsScreen({ navigation }: Props) {
   const importMe = useMeStore((st) => st.importProfile);
   const [status, setStatus] = useState<string | null>(null);
   const [pickerOpen, setPickerOpen] = useState(false);
+  const [tipVisible, setTipVisible] = useState(false);
   // Birthday reminders default ON; read the stored value once on mount.
   const [birthdayReminders, setBirthdayReminders] = useState(true);
 
@@ -141,10 +145,16 @@ export default function SettingsScreen({ navigation }: Props) {
         <AboutRow label={t('settings.import')} icon={Download} onPress={onImport} />
         {status ? <Text style={s.status}>{status}</Text> : null}
 
-        <SettingsAbout onAcknowledgements={() => navigation.navigate('Acknowledgements')} />
+        <SettingsAbout
+          onAcknowledgements={() => navigation.navigate('Acknowledgements')}
+          onSupport={TIP_JAR_ENABLED ? () => setTipVisible(true) : undefined}
+        />
       </ScrollView>
 
       <ContactPicker visible={pickerOpen} onClose={() => setPickerOpen(false)} onAdd={onPicked} />
+      {tipVisible && (
+        <TipJarSheet visible onDismiss={() => setTipVisible(false)} productIds={TIP_PRODUCT_IDS} />
+      )}
     </SafeAreaView>
   );
 }
