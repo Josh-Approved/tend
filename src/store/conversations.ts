@@ -15,6 +15,7 @@ import {
 } from '../data/conversation';
 import { putTombstone } from '../storage/kv';
 import { loadAllConversations, saveConversation, deleteConversationFromDb } from './db';
+import { logEvent, logError } from '../feedback/log';
 import { QA_MODE } from '../qa/qaMode';
 import { qaConversations } from '../qa/fixtures';
 import { usePeopleStore } from './people';
@@ -69,9 +70,11 @@ export const useConversationsStore = create<ConversationsState>()((set, get) => 
           set({ conversations: seeded, hydrated: true });
           for (const c of seeded) persist(c);
         } else {
+          logEvent('conversations', 'hydrated', { conversations: loaded.length });
           set({ conversations: loaded, hydrated: true });
         }
       } catch (err) {
+        logError('conversations', err, { during: 'hydrate' });
         console.warn('conversations: failed to load from disk', err);
         set({ hydrated: true });
       }

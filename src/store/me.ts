@@ -9,6 +9,7 @@
 import { create } from 'zustand';
 import { type MeProfile, mergeMeProfile } from '../data/me';
 import { getAppSetting, setAppSetting } from '../storage/kv';
+import { logEvent, logError } from '../feedback/log';
 import { QA_MODE } from '../qa/qaMode';
 import { qaMeProfile } from '../qa/fixtures';
 
@@ -42,6 +43,7 @@ export const useMeStore = create<MeState>()((set, get) => ({
         set({ profile: loaded, hydrated: true });
       }
     } catch (err) {
+      logError('me', err, { during: 'hydrate' });
       console.warn('me: failed to load', err);
       set({ hydrated: true });
     }

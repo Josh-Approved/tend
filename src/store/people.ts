@@ -26,6 +26,7 @@ import { putTombstone } from '../storage/kv';
 import { dedupePeopleByName } from '../lib/contacts';
 import { loadAllPeople, savePerson, deletePersonFromDb } from './db';
 import { rescheduleAll } from '../lib/notifications';
+import { logEvent, logError } from '../feedback/log';
 import { QA_MODE } from '../qa/qaMode';
 import { qaPeople } from '../qa/fixtures';
 
@@ -83,9 +84,12 @@ export const usePeopleStore = create<PeopleState>()((set, get) => {
         if (QA_MODE && loaded.length === 0) {
           set({ people: qaPeople(), hydrated: true });
         } else {
+          // The count that answers "I opened it and everyone was gone".
+          logEvent('people', 'hydrated', { people: loaded.length });
           set({ people: loaded, hydrated: true });
         }
       } catch (err) {
+        logError('people', err, { during: 'hydrate' });
         console.warn('people: failed to load from disk', err);
         set({ hydrated: true });
       }
