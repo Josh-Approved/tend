@@ -84,6 +84,30 @@ describe('DatesSheet', () => {
     expect(handlers.onClearBirthday).not.toHaveBeenCalled();
   });
 
+  it('stores the birthday from its own check, once month and day are both valid', async () => {
+    const user = userEvent.setup({ delay: 0 });
+    await renderSheet();
+
+    await user.type(screen.getByLabelText('Birthday MM'), '11');
+    await user.type(screen.getByLabelText('Birthday DD'), '9');
+    await user.press(screen.getByRole('button', { name: 'Save' }));
+
+    expect(handlers.onSetBirthday).toHaveBeenCalledWith(11, 9);
+    expect(handlers.onAdd).not.toHaveBeenCalled();
+  });
+
+  it('refuses to store a birthday that cannot exist', async () => {
+    const user = userEvent.setup({ delay: 0 });
+    await renderSheet();
+
+    await user.type(screen.getByLabelText('Birthday MM'), '13');
+    await user.type(screen.getByLabelText('Birthday DD'), '40');
+    await user.press(screen.getByRole('button', { name: 'Save' }));
+
+    // A birthday that never comes round would arm a reminder that never fires.
+    expect(handlers.onSetBirthday).not.toHaveBeenCalled();
+  });
+
   it('files a new date from the add row and clears the form', async () => {
     const user = userEvent.setup({ delay: 0 });
     await renderSheet();

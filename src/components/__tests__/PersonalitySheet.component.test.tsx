@@ -11,7 +11,7 @@
  */
 
 import React from 'react';
-import { render, screen } from '@testing-library/react-native';
+import { render, screen, userEvent } from '@testing-library/react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 jest.mock('expo-font', () => ({
@@ -36,10 +36,10 @@ const METRICS = {
   insets: { top: 47, left: 0, right: 0, bottom: 34 },
 };
 
-function renderSheet(person: Person) {
+function renderSheet(person: Person, onPick: jest.Mock = jest.fn()) {
   return render(
     <SafeAreaProvider initialMetrics={METRICS}>
-      <PersonalitySheet visible person={person} onPick={jest.fn()} onClose={jest.fn()} />
+      <PersonalitySheet visible person={person} onPick={onPick} onClose={jest.fn()} />
     </SafeAreaProvider>
   );
 }
@@ -60,6 +60,28 @@ describe('PersonalitySheet chips', () => {
 
     const secure = screen.getByRole('button', { name: 'Secure' });
     expect(secure.props.accessibilityHint).toBeUndefined();
+  });
+
+  it('records the chip that was pressed, against its own framework', async () => {
+    const onPick = jest.fn();
+    const user = userEvent.setup({ delay: 0 });
+    await renderSheet(makePerson('Ada'), onPick);
+
+    await user.press(screen.getByRole('button', { name: '4' }));
+
+    expect(onPick).toHaveBeenCalledWith('enneagram', '4');
+  });
+
+  it('clears the value when the chip already selected is pressed again', async () => {
+    const onPick = jest.fn();
+    const user = userEvent.setup({ delay: 0 });
+    await renderSheet(withPersonality('4'), onPick);
+
+    // Nothing here is required, so a mis-tap has to be undoable by tapping the
+    // same chip — without that, a wrong pick is permanent.
+    await user.press(screen.getByRole('button', { name: '4' }));
+
+    expect(onPick).toHaveBeenCalledWith('enneagram', null);
   });
 
   it('announces which chip is selected rather than only filling it', async () => {

@@ -73,6 +73,23 @@ function overduePerson(name: string): Person {
   return { ...p, cadenceDays: 7, lastContactedAt: Date.now() - 90 * 24 * 60 * 60 * 1000 };
 }
 
+/**
+ * Someone NOT due, carrying a date a few days out — so the "Coming up" section
+ * renders on its own, with nothing in the reach-out list above it.
+ */
+function personWithDateSoon(name: string, label: string, inDays: number): Person {
+  const p = makePerson(name);
+  const at = new Date(Date.now() + inDays * 24 * 60 * 60 * 1000);
+  return {
+    ...p,
+    cadenceDays: 365,
+    lastContactedAt: Date.now(),
+    importantDates: [
+      { id: 'd1', label, month: at.getMonth() + 1, day: at.getDate() },
+    ],
+  };
+}
+
 describe('TodayScreen header', () => {
   beforeEach(() => {
     jest.clearAllMocks();
@@ -96,5 +113,56 @@ describe('TodayScreen header', () => {
     await user.press(screen.getByRole('button', { name: 'Settings' }));
 
     expect(navigation.navigate).toHaveBeenCalledWith('Settings');
+  });
+});
+
+/**
+ * The triage list itself (Uplevel-3 T3 action coverage). Today is a one-tap
+ * surface: the pill logs a catch-up without leaving the screen, and everything
+ * else is a route into the person. The two must not be confused — a row press
+ * that logged, or a pill that navigated, is the failure this pins.
+ */
+describe('TodayScreen list', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    mockState.people = [];
+  });
+
+  it('logs the catch-up from the pill without leaving Today', async () => {
+    const ada = overduePerson('Ada');
+    mockState.people = [ada];
+    const user = userEvent.setup({ delay: 0 });
+    await renderToday();
+
+    await user.press(screen.getByRole('button', { name: 'Reached out' }));
+
+    expect(mockState.logContact).toHaveBeenCalledWith(ada.id);
+    expect(navigation.navigate).not.toHaveBeenCalled();
+  });
+
+  it('opens the person from the row, without logging anything', async () => {
+    const ada = overduePerson('Ada');
+    mockState.people = [ada];
+    const user = userEvent.setup({ delay: 0 });
+    await renderToday();
+
+    await user.press(screen.getByRole('button', { name: 'Ada' }));
+
+    expect(navigation.navigate).toHaveBeenCalledWith('PersonDetail', { personId: ada.id });
+    // Reading about someone is not the same as having reached out to them.
+    expect(mockState.logContact).not.toHaveBeenCalled();
+  });
+
+  it('opens the person behind a coming-up date', async () => {
+    const grace = personWithDateSoon('Grace', 'Birthday', 5);
+    mockState.people = [grace];
+    const user = userEvent.setup({ delay: 0 });
+    await renderToday();
+
+    // The row has no label of its own — its name is the sentence it prints, so
+    // it is matched by pattern rather than by the exact composed copy.
+    await user.press(screen.getByRole('button', { name: /Grace's Birthday/ }));
+
+    expect(navigation.navigate).toHaveBeenCalledWith('PersonDetail', { personId: grace.id });
   });
 });

@@ -60,6 +60,7 @@ jest.mock('expo-contacts/legacy', () => ({
 
 import { usePeopleStore } from '../../store/people';
 import { useConversationsStore } from '../../store/conversations';
+import { makeConversation } from '../../data/conversation';
 import PersonDetailScreen from '../PersonDetailScreen';
 
 const nav = { goBack: jest.fn(), navigate: jest.fn(), replace: jest.fn() };
@@ -152,6 +153,46 @@ describe('PersonDetailScreen — existing person', () => {
     expect(logged.lastContactedAt).not.toBeNull();
     // The note box empties, so the next catch-up doesn't inherit this one's note.
     expect(screen.getByLabelText('What did you talk about? (optional)').props.value).toBe('');
+  });
+
+  it('logs the catch-up under the kind chip that is selected', async () => {
+    const user = userEvent.setup({ delay: 0 });
+    await renderDetail(id);
+
+    // "Call" is the default, so this proves the chip actually took. Filing a
+    // text as a call is a quiet wrong-record bug with nothing on screen to
+    // flag it.
+    await user.press(screen.getByRole('button', { name: 'In person' }));
+    await user.press(screen.getByRole('button', { name: 'I reached out' }));
+
+    expect(people()[0].interactions[0].kind).toBe('inPerson');
+  });
+
+  it('announces which kind chip is selected rather than only filling it', async () => {
+    const user = userEvent.setup({ delay: 0 });
+    await renderDetail(id);
+
+    await user.press(screen.getByRole('button', { name: 'Text' }));
+
+    expect(screen.getByRole('button', { name: 'Text' }).props.accessibilityState).toMatchObject({
+      selected: true,
+    });
+    expect(screen.getByRole('button', { name: 'Call' }).props.accessibilityState).toMatchObject({
+      selected: false,
+    });
+  });
+
+  it('opens an existing conversation from its row on the hub', async () => {
+    const conv = { ...makeConversation(id, 'Ada', 'open'), topic: 'The move' };
+    useConversationsStore.setState({ conversations: [conv] });
+    const user = userEvent.setup({ delay: 0 });
+    await renderDetail(id);
+
+    await user.press(screen.getByRole('button', { name: 'The move' }));
+
+    expect(nav.navigate).toHaveBeenCalledWith('ConversationDetail', {
+      conversationId: conv.id,
+    });
   });
 
   it('starts a conversation linked to this person and opens it', async () => {

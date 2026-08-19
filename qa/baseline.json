@@ -1,5 +1,7 @@
 {
   "testing/enforce": true,
   "theme/enforce": true,
-  "language/enforce": true
+  "language/enforce": true,
+  "coverage/enforce": true,
+  "ux/enforce": true
 }

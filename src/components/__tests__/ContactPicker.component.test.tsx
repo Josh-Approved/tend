@@ -53,13 +53,24 @@ import type { Person } from '../../data/person';
 
 const mockFetch = fetchContactsForPicker as jest.MockedFunction<typeof fetchContactsForPicker>;
 
+const BASE_CONTACTS = [
+  { id: 'c1', name: 'Ada Lovelace', raw: { id: 'c1', name: 'Ada Lovelace' } },
+  { id: 'c2', name: 'Grace Hopper', raw: { id: 'c2', name: 'Grace Hopper', birthday: { month: 11, day: 9 } } },
+  { id: 'c3', name: 'Mom', raw: { id: 'c3', name: 'Mom' } }, // already tracked
+];
+
 function ready(): ContactFetchResult {
+  return { limited: false, contacts: BASE_CONTACTS };
+}
+
+/** Enough contacts that the picker offers its search box (threshold is 8). */
+function manyContacts(): ContactFetchResult {
+  const extra = ['Alan Turing', 'Edsger Dijkstra', 'Barbara Liskov', 'Ken Thompson', 'Anita Borg', 'Katherine Johnson'];
   return {
     limited: false,
     contacts: [
-      { id: 'c1', name: 'Ada Lovelace', raw: { id: 'c1', name: 'Ada Lovelace' } },
-      { id: 'c2', name: 'Grace Hopper', raw: { id: 'c2', name: 'Grace Hopper', birthday: { month: 11, day: 9 } } },
-      { id: 'c3', name: 'Mom', raw: { id: 'c3', name: 'Mom' } }, // already tracked
+      ...BASE_CONTACTS,
+      ...extra.map((name, i) => ({ id: `x${i}`, name, raw: { id: `x${i}`, name } })),
     ],
   };
 }
@@ -120,5 +131,44 @@ describe('ContactPicker', () => {
 
     await waitFor(() => expect(screen.getByText('Contacts access was declined.')).toBeTruthy());
     expect(onAdd).not.toHaveBeenCalled();
+  });
+
+  it('closes on Cancel without importing the contacts already ticked', async () => {
+    const user = userEvent.setup({ delay: 0 });
+    const onAdd = jest.fn();
+    const onClose = jest.fn();
+    mockFetch.mockResolvedValue(ready());
+
+    await render(wrap(<ContactPicker visible onAdd={onAdd} onClose={onClose} />));
+    await screen.findByRole('checkbox', { name: 'Ada Lovelace' });
+
+    await user.press(screen.getByRole('checkbox', { name: 'Ada Lovelace' }));
+    await user.press(screen.getByRole('button', { name: 'Cancel' }));
+
+    // Backing out is a real cancel — a tick is not a commit, so nobody lands in
+    // the directory from a picker the user closed.
+    expect(onClose).toHaveBeenCalledTimes(1);
+    expect(onAdd).not.toHaveBeenCalled();
+  });
+
+  it('restores the full list when the search is cleared', async () => {
+    const user = userEvent.setup({ delay: 0 });
+    // The search box only appears once the address book is long enough to need one.
+    mockFetch.mockResolvedValue(manyContacts());
+
+    await render(wrap(<ContactPicker visible onAdd={jest.fn()} onClose={jest.fn()} />));
+    await screen.findByRole('checkbox', { name: 'Ada Lovelace' });
+
+    await user.type(screen.getByLabelText('Search contacts'), 'Grace');
+    await waitFor(() => expect(screen.queryByRole('checkbox', { name: 'Ada Lovelace' })).toBeNull());
+
+    await user.press(screen.getByRole('button', { name: 'Clear search' }));
+
+    // The X has to empty the box AND re-run the filter — clearing the text while
+    // leaving the list filtered strands the user with no way back to everyone.
+    await waitFor(() =>
+      expect(screen.getByRole('checkbox', { name: 'Ada Lovelace' })).toBeTruthy()
+    );
+    expect(screen.getByLabelText('Search contacts').props.value).toBe('');
   });
 });

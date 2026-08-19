@@ -120,6 +120,41 @@ describe('PeopleScreen controls', () => {
     expect(navigation.navigate).toHaveBeenCalledWith('Settings');
   });
 
+  it('opens the person whose row was tapped', async () => {
+    const mom = makePerson('Mom');
+    mockState.people = [mom, makePerson('Sarah Chen')];
+    const user = userEvent.setup({ delay: 0 });
+    await renderPeople();
+
+    // The row's accessible name is the whole summary line, so it is matched by
+    // pattern — pinning the exact composed string here would make this test a
+    // copy assertion rather than a navigation one.
+    await user.press(screen.getByRole('button', { name: /^Mom,/ }));
+
+    expect(navigation.navigate).toHaveBeenCalledWith('PersonDetail', { personId: mom.id });
+  });
+
+  it('restores the full directory when the search is cleared', async () => {
+    // The search box only appears once the directory is long enough to need one.
+    mockState.people = [
+      makePerson('Mom'),
+      makePerson('Sarah Chen'),
+      ...['Ada', 'Grace', 'Alan', 'Edsger', 'Barbara', 'Ken'].map((n) => makePerson(n)),
+    ];
+    const user = userEvent.setup({ delay: 0 });
+    await renderPeople();
+
+    await user.type(screen.getByLabelText('Search people'), 'Sarah');
+    await waitFor(() => expect(screen.queryByRole('button', { name: /^Mom,/ })).toBeNull());
+
+    await user.press(screen.getByRole('button', { name: 'Clear search' }));
+
+    // The X has to empty the box AND re-run the filter — clearing the text while
+    // leaving the list filtered strands the user with no way back to everyone.
+    await waitFor(() => expect(screen.getByRole('button', { name: /^Mom,/ })).toBeTruthy());
+    expect(screen.getByLabelText('Search people').props.value).toBe('');
+  });
+
   it('opens the contact picker from the empty state', async () => {
     const user = userEvent.setup({ delay: 0 });
     await renderPeople();

@@ -526,144 +526,160 @@
       "label": "Pressable (dynamic label)",
       "where": "src/components/DrilldownRow.tsx:35",
       "proof": {
-        "kind": "none"
+        "kind": "rntl",
+        "ref": "src/components/__tests__/DrilldownKit.component.test.tsx"
       },
-      "note": "Pressable · onPress · dynamic/child-text label"
+      "note": "Pressable · onPress · dynamic/child-text label — presses a hub row and asserts it opens that dimension's editor; the name carries label + current value"
     },
     {
       "id": "components/OptionChips#pressable-41",
       "label": "Pressable (dynamic label)",
       "where": "src/components/OptionChips.tsx:41",
       "proof": {
-        "kind": "none"
+        "kind": "rntl",
+        "ref": "src/components/__tests__/DrilldownKit.component.test.tsx"
       },
-      "note": "Pressable · onPress · dynamic/child-text label"
+      "note": "Pressable · onPress · dynamic/child-text label — presses a chip and asserts the picked key, plus that the selected state is announced, not just filled"
     },
     {
       "id": "components/PrefsSheet#person.remove",
       "label": "person.remove",
       "where": "src/components/PrefsSheet.tsx:55",
       "proof": {
-        "kind": "none"
+        "kind": "rntl",
+        "ref": "src/components/__tests__/PrefsSheet.component.test.tsx"
       },
-      "note": "Pressable · onPress"
+      "note": "Pressable · onPress — presses the X on a preference and asserts it is removed by id"
     },
     {
       "id": "components/PrefsSheet#pressable-71",
       "label": "Pressable (dynamic label)",
       "where": "src/components/PrefsSheet.tsx:71",
       "proof": {
-        "kind": "none"
+        "kind": "rntl",
+        "ref": "src/components/__tests__/PrefsSheet.component.test.tsx"
       },
-      "note": "Pressable · onPress · dynamic/child-text label"
+      "note": "Pressable · onPress · dynamic/child-text label — picks a kind chip and asserts the entry is filed under THAT kind, not the default"
     },
     {
       "id": "components/PrefsSheet#person.prefplaceholder",
       "label": "person.prefPlaceholder",
       "where": "src/components/PrefsSheet.tsx:85",
       "proof": {
-        "kind": "none"
+        "kind": "rntl",
+        "ref": "src/components/__tests__/PrefsSheet.component.test.tsx"
       },
-      "note": "TextInput · onSubmitEditing"
+      "note": "TextInput · onSubmitEditing — files from the keyboard return and asserts the box clears; a blank box files nothing"
     },
     {
       "id": "components/PrefsSheet#person.addpref",
       "label": "person.addPref",
       "where": "src/components/PrefsSheet.tsx:95",
       "proof": {
-        "kind": "none"
+        "kind": "rntl",
+        "ref": "src/components/__tests__/PrefsSheet.component.test.tsx"
       },
-      "note": "Pressable · onPress"
+      "note": "Pressable · onPress — presses + and asserts the typed entry is filed"
     },
     {
       "id": "components/ContactPicker#common.cancel",
       "label": "common.cancel",
       "where": "src/components/ContactPicker.tsx:249",
       "proof": {
-        "kind": "none"
+        "kind": "rntl",
+        "ref": "src/components/__tests__/ContactPicker.component.test.tsx"
       },
-      "note": "Pressable · onPress"
+      "note": "Pressable · onPress — closes the picker and asserts a ticked contact is NOT imported"
     },
     {
       "id": "components/DatesSheet#common.save",
       "label": "common.save",
       "where": "src/components/DatesSheet.tsx:130",
       "proof": {
-        "kind": "none"
+        "kind": "rntl",
+        "ref": "src/components/__tests__/DatesSheet.component.test.tsx"
       },
-      "note": "Pressable · onPress"
+      "note": "Pressable · onPress — stores the birthday from its own check, and refuses a month/day that cannot exist"
     },
     {
       "id": "components/DatesSheet#person.remove-2",
       "label": "person.remove",
       "where": "src/components/DatesSheet.tsx:170",
       "proof": {
-        "kind": "none"
+        "kind": "rntl",
+        "ref": "src/components/__tests__/DatesSheet.component.test.tsx"
       },
-      "note": "Pressable · onPress"
+      "note": "Pressable · onPress — presses the Trash on a non-birthday date and asserts it is removed by id, leaving the birthday alone"
     },
     {
       "id": "screens/PersonDetailScreen#pressable-269",
       "label": "Pressable (dynamic label)",
       "where": "src/screens/PersonDetailScreen.tsx:269",
       "proof": {
-        "kind": "none"
+        "kind": "rntl",
+        "ref": "src/screens/__tests__/PersonDetailScreen.component.test.tsx"
       },
-      "note": "Pressable · onPress · dynamic/child-text label"
+      "note": "Pressable · onPress · dynamic/child-text label — picks an interaction-kind chip and asserts the catch-up is logged under THAT kind"
     },
     {
       "id": "screens/PersonDetailScreen#pressable-369",
       "label": "Pressable (dynamic label)",
       "where": "src/screens/PersonDetailScreen.tsx:369",
       "proof": {
-        "kind": "none"
+        "kind": "rntl",
+        "ref": "src/screens/__tests__/PersonDetailScreen.component.test.tsx"
       },
-      "note": "Pressable · onPress · dynamic/child-text label"
+      "note": "Pressable · onPress · dynamic/child-text label — presses a conversation row and asserts it opens that conversation"
     },
     {
       "id": "screens/SettingsScreen#settings.birthdayreminders",
       "label": "settings.birthdayReminders",
       "where": "src/screens/SettingsScreen.tsx:137",
       "proof": {
-        "kind": "none"
+        "kind": "rntl",
+        "ref": "src/screens/__tests__/SettingsScreen.component.test.tsx"
       },
-      "note": "Switch · onValueChange"
+      "note": "Switch · onValueChange — asserts the toggle persists the choice AND re-syncs the armed OS reminders, and that the stored value is read back on arrival"
     },
     {
       "id": "components/DrilldownSheet#pressable-164",
       "label": "Pressable (dynamic label)",
       "where": "src/components/DrilldownSheet.tsx:164",
       "proof": {
-        "kind": "none"
+        "kind": "rntl",
+        "ref": "src/components/__tests__/DrilldownKit.component.test.tsx"
       },
-      "note": "Pressable · onPress · dynamic/child-text label"
+      "note": "Pressable · onPress · dynamic/child-text label — presses a SheetOption row and asserts it reports itself; the detail line stays out of the speakable name"
     },
     {
       "id": "screens/PeopleScreen#pressable-167",
       "label": "Pressable (dynamic label)",
       "where": "src/screens/PeopleScreen.tsx:167",
       "proof": {
-        "kind": "none"
+        "kind": "rntl",
+        "ref": "src/screens/__tests__/PeopleScreen.component.test.tsx"
       },
-      "note": "Pressable · onPress · dynamic/child-text label"
+      "note": "Pressable · onPress · dynamic/child-text label — presses a directory row and asserts it opens that person"
     },
     {
       "id": "components/ContactPicker#pressable-135",
       "label": "Pressable (dynamic label)",
       "where": "src/components/ContactPicker.tsx:135",
       "proof": {
-        "kind": "none"
+        "kind": "rntl",
+        "ref": "src/components/__tests__/ContactPicker.component.test.tsx"
       },
-      "note": "Pressable · onPress · dynamic/child-text label"
+      "note": "Pressable · onPress · dynamic/child-text label — ticks a contact row and asserts only that one is handed back"
     },
     {
       "id": "components/ContactPicker#pressable-265",
       "label": "Pressable (dynamic label)",
       "where": "src/components/ContactPicker.tsx:265",
       "proof": {
-        "kind": "none"
+        "kind": "rntl",
+        "ref": "src/components/__tests__/ContactPicker.component.test.tsx"
       },
-      "note": "Pressable · onPress · dynamic/child-text label"
+      "note": "Pressable · onPress · dynamic/child-text label — presses the running-count Add and asserts the mapped people reach onAdd"
     },
     {
       "id": "components/FundingFooter#about.supportshort",
@@ -680,9 +696,10 @@
       "label": "common.gotIt",
       "where": "src/components/LaunchNoticeModal.tsx:90",
       "proof": {
-        "kind": "none"
+        "kind": "rntl",
+        "ref": "src/components/__tests__/LaunchNoticeModal.component.test.tsx"
       },
-      "note": "Pressable · onPress"
+      "note": "Pressable · onPress — dismisses the launch card; asserts it is the ONLY action on the card and that showing it was counted"
     },
     {
       "id": "components/PersonPicker#pressable-69",
@@ -699,90 +716,100 @@
       "label": "Pressable (dynamic label)",
       "where": "src/components/PersonalitySheet.tsx:63",
       "proof": {
-        "kind": "none"
+        "kind": "rntl",
+        "ref": "src/components/__tests__/PersonalitySheet.component.test.tsx"
       },
-      "note": "Pressable · onPress · dynamic/child-text label"
+      "note": "Pressable · onPress · dynamic/child-text label — presses a personality chip and asserts the pick reaches onPick, clearing on a second press"
     },
     {
       "id": "components/ReviewModal#about.review",
       "label": "about.review",
       "where": "src/components/ReviewModal.tsx:150",
       "proof": {
-        "kind": "none"
+        "kind": "rntl",
+        "ref": "src/components/__tests__/ReviewModal.linkSafety.test.tsx"
       },
-      "note": "Pressable · onPress"
+      "note": "Pressable · onPress — opens the write-review URL and marks the install done; never marks done when the link fails or the store id is blank"
     },
     {
       "id": "components/SettingsAbout#about.learnmore",
       "label": "about.learnMore",
       "where": "src/components/SettingsAbout.tsx:69",
       "proof": {
-        "kind": "none"
+        "kind": "rntl",
+        "ref": "src/components/__tests__/SettingsAbout.component.test.tsx"
       },
-      "note": "Pressable · onPress"
+      "note": "Pressable · onPress — presses the studio stamp and asserts it opens STUDIO_URL, with the destination in the hint"
     },
     {
       "id": "components/TipJarSheet#common.done",
       "label": "common.done",
       "where": "src/components/TipJarSheet.tsx:132",
       "proof": {
-        "kind": "none"
+        "kind": "rntl",
+        "ref": "src/components/__tests__/TipJarSheet.component.test.tsx"
       },
-      "note": "Pressable · onPress"
+      "note": "Pressable · onPress — dismisses from the thank-you state; asserts Maybe later is gone once the tip landed"
     },
     {
       "id": "components/TipJarSheet#pressable-166",
       "label": "Pressable (dynamic label)",
       "where": "src/components/TipJarSheet.tsx:166",
       "proof": {
-        "kind": "none"
+        "kind": "rntl",
+        "ref": "src/components/__tests__/TipJarSheet.component.test.tsx"
       },
-      "note": "Pressable · onPress · dynamic/child-text label"
+      "note": "Pressable · onPress · dynamic/child-text label — presses a tier and asserts onTip fires with that product id; the tier is named by its price alone"
     },
     {
       "id": "components/TipJarSheet#common.maybelater",
       "label": "common.maybeLater",
       "where": "src/components/TipJarSheet.tsx:198",
       "proof": {
-        "kind": "none"
+        "kind": "rntl",
+        "ref": "src/components/__tests__/TipJarSheet.component.test.tsx"
       },
-      "note": "Pressable · onPress"
+      "note": "Pressable · onPress — dismisses the tip sheet without buying anything"
     },
     {
       "id": "screens/TodayScreen#pressable-108",
       "label": "Pressable (dynamic label)",
       "where": "src/screens/TodayScreen.tsx:108",
       "proof": {
-        "kind": "none"
+        "kind": "rntl",
+        "ref": "src/screens/__tests__/TodayScreen.component.test.tsx"
       },
-      "note": "Pressable · onPress · dynamic/child-text label"
+      "note": "Pressable · onPress · dynamic/child-text label — presses a reach-out row and asserts it opens the person WITHOUT logging a catch-up"
     },
     {
       "id": "screens/TodayScreen#today.reachedout",
       "label": "today.reachedOut",
       "where": "src/screens/TodayScreen.tsx:119",
       "proof": {
-        "kind": "none"
+        "kind": "rntl",
+        "ref": "src/screens/__tests__/TodayScreen.component.test.tsx"
       },
-      "note": "Pressable · onPress"
+      "note": "Pressable · onPress — presses the pill and asserts the catch-up is logged without leaving Today"
     },
     {
       "id": "screens/TodayScreen#pressable-148",
       "label": "Pressable (dynamic label)",
       "where": "src/screens/TodayScreen.tsx:148",
       "proof": {
-        "kind": "none"
+        "kind": "rntl",
+        "ref": "src/screens/__tests__/TodayScreen.component.test.tsx"
       },
-      "note": "Pressable · onPress · dynamic/child-text label"
+      "note": "Pressable · onPress · dynamic/child-text label — presses a coming-up date row and asserts it opens the person behind it"
     },
     {
       "id": "components/ContactPicker#home.searchclear",
       "label": "home.searchClear",
       "where": "src/components/ContactPicker.tsx:208",
       "proof": {
-        "kind": "none"
+        "kind": "rntl",
+        "ref": "src/components/__tests__/ContactPicker.component.test.tsx"
       },
-      "note": "Pressable · onPress"
+      "note": "Pressable · onPress — clears the search and asserts the full list comes back, not just the box emptying"
     },
     {
       "id": "components/PersonPicker#home.searchclear",
@@ -799,9 +826,10 @@
       "label": "home.searchClear",
       "where": "src/screens/PeopleScreen.tsx:138",
       "proof": {
-        "kind": "none"
+        "kind": "rntl",
+        "ref": "src/screens/__tests__/PeopleScreen.component.test.tsx"
       },
-      "note": "Pressable · onPress"
+      "note": "Pressable · onPress — clears the search and asserts the full directory comes back, not just the box emptying"
     }
   ]
 }
