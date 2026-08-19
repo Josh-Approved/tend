@@ -256,243 +256,270 @@
       "label": "htc.add",
       "where": "src/screens/HTCScreen.tsx:142",
       "proof": {
-        "kind": "none"
+        "kind": "rntl",
+        "ref": "src/screens/__tests__/HTCScreen.component.test.tsx"
       },
-      "note": "Pressable · onPress"
+      "note": "Pressable · onPress — presses the + and asserts nobody is created until the \"who is this with?\" step is answered, then that the new conversation is the one opened"
     },
     {
       "id": "screens/MeScreen#settings.title",
       "label": "settings.title",
       "where": "src/screens/MeScreen.tsx:46",
       "proof": {
-        "kind": "none"
+        "kind": "rntl",
+        "ref": "src/screens/__tests__/MeScreen.component.test.tsx"
       },
-      "note": "Pressable · onPress"
+      "note": "Pressable · onPress — presses the gear and asserts Settings is where it lands"
     },
     {
       "id": "screens/MeScreen#me.share",
       "label": "me.share",
       "where": "src/screens/MeScreen.tsx:76",
       "proof": {
-        "kind": "none"
+        "kind": "rntl",
+        "ref": "src/screens/__tests__/MeScreen.component.test.tsx"
       },
-      "note": "Pressable · onPress"
+      "note": "Pressable · onPress — asserts the OS share sheet gets the composed manual, and is not opened at all while the manual is empty"
     },
     {
       "id": "screens/PeopleScreen#home.importcontacts",
       "label": "home.importContacts",
       "where": "src/screens/PeopleScreen.tsx:104",
       "proof": {
-        "kind": "none"
+        "kind": "rntl",
+        "ref": "src/screens/__tests__/PeopleScreen.component.test.tsx"
       },
-      "note": "Pressable · onPress"
+      "note": "Pressable · onPress — presses the empty state’s contacts route and asserts the picker modal actually comes up"
     },
     {
       "id": "screens/PeopleScreen#settings.title",
       "label": "settings.title",
       "where": "src/screens/PeopleScreen.tsx:90",
       "proof": {
-        "kind": "none"
+        "kind": "rntl",
+        "ref": "src/screens/__tests__/PeopleScreen.component.test.tsx"
       },
-      "note": "Pressable · onPress"
+      "note": "Pressable · onPress — presses the gear and asserts Settings is where it lands"
     },
     {
       "id": "screens/PeopleScreen#home.add",
       "label": "home.add",
       "where": "src/screens/PeopleScreen.tsx:189",
       "proof": {
-        "kind": "none"
+        "kind": "rntl",
+        "ref": "src/screens/__tests__/PeopleScreen.component.test.tsx"
       },
-      "note": "Pressable · onPress"
+      "note": "Pressable · onPress — presses the FAB and asserts it opens a BLANK draft (empty params), so backing out persists nothing"
     },
     {
       "id": "screens/PersonDetailScreen#person.nameplaceholder",
       "label": "person.namePlaceholder",
       "where": "src/screens/PersonDetailScreen.tsx:131",
       "proof": {
-        "kind": "none"
+        "kind": "rntl",
+        "ref": "src/screens/__tests__/PersonDetailScreen.component.test.tsx"
       },
-      "note": "TextInput · onSubmitEditing"
+      "note": "TextInput · onSubmitEditing — keyboard return saves the draft person; a blank name is refused"
     },
     {
       "id": "screens/PersonDetailScreen#common.save",
       "label": "common.save",
       "where": "src/screens/PersonDetailScreen.tsx:152",
       "proof": {
-        "kind": "none"
+        "kind": "rntl",
+        "ref": "src/screens/__tests__/PersonDetailScreen.component.test.tsx"
       },
-      "note": "Pressable · onPress"
+      "note": "Pressable · onPress — asserts the store stays empty until Save, then that Save creates the person and replaces the draft route with it"
     },
     {
       "id": "screens/PersonDetailScreen#person.reachedout",
       "label": "person.reachedOut",
       "where": "src/screens/PersonDetailScreen.tsx:292",
       "proof": {
-        "kind": "none"
+        "kind": "rntl",
+        "ref": "src/screens/__tests__/PersonDetailScreen.component.test.tsx"
       },
-      "note": "Pressable · onPress"
+      "note": "Pressable · onPress — logs a catch-up and asserts the interaction the store actually holds, plus that the note box clears"
     },
     {
       "id": "screens/PersonDetailScreen#htc.add",
       "label": "htc.add",
       "where": "src/screens/PersonDetailScreen.tsx:382",
       "proof": {
-        "kind": "none"
+        "kind": "rntl",
+        "ref": "src/screens/__tests__/PersonDetailScreen.component.test.tsx"
       },
-      "note": "Pressable · onPress"
+      "note": "Pressable · onPress — asserts the created conversation is LINKED to this person and is the one opened"
     },
     {
       "id": "screens/PersonDetailScreen#person.deleteperson",
       "label": "person.deletePerson",
       "where": "src/screens/PersonDetailScreen.tsx:393",
       "proof": {
-        "kind": "none"
+        "kind": "rntl",
+        "ref": "src/screens/__tests__/PersonDetailScreen.component.test.tsx"
       },
-      "note": "Pressable · onPress"
+      "note": "Pressable · onPress — asserts the press alone deletes nothing (destructive confirm) and only the confirm button removes the person"
     },
     {
       "id": "screens/TodayScreen#settings.title",
       "label": "settings.title",
       "where": "src/screens/TodayScreen.tsx:70",
       "proof": {
-        "kind": "none"
+        "kind": "rntl",
+        "ref": "src/screens/__tests__/TodayScreen.component.test.tsx"
       },
-      "note": "Pressable · onPress"
+      "note": "Pressable · onPress — presses the gear on BOTH the caught-up and the due branch and asserts Settings is where it lands"
     },
     {
       "id": "components/DatesSheet#person.remove",
       "label": "person.remove",
       "where": "src/components/DatesSheet.tsx:144",
       "proof": {
-        "kind": "none"
+        "kind": "rntl",
+        "ref": "src/components/__tests__/DatesSheet.component.test.tsx"
       },
-      "note": "Pressable · onPress"
+      "note": "Pressable · onPress — the birthday’s Trash clears the birthday and nothing else"
     },
     {
       "id": "components/DatesSheet#person.adddate",
       "label": "person.addDate",
       "where": "src/components/DatesSheet.tsx:211",
       "proof": {
-        "kind": "none"
+        "kind": "rntl",
+        "ref": "src/components/__tests__/DatesSheet.component.test.tsx"
       },
-      "note": "Pressable · onPress"
+      "note": "Pressable · onPress — files the typed date (label falls back when blank), clears the form, and refuses an impossible month/day"
     },
     {
       "id": "components/Dialogs#common.closemenu",
       "label": "common.closeMenu",
       "where": "src/components/Dialogs.tsx:110",
       "proof": {
-        "kind": "none"
+        "kind": "rntl",
+        "ref": "src/components/__tests__/Dialogs.component.test.tsx"
       },
-      "note": "Pressable · onPress"
+      "note": "Pressable · onPress — the scrim closes the action menu without firing any option"
     },
     {
       "id": "components/Dialogs#pressable-116",
       "label": "Pressable (dynamic label)",
       "where": "src/components/Dialogs.tsx:116",
       "proof": {
-        "kind": "none"
+        "kind": "rntl",
+        "ref": "src/components/__tests__/Dialogs.component.test.tsx"
       },
-      "note": "Pressable · onPress · dynamic/child-text label"
+      "note": "Pressable · onPress · sheet body — a tap that lands on the sheet is swallowed, so the menu stays open"
     },
     {
       "id": "components/Dialogs#pressable-123",
       "label": "Pressable (dynamic label)",
       "where": "src/components/Dialogs.tsx:123",
       "proof": {
-        "kind": "none"
+        "kind": "rntl",
+        "ref": "src/components/__tests__/Dialogs.component.test.tsx"
       },
-      "note": "Pressable · onPress · dynamic/child-text label"
+      "note": "Pressable · onPress · option row — fires that option’s handler (past the 260ms defer) and closes the sheet"
     },
     {
       "id": "components/Dialogs#common.cancel",
       "label": "common.cancel",
       "where": "src/components/Dialogs.tsx:135",
       "proof": {
-        "kind": "none"
+        "kind": "rntl",
+        "ref": "src/components/__tests__/Dialogs.component.test.tsx"
       },
-      "note": "Pressable · onPress"
+      "note": "Pressable · onPress — the sheet’s Cancel closes it and no option ever fires"
     },
     {
       "id": "components/Dialogs#common.cancel-2",
       "label": "common.cancel",
       "where": "src/components/Dialogs.tsx:212",
       "proof": {
-        "kind": "none"
+        "kind": "rntl",
+        "ref": "src/components/__tests__/Dialogs.component.test.tsx"
       },
-      "note": "Pressable · onPress"
+      "note": "Pressable · onPress · prompt scrim — closes without submitting"
     },
     {
       "id": "components/Dialogs#pressable-218",
       "label": "Pressable (dynamic label)",
       "where": "src/components/Dialogs.tsx:218",
       "proof": {
-        "kind": "none"
+        "kind": "rntl",
+        "ref": "src/components/__tests__/Dialogs.component.test.tsx"
       },
-      "note": "Pressable · onPress · dynamic/child-text label"
+      "note": "Pressable · onPress · prompt card — a tap inside the card is swallowed, so the edit is not thrown away"
     },
     {
       "id": "components/Dialogs#textinput-223",
       "label": "TextInput (dynamic label)",
       "where": "src/components/Dialogs.tsx:223",
       "proof": {
-        "kind": "none"
+        "kind": "rntl",
+        "ref": "src/components/__tests__/Dialogs.component.test.tsx"
       },
-      "note": "TextInput · onSubmitEditing · dynamic/child-text label"
+      "note": "TextInput · onSubmitEditing — keyboard return submits the typed text"
     },
     {
       "id": "components/Dialogs#common.cancel-3",
       "label": "common.cancel",
       "where": "src/components/Dialogs.tsx:238",
       "proof": {
-        "kind": "none"
+        "kind": "rntl",
+        "ref": "src/components/__tests__/Dialogs.component.test.tsx"
       },
-      "note": "Pressable · onPress"
+      "note": "Pressable · onPress · prompt ghost button — the Cancel a user aims at abandons the edit"
     },
     {
       "id": "components/Dialogs#pressable-246",
       "label": "Pressable (dynamic label)",
       "where": "src/components/Dialogs.tsx:246",
       "proof": {
-        "kind": "none"
+        "kind": "rntl",
+        "ref": "src/components/__tests__/Dialogs.component.test.tsx"
       },
-      "note": "Pressable · onPress · dynamic/child-text label"
+      "note": "Pressable · onPress — the prompt’s confirm submits the trimmed text (custom label honoured)"
     },
     {
       "id": "components/Dialogs#common.cancel-4",
       "label": "common.cancel",
       "where": "src/components/Dialogs.tsx:311",
       "proof": {
-        "kind": "none"
+        "kind": "rntl",
+        "ref": "src/components/__tests__/Dialogs.component.test.tsx"
       },
-      "note": "Pressable · onPress"
+      "note": "Pressable · onPress · confirm scrim — closes without confirming"
     },
     {
       "id": "components/Dialogs#pressable-317",
       "label": "Pressable (dynamic label)",
       "where": "src/components/Dialogs.tsx:317",
       "proof": {
-        "kind": "none"
+        "kind": "rntl",
+        "ref": "src/components/__tests__/Dialogs.component.test.tsx"
       },
-      "note": "Pressable · onPress · dynamic/child-text label"
+      "note": "Pressable · onPress · confirm card — a tap on the card neither confirms nor dismisses"
     },
     {
       "id": "components/Dialogs#common.cancel-5",
       "label": "common.cancel",
       "where": "src/components/Dialogs.tsx:323",
       "proof": {
-        "kind": "none"
+        "kind": "rntl",
+        "ref": "src/components/__tests__/Dialogs.component.test.tsx"
       },
-      "note": "Pressable · onPress"
+      "note": "Pressable · onPress · confirm ghost button — the deliberate \"no\" on a destructive confirm"
     },
     {
       "id": "components/Dialogs#pressable-331",
       "label": "Pressable (dynamic label)",
       "where": "src/components/Dialogs.tsx:331",
       "proof": {
-        "kind": "none"
+        "kind": "rntl",
+        "ref": "src/components/__tests__/Dialogs.component.test.tsx"
       },
-      "note": "Pressable · onPress · dynamic/child-text label"
+      "note": "Pressable · onPress — the confirm button fires onConfirm and closes (custom/destructive label honoured)"
     },
     {
       "id": "components/DrilldownRow#pressable-35",

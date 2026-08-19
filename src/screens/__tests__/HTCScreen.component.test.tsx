@@ -102,6 +102,24 @@ describe('HTCScreen', () => {
     expect(nav.navigate).toHaveBeenCalledWith('Settings');
   });
 
+  it('starts a conversation from the + and opens the new record', async () => {
+    const user = userEvent.setup({ delay: 0 });
+    await renderHTC();
+
+    await user.press(screen.getByRole('button', { name: 'Start a conversation' }));
+    // The + asks who it's with first — nothing is created until that's answered.
+    expect(screen.getByRole('header', { name: 'Who is this with?' })).toBeTruthy();
+    expect(useConversationsStore.getState().conversations).toHaveLength(0);
+
+    await user.press(screen.getByRole('button', { name: 'Someone new' }));
+
+    const created = useConversationsStore.getState().conversations;
+    expect(created).toHaveLength(1);
+    expect(nav.navigate).toHaveBeenCalledWith('ConversationDetail', {
+      conversationId: created[0].id,
+    });
+  });
+
   it('shows the intro unprompted the very first time the tab is opened', async () => {
     delete mockSettings['htc.introSeen'];
     const user = userEvent.setup({ delay: 0 });

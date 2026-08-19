@@ -10,10 +10,13 @@
  *
  * Queries go by role/label only, so this also fails if the FAB or the gear loses
  * its accessibility label.
+ *
+ * The second block presses each of the tab's three controls and asserts where it
+ * lands (Uplevel-3 T3 action coverage).
  */
 
 import React from 'react';
-import { render, screen } from '@testing-library/react-native';
+import { render, screen, userEvent, waitFor } from '@testing-library/react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 const METRICS = {
@@ -51,10 +54,11 @@ jest.mock('../../store/people', () => ({
 
 import PeopleScreen from '../PeopleScreen';
 
+// The screen only ever touches navigation.navigate; the rest of the
+// react-navigation prop surface is irrelevant to what's on screen.
+const navigation = { navigate: jest.fn() };
+
 function renderPeople() {
-  const navigation = { navigate: jest.fn() };
-  // The screen only ever touches navigation.navigate; the rest of the
-  // react-navigation prop surface is irrelevant to what's on screen.
   return render(
     <SafeAreaProvider initialMetrics={METRICS}>
       {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
@@ -62,6 +66,11 @@ function renderPeople() {
     </SafeAreaProvider>
   );
 }
+
+beforeEach(() => {
+  jest.clearAllMocks();
+  mockState.people = [];
+});
 
 describe('PeopleScreen action surface', () => {
   it('offers exactly one way to add a person once the directory has people', async () => {
@@ -85,5 +94,42 @@ describe('PeopleScreen action surface', () => {
     // contacts, plus the FAB for typing a name.
     expect(screen.getByRole('button', { name: 'Import from contacts' })).toBeTruthy();
     expect(screen.getByRole('button', { name: 'Add person' })).toBeTruthy();
+  });
+});
+
+describe('PeopleScreen controls', () => {
+  it('opens a blank person draft from the FAB without creating a record', async () => {
+    mockState.people = [makePerson('Mom')];
+    const user = userEvent.setup({ delay: 0 });
+    await renderPeople();
+
+    await user.press(screen.getByRole('button', { name: 'Add person' }));
+
+    // Empty params — the draft persists nothing until Save, so backing straight
+    // out of a blank screen must not leave a nameless person behind.
+    expect(navigation.navigate).toHaveBeenCalledWith('PersonDetail', {});
+  });
+
+  it('opens Settings from the gear', async () => {
+    mockState.people = [makePerson('Mom')];
+    const user = userEvent.setup({ delay: 0 });
+    await renderPeople();
+
+    await user.press(screen.getByRole('button', { name: 'Settings' }));
+
+    expect(navigation.navigate).toHaveBeenCalledWith('Settings');
+  });
+
+  it('opens the contact picker from the empty state', async () => {
+    const user = userEvent.setup({ delay: 0 });
+    await renderPeople();
+
+    await user.press(screen.getByRole('button', { name: 'Import from contacts' }));
+
+    // The picker is a full-screen modal of its own — its title is the proof it
+    // actually came up, rather than the button merely having a handler.
+    await waitFor(() =>
+      expect(screen.getByRole('header', { name: 'Add from contacts' })).toBeTruthy()
+    );
   });
 });
