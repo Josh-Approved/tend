@@ -209,7 +209,7 @@ export function ContactPicker({ visible, onClose, onAdd }: Props) {
                         onPress={() => setQuery('')}
                         hitSlop={8}
                         accessibilityRole="button"
-                        accessibilityLabel={t('common.cancel')}
+                        accessibilityLabel={t('home.searchClear')}
                         style={({ pressed }) => [s.searchClear, pressed && s.pressed]}
                       >
                         <X size={16} color={c.fgMuted} strokeWidth={1.5} />

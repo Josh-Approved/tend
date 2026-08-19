@@ -34,6 +34,7 @@ const fr = {
     comingUpDays: '{label} de {name} · dans {days} j',
     searchPlaceholder: 'Rechercher une personne',
     searchNoResults: 'Personne ne correspond à « {query} ».',
+    searchClear: 'Effacer la recherche',
     importing: 'Importation…',
   },
   person: {

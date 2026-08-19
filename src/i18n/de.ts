@@ -34,6 +34,7 @@ const de = {
     comingUpDays: '{name}: {label} · in {days} T.',
     searchPlaceholder: 'Menschen suchen',
     searchNoResults: 'Niemand passt zu „{query}“.',
+    searchClear: 'Suche löschen',
     importing: 'Wird importiert…',
   },
   person: {

@@ -34,6 +34,7 @@ const es = {
     comingUpDays: '{label} de {name} · en {days}d',
     searchPlaceholder: 'Buscar personas',
     searchNoResults: 'Nadie coincide con “{query}”.',
+    searchClear: 'Borrar búsqueda',
     importing: 'Importando…',
   },
   person: {

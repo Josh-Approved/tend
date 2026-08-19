@@ -36,6 +36,7 @@ export const APP_STRINGS = {
     comingUpDays: "{name}'s {label} · in {days}d",
     searchPlaceholder: 'Search people',
     searchNoResults: 'No one matches “{query}”.',
+    searchClear: 'Clear search',
     importing: 'Importing…',
   },
   person: {

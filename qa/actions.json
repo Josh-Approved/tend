@@ -6,234 +6,250 @@
       "label": "Pressable (dynamic label)",
       "where": "src/components/AboutRow.tsx:56",
       "proof": {
-        "kind": "none"
+        "kind": "rntl",
+        "ref": "src/components/__tests__/AboutRow.component.test.tsx"
       },
-      "note": "Pressable · onPress · dynamic/child-text label"
+      "note": "Pressable · onPress · dynamic/child-text label — presses a tappable About row and asserts its action ran; a value-only row is not a button"
     },
     {
       "id": "components/Credits#common.back",
       "label": "common.back",
       "where": "src/components/Credits.tsx:45",
       "proof": {
-        "kind": "none"
+        "kind": "rntl",
+        "ref": "src/components/__tests__/Credits.component.test.tsx"
       },
-      "note": "Pressable · onPress"
+      "note": "Pressable · onPress — presses Back and asserts the screen hands control back"
     },
     {
       "id": "components/Credits#pressable-66",
       "label": "Pressable (dynamic label)",
       "where": "src/components/Credits.tsx:66",
       "proof": {
-        "kind": "none"
+        "kind": "rntl",
+        "ref": "src/components/__tests__/Credits.component.test.tsx"
       },
-      "note": "Pressable · onPress · dynamic/child-text label"
+      "note": "Pressable · onPress · dynamic/child-text label — presses a credit row and asserts the generated entry URL is what opens"
     },
     {
       "id": "components/FundingFooter#about.feedback",
       "label": "about.feedback",
       "where": "src/components/FundingFooter.tsx:100",
       "proof": {
-        "kind": "none"
+        "kind": "rntl",
+        "ref": "src/components/__tests__/FundingFooter.component.test.tsx"
       },
-      "note": "Pressable · onPress"
+      "note": "Pressable · onPress — presses Send feedback and asserts the feedback sheet opens"
     },
     {
       "id": "components/HTCIntro#htc.introdismiss",
       "label": "htc.introDismiss",
       "where": "src/components/HTCIntro.tsx:45",
       "proof": {
-        "kind": "none"
+        "kind": "rntl",
+        "ref": "src/components/__tests__/HTCIntro.component.test.tsx"
       },
-      "note": "Pressable · onPress"
+      "note": "Pressable · onPress — presses Got it and asserts the full-screen intro closes"
     },
     {
       "id": "components/LanguageSetting#pressable-95",
       "label": "Pressable (dynamic label)",
       "where": "src/components/LanguageSetting.tsx:95",
       "proof": {
-        "kind": "none"
+        "kind": "rntl",
+        "ref": "src/components/__tests__/LanguageSetting.component.test.tsx"
       },
-      "note": "Pressable · onPress · dynamic/child-text label"
+      "note": "Pressable · onPress · dynamic/child-text label — presses the Settings row and asserts the language sheet opens"
     },
     {
       "id": "components/LanguageSetting#common.cancel",
       "label": "common.cancel",
       "where": "src/components/LanguageSetting.tsx:113",
       "proof": {
-        "kind": "none"
+        "kind": "rntl",
+        "ref": "src/components/__tests__/LanguageSetting.component.test.tsx"
       },
-      "note": "Pressable · onPress"
+      "note": "Pressable · onPress — presses the scrim and asserts the sheet closes with the language unchanged"
     },
     {
       "id": "components/LanguageSetting#pressable-114",
       "label": "Pressable (dynamic label)",
       "where": "src/components/LanguageSetting.tsx:114",
       "proof": {
-        "kind": "none"
+        "kind": "rntl",
+        "ref": "src/components/__tests__/LanguageSetting.component.test.tsx"
       },
-      "note": "Pressable · onPress · dynamic/child-text label"
+      "note": "Pressable · onPress · dynamic/child-text label — presses inside the sheet and asserts it does NOT fall through to the scrim"
     },
     {
       "id": "components/LanguageSetting#common.done",
       "label": "common.done",
       "where": "src/components/LanguageSetting.tsx:117",
       "proof": {
-        "kind": "none"
+        "kind": "rntl",
+        "ref": "src/components/__tests__/LanguageSetting.component.test.tsx"
       },
-      "note": "Pressable · onPress"
+      "note": "Pressable · onPress — presses Done and asserts the sheet closes with the language unchanged"
     },
     {
       "id": "components/LanguageSetting#pressable-135",
       "label": "Pressable (dynamic label)",
       "where": "src/components/LanguageSetting.tsx:135",
       "proof": {
-        "kind": "none"
+        "kind": "rntl",
+        "ref": "src/components/__tests__/LanguageSetting.component.test.tsx"
       },
-      "note": "Pressable · onPress · dynamic/child-text label"
+      "note": "Pressable · onPress · dynamic/child-text label — picks Español and asserts the app is really in Spanish afterwards"
     },
     {
       "id": "components/MoreFromJA#pressable-58",
       "label": "Pressable (dynamic label)",
       "where": "src/components/MoreFromJA.tsx:58",
       "proof": {
-        "kind": "none"
+        "kind": "rntl",
+        "ref": "src/components/__tests__/MoreFromJA.component.test.tsx"
       },
-      "note": "Pressable · onPress · dynamic/child-text label"
+      "note": "Pressable · onPress · dynamic/child-text label — presses a cross-promo row and asserts the catalog store URL is what opens"
     },
     {
       "id": "components/PersonPicker#common.cancel",
       "label": "common.cancel",
       "where": "src/components/PersonPicker.tsx:96",
       "proof": {
-        "kind": "none"
+        "kind": "rntl",
+        "ref": "src/components/__tests__/PersonPicker.component.test.tsx"
       },
-      "note": "Pressable · onPress"
+      "note": "Pressable · onPress — presses the header X and asserts it closes without choosing anyone"
     },
     {
       "id": "components/PersonPicker#htc.someonenew",
       "label": "htc.someoneNew",
       "where": "src/components/PersonPicker.tsx:117",
       "proof": {
-        "kind": "none"
+        "kind": "rntl",
+        "ref": "src/components/__tests__/PersonPicker.component.test.tsx"
       },
-      "note": "Pressable · onPress"
-    },
-    {
-      "id": "components/PersonPicker#common.cancel-2",
-      "label": "common.cancel",
-      "where": "src/components/PersonPicker.tsx:149",
-      "proof": {
-        "kind": "none"
-      },
-      "note": "Pressable · onPress"
+      "note": "Pressable · onPress — presses Someone new and asserts the unlinked result is handed back"
     },
     {
       "id": "components/ReviewModal#common.notnow",
       "label": "common.notNow",
       "where": "src/components/ReviewModal.tsx:162",
       "proof": {
-        "kind": "none"
+        "kind": "rntl",
+        "ref": "src/components/__tests__/ReviewModal.linkSafety.test.tsx"
       },
-      "note": "Pressable · onPress"
+      "note": "Pressable · onPress — presses Not now and asserts nothing opens and the install is not retired"
     },
     {
       "id": "components/ScreenHeader#common.back",
       "label": "common.back",
       "where": "src/components/ScreenHeader.tsx:38",
       "proof": {
-        "kind": "none"
+        "kind": "rntl",
+        "ref": "src/components/__tests__/ScreenHeader.component.test.tsx"
       },
-      "note": "Pressable · onPress"
+      "note": "Pressable · onPress — presses Back and asserts the handler ran (the canonical RNTL exemplar)"
     },
     {
       "id": "screens/ConversationDetailScreen#htc.changeperson",
       "label": "htc.changePerson",
       "where": "src/screens/ConversationDetailScreen.tsx:165",
       "proof": {
-        "kind": "none"
+        "kind": "rntl",
+        "ref": "src/screens/__tests__/ConversationDetailScreen.component.test.tsx"
       },
-      "note": "Pressable · onPress"
+      "note": "Pressable · onPress — presses Change on a linked conversation and asserts the picker reopens"
     },
     {
       "id": "screens/ConversationDetailScreen#htc.linkexisting",
       "label": "htc.linkExisting",
       "where": "src/screens/ConversationDetailScreen.tsx:178",
       "proof": {
-        "kind": "none"
+        "kind": "rntl",
+        "ref": "src/screens/__tests__/ConversationDetailScreen.component.test.tsx"
       },
-      "note": "Pressable · onPress"
+      "note": "Pressable · onPress — presses Choose from your people and asserts the picker opens with the directory"
     },
     {
       "id": "screens/ConversationDetailScreen#pressable-195",
       "label": "Pressable (dynamic label)",
       "where": "src/screens/ConversationDetailScreen.tsx:195",
       "proof": {
-        "kind": "none"
+        "kind": "rntl",
+        "ref": "src/screens/__tests__/ConversationDetailScreen.component.test.tsx"
       },
-      "note": "Pressable · onPress · dynamic/child-text label"
+      "note": "Pressable · onPress · dynamic/child-text label — presses a flavor chip and asserts the store flavor changed and the prompts re-tailored"
     },
     {
       "id": "screens/ConversationDetailScreen#htc.reopen",
       "label": "htc.reopen",
       "where": "src/screens/ConversationDetailScreen.tsx:301",
       "proof": {
-        "kind": "none"
+        "kind": "rntl",
+        "ref": "src/screens/__tests__/ConversationDetailScreen.component.test.tsx"
       },
-      "note": "Pressable · onPress"
+      "note": "Pressable · onPress — presses Mark as still to have and asserts the record leaves had"
     },
     {
       "id": "screens/ConversationDetailScreen#htc.markhad",
       "label": "htc.markHad",
       "where": "src/screens/ConversationDetailScreen.tsx:312",
       "proof": {
-        "kind": "none"
+        "kind": "rntl",
+        "ref": "src/screens/__tests__/ConversationDetailScreen.component.test.tsx"
       },
-      "note": "Pressable · onPress"
+      "note": "Pressable · onPress — presses We had this conversation and asserts status had + the reflection appears"
     },
     {
       "id": "screens/ConversationDetailScreen#htc.deleteconversation",
       "label": "htc.deleteConversation",
       "where": "src/screens/ConversationDetailScreen.tsx:324",
       "proof": {
-        "kind": "none"
+        "kind": "rntl",
+        "ref": "src/screens/__tests__/ConversationDetailScreen.component.test.tsx"
       },
-      "note": "Pressable · onPress"
+      "note": "Pressable · onPress — presses Delete and asserts nothing is removed until the destructive confirm is taken"
     },
     {
       "id": "screens/ConversationDetailScreen#common.save",
       "label": "common.save",
       "where": "src/screens/ConversationDetailScreen.tsx:336",
       "proof": {
-        "kind": "none"
+        "kind": "rntl",
+        "ref": "src/screens/__tests__/ConversationDetailScreen.component.test.tsx"
       },
-      "note": "Pressable · onPress"
+      "note": "Pressable · onPress — presses Save and asserts it leaves the screen with what was written intact"
     },
     {
       "id": "screens/HTCScreen#pressable-77",
       "label": "Pressable (dynamic label)",
       "where": "src/screens/HTCScreen.tsx:77",
       "proof": {
-        "kind": "none"
+        "kind": "rntl",
+        "ref": "src/screens/__tests__/HTCScreen.component.test.tsx"
       },
-      "note": "Pressable · onPress · dynamic/child-text label"
+      "note": "Pressable · onPress · dynamic/child-text label — presses a listed conversation and asserts it navigates to that conversation id"
     },
     {
       "id": "screens/HTCScreen#htc.whatisthis",
       "label": "htc.whatIsThis",
       "where": "src/screens/HTCScreen.tsx:100",
       "proof": {
-        "kind": "none"
+        "kind": "rntl",
+        "ref": "src/screens/__tests__/HTCScreen.component.test.tsx"
       },
-      "note": "Pressable · onPress"
+      "note": "Pressable · onPress — presses the info button and asserts the concept intro reopens"
     },
     {
       "id": "screens/HTCScreen#settings.title",
       "label": "settings.title",
       "where": "src/screens/HTCScreen.tsx:109",
       "proof": {
-        "kind": "none"
+        "kind": "rntl",
+        "ref": "src/screens/__tests__/HTCScreen.component.test.tsx"
       },
-      "note": "Pressable · onPress"
+      "note": "Pressable · onPress — presses the gear and asserts it navigates to Settings"
     },
     {
       "id": "screens/HTCScreen#htc.add",
@@ -275,15 +291,6 @@
       "id": "screens/PeopleScreen#settings.title",
       "label": "settings.title",
       "where": "src/screens/PeopleScreen.tsx:90",
-      "proof": {
-        "kind": "none"
-      },
-      "note": "Pressable · onPress"
-    },
-    {
-      "id": "screens/PeopleScreen#person.cancel",
-      "label": "person.cancel",
-      "where": "src/screens/PeopleScreen.tsx:138",
       "proof": {
         "kind": "none"
       },
@@ -544,15 +551,6 @@
     {
       "id": "components/ContactPicker#common.cancel",
       "label": "common.cancel",
-      "where": "src/components/ContactPicker.tsx:208",
-      "proof": {
-        "kind": "none"
-      },
-      "note": "Pressable · onPress"
-    },
-    {
-      "id": "components/ContactPicker#common.cancel-2",
-      "label": "common.cancel",
       "where": "src/components/ContactPicker.tsx:249",
       "proof": {
         "kind": "none"
@@ -645,9 +643,10 @@
       "label": "about.supportShort",
       "where": "src/components/FundingFooter.tsx:80",
       "proof": {
-        "kind": "none"
+        "kind": "rntl",
+        "ref": "src/components/__tests__/FundingFooter.component.test.tsx"
       },
-      "note": "Pressable · onPress"
+      "note": "Pressable · onPress — presses Support and asserts the tip jar opens; absent entirely with no tip jar wired"
     },
     {
       "id": "components/LaunchNoticeModal#common.gotit",
@@ -663,9 +662,10 @@
       "label": "Pressable (dynamic label)",
       "where": "src/components/PersonPicker.tsx:69",
       "proof": {
-        "kind": "none"
+        "kind": "rntl",
+        "ref": "src/components/__tests__/PersonPicker.component.test.tsx"
       },
-      "note": "Pressable · onPress · dynamic/child-text label"
+      "note": "Pressable · onPress · dynamic/child-text label — presses a person row and asserts that person id + name is handed back"
     },
     {
       "id": "components/PersonalitySheet#pressable-63",
@@ -747,6 +747,34 @@
         "kind": "none"
       },
       "note": "Pressable · onPress · dynamic/child-text label"
+    },
+    {
+      "id": "components/ContactPicker#home.searchclear",
+      "label": "home.searchClear",
+      "where": "src/components/ContactPicker.tsx:208",
+      "proof": {
+        "kind": "none"
+      },
+      "note": "Pressable · onPress"
+    },
+    {
+      "id": "components/PersonPicker#home.searchclear",
+      "label": "home.searchClear",
+      "where": "src/components/PersonPicker.tsx:149",
+      "proof": {
+        "kind": "rntl",
+        "ref": "src/components/__tests__/PersonPicker.component.test.tsx"
+      },
+      "note": "Pressable · onPress — presses the clear-search X and asserts the directory returns; regression proof for defect tend-20260819-1 (it used to be named \"Cancel\", same as the dismiss control)"
+    },
+    {
+      "id": "screens/PeopleScreen#home.searchclear",
+      "label": "home.searchClear",
+      "where": "src/screens/PeopleScreen.tsx:138",
+      "proof": {
+        "kind": "none"
+      },
+      "note": "Pressable · onPress"
     }
   ]
 }

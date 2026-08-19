@@ -34,6 +34,7 @@ const ptBR = {
     comingUpDays: '{label} de {name} · em {days}d',
     searchPlaceholder: 'Buscar pessoas',
     searchNoResults: 'Ninguém corresponde a “{query}”.',
+    searchClear: 'Limpar busca',
     importing: 'Importando…',
   },
   person: {

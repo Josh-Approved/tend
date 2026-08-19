@@ -34,6 +34,7 @@ const ja = {
     comingUpDays: '{name}の{label}・あと{days}日',
     searchPlaceholder: '人を検索',
     searchNoResults: '「{query}」に一致する人はいません。',
+    searchClear: '検索をクリア',
     importing: '取り込み中…',
   },
   person: {

@@ -139,7 +139,7 @@ export default function PeopleScreen({ navigation }: TabScreenProps<'People'>) {
                     onPress={() => setQuery('')}
                     hitSlop={8}
                     accessibilityRole="button"
-                    accessibilityLabel={t('person.cancel')}
+                    accessibilityLabel={t('home.searchClear')}
                     style={({ pressed }) => [s.searchClear, pressed && s.pressed]}
                   >
                     <X size={16} color={c.fgMuted} strokeWidth={1.5} />
