@@ -12,6 +12,13 @@ import { getDb } from '../storage/kv';
 import type { Person, ImportantDate, Preference, Interaction, PersonalityType } from '../data/person';
 import type { Conversation, ConversationFlavor, ConversationStatus } from '../data/conversation';
 
+// Memoize the in-flight PROMISE, not a resolved flag: hydration (people),
+// the conversation list and the shell's settings read all reach for the
+// database in the same startup tick, and a resolved-only cache would let each
+// of them run its own CREATE + ALTER sequence concurrently. A rejected setup
+// is deliberately NOT cached — otherwise one transient open failure would
+// leave the people list empty for the rest of the process, with a retry that
+// can never succeed.
 let _ready: Promise<void> | null = null;
 
 async function ensureTable(): Promise<void> {
@@ -46,7 +53,10 @@ async function ensureTable(): Promise<void> {
         // column already exists — expected on a current schema
       }
     }
-  })();
+  })().catch((err) => {
+    _ready = null; // a failed setup must not be cached
+    throw err;
+  });
   return _ready;
 }
 
@@ -146,7 +156,10 @@ async function ensureConversationsTable(): Promise<void> {
         hadAt        INTEGER
       );
     `);
-  })();
+  })().catch((err) => {
+    _convReady = null; // a failed setup must not be cached
+    throw err;
+  });
   return _convReady;
 }
 
