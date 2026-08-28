@@ -36,6 +36,38 @@
     "cadence-row-monthly": {
       "text": ".*Reach-out reminder: Monthly.*",
       "note": "the hub row after the pick \u2014 the Tier-2 outcome proof the spoke wrote through"
+    },
+    "back": {
+      "text": "Back",
+      "note": "ScreenHeader back button (i18n common.back) \u2014 the only back affordance on PersonDetail / ConversationDetail"
+    },
+    "htc-tab": {
+      "text": "HTC",
+      "note": "the Have-the-Conversation bottom-tab (i18n nav.htc). Deliberately the short label, not the screen title 'Have the Conversation', so the anchor can never collide with the screen it opens."
+    },
+    "fixture-only-person": {
+      "text": "Marcus.*",
+      "note": "a seeded person the T5 upgrade flow NEVER makes durable (src/qa/fixtures.ts). The QA seed is in memory only \u2014 it fires only when the people table is empty \u2014 so after the write flow persists Mom, Marcus exists nowhere on disk. He is the upgrade harness's TRIPWIRE: if HEAD loses the people table, QA_MODE re-seeds all five fixtures and Marcus comes BACK. Wrapped in .* because the directory row merges name + due state + last check-in into one a11y label on iOS."
+    },
+    "seeded-conversation": {
+      "text": ".*I snapped at her on the phone last weekend.*",
+      "note": "the seeded apology conversation for Mom (src/qa/fixtures.ts), listed under 'Conversations to have' on her detail screen. Unlike the people fixtures, the conversations seed writes itself to disk on hydrate (src/store/conversations.ts:71), so this row IS a row the released build genuinely persisted. Anchored on the row's a11y label, which is the conversation topic."
+    },
+    "new-conversation": {
+      "text": "Something to share",
+      "note": "the 'open' flavor label (i18n htc.flavor.open). On a person's detail screen a conversation row falls back to its flavor label when it has no topic, so this text identifies a conversation created by the 'Start a conversation' button and never edited. NONE of the seeded conversations use the open flavor (they are apology / hurt / appreciation, all with topics), so this string appears on PersonDetail only for a conversation the user actually created \u2014 which is what makes it the T5 upgrade flow's off-seed datum."
+    },
+    "start-conversation": {
+      "text": "Start a conversation",
+      "note": "i18n htc.add \u2014 both the button at the bottom of a person's detail screen (creates + persists a conversation immediately, then opens it) and the FAB on the HTC tab. Used as a tap target on PersonDetail and as a liveness assert on the HTC tab (the first-run intro is a full-screen modal, so the FAB is not visible behind it)."
+    },
+    "conversation-flavor-label": {
+      "text": "What kind of conversation is this?",
+      "note": "ConversationDetail's flavor section header (i18n htc.flavorLabel) \u2014 the arrival anchor proving the newly created conversation opened. Unique to that screen and high enough on it to be above the fold on the smallest device."
+    },
+    "htc-intro-dismiss": {
+      "text": "Got it",
+      "note": "the dismiss button on the first-visit HTC intro modal (i18n htc.introDismiss). Present ONLY while that modal is up \u2014 the shell's launch-notice card shares the string but never renders under QA_MODE (src/shell/AppShell.tsx). Dismissing writes htc.introSeen into the app_settings table, so its presence/absence is the T5 upgrade flow's oracle on the key-value store. Anchored on the button rather than the intro's title, because the title ('Have the conversation') differs from the tab's screen title ('Have the Conversation') only by one letter's case."
     }
   }
 }

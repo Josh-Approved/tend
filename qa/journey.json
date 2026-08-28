@@ -113,5 +113,84 @@
         "assert": "@reached-out-confirm"
       }
     ]
+  },
+  "upgrade": {
+    "$comment": "T5 upgrade harness — cross-version subflow (compiles to qa/flows/upgrade-write.yaml + upgrade-assert.yaml; run by scripts/qa/upgrade-test.mjs against qa/released/<platform>, full profile + nightly, NOT per-PR). The bug class: install a HEAD build over months-old data and silently lose it. 'write' runs on the LAST-RELEASED binary (installed fresh, so its QA seed fires), the harness installs HEAD OVER it (never uninstall), and 'assert' proves the data is still there. Neither flow may clear state — persistence across the install is the whole point (upgradeJourneys forces clearState:false). THE ONE THING TO KNOW ABOUT THIS APP: the people fixtures are IN MEMORY ONLY. src/store/people.ts:89 seeds with `if (QA_MODE && loaded.length === 0)` and never writes the fixtures back, so once the write flow puts ANY person on disk the seed stops firing and the other four fixture people are gone on the next boot — asserting a raw, never-persisted fixture person after the upgrade would fail 100% of the time and prove nothing about migration. So the write flow FIRST makes a seeded person genuinely durable: it logs a catch-up on Mom ('I reached out'), which runs logContact -> mutate -> savePerson and lands that fixture row in the SQLite `people` table exactly as a released build wrote it — the same gesture the T4 chaos flow already certified on device. THEN it writes two things the seed does not contain: (a) a cadence of Monthly on Mom (the seed says Weekly), a post-seed FIELD VALUE that only a real write could have produced, and (b) a brand-new conversation created from her detail screen, an INSERT into the `conversations` table with no fixture counterpart. It also dismisses the first-visit HTC intro, which writes htc.introSeen into `app_settings`. That single pass leaves durable state in THREE tables — people, conversations, app_settings (kv) — and the assert flow re-reads all three on HEAD. THE LOAD-BEARING ORACLE IS THE TRIPWIRE, NOT THE POSITIVE ASSERTS: because this app re-seeds when a table reads empty, a wiped store looks superficially healthy, so `assert @seeded-person` (Mom) would go GREEN on total data loss. The assert flow therefore also asserts that Marcus — a fixture person the write flow deliberately never persists — is ABSENT. Wrong reading if HEAD lost the `people` table: the seed re-fires, all five fixtures return, Marcus is on screen, and Mom reads 'Last reached out 12d ago' / 'Reach-out reminder: Weekly' instead of 'Reached out today' / 'Monthly'. The same trap applies to conversations: the conversations seed DOES write itself to disk on hydrate (src/store/conversations.ts:71), so @seeded-conversation is a genuine released-build-written row — but a wiped `conversations` table would re-seed it and relink it to the surviving Mom, so it is only a corroborator. The row that cannot come back from a re-seed is the created-after-seed one (@new-conversation, 'Something to share'), and that is the real oracle for that table. Deliberately NOT asserted: the four other fixture people and the Me manual. The fixture people are correctly absent after the write flow (see above) and are covered by the Marcus tripwire instead of a per-person list. The Me manual is persisted by the released build (src/store/me.ts:38 seeds and saves) and would be a fourth table's worth of proof, but every field on that screen is a TextInput carrying an explicit accessibilityLabel of its PROMPT, which on iOS hides the stored value from the a11y tree — an assertion there would be reading the label, not the data, i.e. a green that proves nothing. app_settings is proven through the HTC intro flag instead, which is a real read of the same kv table. Also NOT authored: an `upgrade.pressure` oracle — that regime is Android-only and needs a real device to author honestly (home-maintenance declined it for the same reason). TWO NAVIGATION FACTS THIS SCRIPT IS BUILT AROUND, both learned by reading the screens rather than by watching them fail: (1) a contacted person leaves Today's 'Reach out' list, so BOTH flows reach Mom through the People tab, exactly as the T4 survival flow's comment records — and going through the directory is also what puts the Marcus tripwire on screen for free; (2) PersonDetail is not unmounted while ConversationDetail is pushed over it, so coming back leaves the scroll where it was, several screens down. Rather than guess at that scroll position, the write flow backs all the way out to the directory and re-enters Mom fresh (scroll reset to the top) before asserting the created conversation — so the write flow's second pass over the hub is the SAME navigation the assert flow performs on HEAD, and the created row is additionally proven to survive a full screen remount within the released build itself. Both flows then reach the conversations section with a single downward scroll to @seeded-conversation and assert @new-conversation without a second scroll: openConversations sorts newest-first (src/data/conversation.ts), so the created row always renders immediately ABOVE the seeded one and is on screen once the seeded one is. Timing caveat: 'Reached out today' is derived from lastContactedAt being the same calendar day, so a run that straddles local midnight between the write and assert halves would read 'Last reached out 1d ago' and go red for a non-migration reason; the harness runs both halves minutes apart, and the T4 survival flow already carries the same assumption. NOTHING HERE IS DEVICE-CERTIFIED YET: the log-contact and cadence-drilldown gestures come straight from the certified main journey and survival flow, but the conversation-create, the back navigations and the HTC-intro handling have never been run on a simulator or emulator — qa/baseline.json deliberately does NOT set \"upgrade/enforce\", so this SKIPs until a device run proves both halves.",
+    "write": {
+      "steps": [
+        { "waitFor": "@home-title", "timeout": 30000 },
+
+        { "tap": "@people-tab" },
+        { "waitFor": "@seeded-person", "timeout": 15000 },
+        { "assert": "@fixture-only-person" },
+
+        { "tap": "@seeded-person" },
+        { "waitFor": "@reached-out-btn", "timeout": 15000 },
+        { "assertNot": "@reached-out-confirm" },
+        { "assert": "@cadence-row" },
+
+        { "tap": "@reached-out-btn" },
+        { "assert": "@reached-out-confirm" },
+
+        { "tap": "@cadence-row" },
+        { "waitFor": "@cadence-sheet-title", "timeout": 10000 },
+        { "tap": "@cadence-monthly" },
+        { "assertNot": "@cadence-sheet-title" },
+        { "assert": "@cadence-row-monthly" },
+
+        { "scrollUntilVisible": "@seeded-conversation" },
+        { "assert": "@seeded-conversation" },
+        { "assertNot": "@new-conversation" },
+        { "scrollUntilVisible": "@start-conversation" },
+        { "tap": "@start-conversation" },
+        { "waitFor": "@conversation-flavor-label", "timeout": 15000 },
+        { "tap": "@back" },
+        { "waitFor": "@start-conversation", "timeout": 15000 },
+
+        { "tap": "@back" },
+        { "waitFor": "@seeded-person", "timeout": 15000 },
+        { "tap": "@seeded-person" },
+        { "waitFor": "@reached-out-btn", "timeout": 15000 },
+        { "assert": "@reached-out-confirm" },
+        { "scrollUntilVisible": "@seeded-conversation" },
+        { "assert": "@seeded-conversation" },
+        { "assert": "@new-conversation" },
+
+        { "tap": "@back" },
+        { "waitFor": "@seeded-person", "timeout": 15000 },
+        { "tap": "@htc-tab" },
+        { "waitFor": "@htc-intro-dismiss", "timeout": 15000 },
+        { "tap": "@htc-intro-dismiss" },
+        { "wait": 1500 },
+        { "assertNot": "@htc-intro-dismiss" },
+
+        { "wait": 4000 }
+      ]
+    },
+    "assert": {
+      "steps": [
+        { "waitFor": "@home-title", "timeout": 30000 },
+
+        { "tap": "@people-tab" },
+        { "waitFor": "@seeded-person", "timeout": 15000 },
+        { "assertNot": "@fixture-only-person" },
+
+        { "tap": "@seeded-person" },
+        { "waitFor": "@reached-out-btn", "timeout": 15000 },
+        { "assert": "@reached-out-confirm" },
+        { "assert": "@cadence-row-monthly" },
+
+        { "scrollUntilVisible": "@seeded-conversation" },
+        { "assert": "@seeded-conversation" },
+        { "assert": "@new-conversation" },
+
+        { "tap": "@back" },
+        { "waitFor": "@seeded-person", "timeout": 15000 },
+        { "tap": "@htc-tab" },
+        { "wait": 2500 },
+        { "assertNot": "@htc-intro-dismiss" },
+        { "assert": "@start-conversation" }
+      ]
+    }
   }
 }
