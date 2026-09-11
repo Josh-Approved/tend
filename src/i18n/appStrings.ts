@@ -212,6 +212,11 @@ export const APP_STRINGS = {
     chooseExisting: 'Someone you’re tracking',
     linkExisting: 'Choose from your people',
     changePerson: 'Change',
+    // Appended to the person's name to build the linked-row's accessible name
+    // ("Ada, Change"). Voice Control matches the words on the control, so the
+    // NAME has to lead and the action word follows — this key carries the
+    // separator too, so a language can pick its own (ja uses "、", not ", ").
+    changePersonSuffix: ', Change',
     noPeopleYet: 'No one in your people list yet.',
     flavorLabel: 'What kind of conversation is this?',
     core: {

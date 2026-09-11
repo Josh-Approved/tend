@@ -210,6 +210,7 @@ const de = {
     chooseExisting: 'Jemand, den du begleitest',
     linkExisting: 'Aus deinen Menschen wählen',
     changePerson: 'Ändern',
+    changePersonSuffix: ', Ändern',
     noPeopleYet: 'Noch niemand in deiner Liste.',
     flavorLabel: 'Was für ein Gespräch ist das?',
     core: {

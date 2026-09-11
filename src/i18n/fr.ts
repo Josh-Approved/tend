@@ -210,6 +210,7 @@ const fr = {
     chooseExisting: 'Quelqu’un que tu suis',
     linkExisting: 'Choisir parmi tes proches',
     changePerson: 'Changer',
+    changePersonSuffix: ', Changer',
     noPeopleYet: "Personne dans ta liste de proches pour l'instant.",
     flavorLabel: "Quel genre de conversation est-ce ?",
     core: {

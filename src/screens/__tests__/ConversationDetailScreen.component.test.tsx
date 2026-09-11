@@ -108,9 +108,11 @@ describe('ConversationDetailScreen', () => {
     usePeopleStore.setState({ people: [mom] });
     await renderDetail(seedConversation(mom.id, 'Mom'));
 
-    // A linked conversation swaps the invitation for a Change control...
+    // A linked conversation swaps the invitation for a Change control. Its
+    // accessible name leads with the person printed on it so Voice Control can
+    // reach it — see ConversationDetailScreen.voiceControl.test.tsx.
     expect(screen.queryByRole('button', { name: 'Choose from your people' })).toBeNull();
-    await user.press(screen.getByRole('button', { name: 'Change' }));
+    await user.press(screen.getByRole('button', { name: 'Mom, Change' }));
 
     expect(screen.getByRole('button', { name: 'Someone new' })).toBeTruthy();
   });

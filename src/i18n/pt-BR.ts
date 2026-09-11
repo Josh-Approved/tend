@@ -210,6 +210,7 @@ const ptBR = {
     chooseExisting: 'Alguém que você acompanha',
     linkExisting: 'Escolher das suas pessoas',
     changePerson: 'Trocar',
+    changePersonSuffix: ', Trocar',
     noPeopleYet: 'Ninguém na sua lista de pessoas ainda.',
     flavorLabel: 'Que tipo de conversa é esta?',
     core: {

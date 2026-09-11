@@ -141,6 +141,9 @@ export default function ConversationDetailScreen({ route, navigation }: Props) {
   };
 
   const isLinked = conversation.personId != null;
+  // The words actually printed on the linked-person row. Hoisted so the row's
+  // accessible name can be built from the SAME expression that renders it.
+  const linkedName = conversation.personName.trim() || t('htc.someone');
 
   return (
     <SafeAreaView style={s.safe} edges={['top', 'left', 'right']}>
@@ -165,12 +168,19 @@ export default function ConversationDetailScreen({ route, navigation }: Props) {
             <Pressable
               onPress={() => setPickerVisible(true)}
               accessibilityRole="button"
-              accessibilityLabel={t('htc.changePerson')}
+              // Voice Control activates a control by its accessible name, so the
+              // name has to START with the words on the control — here the
+              // person's name. Labelling this row with the bare verb ("Change")
+              // meant saying the name a user can plainly read matched nothing,
+              // in every language. The action word stays on the end, carried by
+              // a per-locale suffix so each language keeps its own separator and
+              // verb form after the leading name.
+              accessibilityLabel={`${linkedName}${t('htc.changePersonSuffix')}`}
               style={({ pressed }) => [s.linkRow, pressed && s.pressed]}
             >
               <Users size={16} color={c.appAccent} strokeWidth={1.75} />
               <Text style={s.linkedText} numberOfLines={2}>
-                {conversation.personName.trim() || t('htc.someone')}
+                {linkedName}
               </Text>
               <Text style={s.changeText}>{t('htc.changePerson')}</Text>
             </Pressable>

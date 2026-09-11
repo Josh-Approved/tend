@@ -210,6 +210,7 @@ const it = {
     chooseExisting: 'Qualcuno che già segui',
     linkExisting: 'Scegli tra le tue persone',
     changePerson: 'Cambia',
+    changePersonSuffix: ', Cambia',
     noPeopleYet: 'Ancora nessuno nella tua lista di persone.',
     flavorLabel: 'Che tipo di conversazione è?',
     core: {

@@ -102,16 +102,6 @@
       "note": "Pressable · onPress · dynamic/child-text label — picks Español and asserts the app is really in Spanish afterwards"
     },
     {
-      "id": "components/MoreFromJA#pressable-58",
-      "label": "Pressable (dynamic label)",
-      "where": "src/components/MoreFromJA.tsx:58",
-      "proof": {
-        "kind": "rntl",
-        "ref": "src/components/__tests__/MoreFromJA.component.test.tsx"
-      },
-      "note": "Pressable · onPress · dynamic/child-text label — presses a cross-promo row and asserts the catalog store URL is what opens"
-    },
-    {
       "id": "components/PersonPicker#common.cancel",
       "label": "common.cancel",
       "where": "src/components/PersonPicker.tsx:96",
@@ -152,19 +142,9 @@
       "note": "Pressable · onPress — presses Back and asserts the handler ran (the canonical RNTL exemplar)"
     },
     {
-      "id": "screens/ConversationDetailScreen#htc.changeperson",
-      "label": "htc.changePerson",
-      "where": "src/screens/ConversationDetailScreen.tsx:165",
-      "proof": {
-        "kind": "rntl",
-        "ref": "src/screens/__tests__/ConversationDetailScreen.component.test.tsx"
-      },
-      "note": "Pressable · onPress — presses Change on a linked conversation and asserts the picker reopens"
-    },
-    {
       "id": "screens/ConversationDetailScreen#htc.linkexisting",
       "label": "htc.linkExisting",
-      "where": "src/screens/ConversationDetailScreen.tsx:178",
+      "where": "src/screens/ConversationDetailScreen.tsx:188",
       "proof": {
         "kind": "rntl",
         "ref": "src/screens/__tests__/ConversationDetailScreen.component.test.tsx"
@@ -172,19 +152,9 @@
       "note": "Pressable · onPress — presses Choose from your people and asserts the picker opens with the directory"
     },
     {
-      "id": "screens/ConversationDetailScreen#pressable-195",
-      "label": "Pressable (dynamic label)",
-      "where": "src/screens/ConversationDetailScreen.tsx:195",
-      "proof": {
-        "kind": "rntl",
-        "ref": "src/screens/__tests__/ConversationDetailScreen.component.test.tsx"
-      },
-      "note": "Pressable · onPress · dynamic/child-text label — presses a flavor chip and asserts the store flavor changed and the prompts re-tailored"
-    },
-    {
       "id": "screens/ConversationDetailScreen#htc.reopen",
       "label": "htc.reopen",
-      "where": "src/screens/ConversationDetailScreen.tsx:301",
+      "where": "src/screens/ConversationDetailScreen.tsx:311",
       "proof": {
         "kind": "rntl",
         "ref": "src/screens/__tests__/ConversationDetailScreen.component.test.tsx"
@@ -194,7 +164,7 @@
     {
       "id": "screens/ConversationDetailScreen#htc.markhad",
       "label": "htc.markHad",
-      "where": "src/screens/ConversationDetailScreen.tsx:312",
+      "where": "src/screens/ConversationDetailScreen.tsx:322",
       "proof": {
         "kind": "rntl",
         "ref": "src/screens/__tests__/ConversationDetailScreen.component.test.tsx"
@@ -204,7 +174,7 @@
     {
       "id": "screens/ConversationDetailScreen#htc.deleteconversation",
       "label": "htc.deleteConversation",
-      "where": "src/screens/ConversationDetailScreen.tsx:324",
+      "where": "src/screens/ConversationDetailScreen.tsx:334",
       "proof": {
         "kind": "rntl",
         "ref": "src/screens/__tests__/ConversationDetailScreen.component.test.tsx"
@@ -214,7 +184,7 @@
     {
       "id": "screens/ConversationDetailScreen#common.save",
       "label": "common.save",
-      "where": "src/screens/ConversationDetailScreen.tsx:336",
+      "where": "src/screens/ConversationDetailScreen.tsx:346",
       "proof": {
         "kind": "rntl",
         "ref": "src/screens/__tests__/ConversationDetailScreen.component.test.tsx"
@@ -830,6 +800,36 @@
         "ref": "src/screens/__tests__/PeopleScreen.component.test.tsx"
       },
       "note": "Pressable · onPress — clears the search and asserts the full directory comes back, not just the box emptying"
+    },
+    {
+      "id": "components/MoreFromJA#pressable-61",
+      "label": "Pressable (dynamic label)",
+      "where": "src/components/MoreFromJA.tsx:61",
+      "proof": {
+        "kind": "rntl",
+        "ref": "src/components/__tests__/MoreFromJA.component.test.tsx"
+      },
+      "note": "Pressable · onPress · dynamic/child-text label — presses a cross-promo row and asserts the catalog store URL is what opens"
+    },
+    {
+      "id": "screens/ConversationDetailScreen#pressable-168",
+      "label": "Pressable (dynamic label)",
+      "where": "src/screens/ConversationDetailScreen.tsx:168",
+      "proof": {
+        "kind": "rntl",
+        "ref": "src/screens/__tests__/ConversationDetailScreen.component.test.tsx"
+      },
+      "note": "Pressable · onPress · dynamic/child-text label — presses the linked-person row (accessible name \"<person>, Change\") and asserts the picker reopens"
+    },
+    {
+      "id": "screens/ConversationDetailScreen#pressable-205",
+      "label": "Pressable (dynamic label)",
+      "where": "src/screens/ConversationDetailScreen.tsx:205",
+      "proof": {
+        "kind": "rntl",
+        "ref": "src/screens/__tests__/ConversationDetailScreen.component.test.tsx"
+      },
+      "note": "Pressable · onPress · dynamic/child-text label — presses a flavor chip and asserts the store flavor changed and the prompts re-tailored"
     }
   ]
 }

@@ -210,6 +210,7 @@ const ja = {
     chooseExisting: '記録している人',
     linkExisting: 'みんなから選ぶ',
     changePerson: '変更',
+    changePersonSuffix: '、変更',
     noPeopleYet: 'まだみんなのリストに誰もいません。',
     flavorLabel: 'どんな会話ですか？',
     core: {
