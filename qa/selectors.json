@@ -18,8 +18,8 @@
       "note": "status after logging contact (i18n person.lastReachedToday); absent before the tap, present after"
     },
     "people-tab": {
-      "text": "People",
-      "note": "the People bottom-tab (i18n nav.people). The T4 survival flow re-reaches the seeded person AFTER logging contact through here: once contacted, they drop off Today's 'Reach out' list, so post-relaunch navigation goes via the full People directory, not Today."
+      "text": "People.*",
+      "note": "the People bottom-tab (i18n nav.people). The T4 survival flow re-reaches the seeded person AFTER logging contact through here: once contacted, they drop off Today's 'Reach out' list, so post-relaunch navigation goes via the full People directory, not Today. WRAPPED IN .* because iOS exposes a bottom-tab button as the MERGED label 'People, tab, 2 of 4' (proven from a live hierarchy dump, 2026-09-12, defect tend-20260719-1) and Maestro FULL-matches, so a bare 'People' can never match on iOS — the survival flow died here for months while the tab sat plainly on screen. Android exposes the bare label, which 'People.*' also matches, so the anchor stays cross-platform. Same trap as the merged card rows above; the sibling 'htc-tab'/'me' tabs carry it too."
     },
     "cadence-row": {
       "text": "Reach-out reminder: Weekly",

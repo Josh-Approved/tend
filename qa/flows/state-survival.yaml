@@ -14,12 +14,18 @@ appId: com.joshapproved.tend
 - extendedWaitUntil:
     visible: { text: "Today" }
     timeout: 30000
+- scrollUntilVisible:
+    element: { text: "Mom.*" }
+    direction: DOWN
 - extendedWaitUntil:
     visible: { text: "Mom.*" }
     timeout: 15000
 - tapOn:
     text: "Mom.*"
     retryTapIfNoChange: true
+- scrollUntilVisible:
+    element: { text: "I reached out" }
+    direction: DOWN
 - extendedWaitUntil:
     visible: { text: "I reached out" }
     timeout: 10000
@@ -27,6 +33,9 @@ appId: com.joshapproved.tend
 - tapOn:
     text: "I reached out"
     retryTapIfNoChange: true
+- scrollUntilVisible:
+    element: { text: "Reached out today" }
+    direction: DOWN
 - assertVisible: { text: "Reached out today" }
 - waitForAnimationToEnd:
     timeout: 1500
@@ -48,15 +57,24 @@ appId: com.joshapproved.tend
     visible: { text: "Today" }
     timeout: 30000
 - tapOn:
-    text: "People"
+    text: "People.*"
     retryTapIfNoChange: true
+- scrollUntilVisible:
+    element: { text: "Mom.*" }
+    direction: DOWN
 - extendedWaitUntil:
     visible: { text: "Mom.*" }
     timeout: 10000
 - tapOn:
     text: "Mom.*"
     retryTapIfNoChange: true
+- scrollUntilVisible:
+    element: { text: "I reached out" }
+    direction: DOWN
 - extendedWaitUntil:
     visible: { text: "I reached out" }
     timeout: 10000
+- scrollUntilVisible:
+    element: { text: "Reached out today" }
+    direction: DOWN
 - assertVisible: { text: "Reached out today" }

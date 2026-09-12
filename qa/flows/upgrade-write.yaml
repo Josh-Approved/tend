@@ -15,7 +15,7 @@ appId: com.joshapproved.tend
     visible: { text: "Today" }
     timeout: 30000
 - tapOn:
-    text: "People"
+    text: "People.*"
     retryTapIfNoChange: true
 - extendedWaitUntil:
     visible: { text: "Mom.*" }

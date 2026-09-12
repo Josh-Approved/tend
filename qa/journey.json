@@ -56,11 +56,14 @@
     }
   ],
   "survival": {
-    "$comment": "T4 chaos net \u2014 state-survival subflow (compiles to qa/flows/state-survival.yaml; full profile + nightly, NOT per-PR). Core mutating action = log contact ('I reached out'), which persists to disk. Then REAL process death (killApp on Android / stopApp on iOS), then relaunch keeping state. Because a contacted person leaves Today's 'Reach out' list, the post-kill re-navigation goes through the People tab. Intent oracle: the seeded person still reads 'Reached out today' after the kill \u2014 the log survived the crash.",
+    "$comment": "T4 chaos net \u2014 state-survival subflow (compiles to qa/flows/state-survival.yaml; full profile + nightly, NOT per-PR). Core mutating action = log contact ('I reached out'), which persists to disk. Then REAL process death (killApp on Android / stopApp on iOS), then relaunch keeping state. Because a contacted person leaves Today's 'Reach out' list, the post-kill re-navigation goes through the People tab. Intent oracle: the seeded person still reads 'Reached out today' after the kill \u2014 the log survived the crash. EVERY list row and mid-form control here is now reached with scrollUntilVisible FIRST, on BOTH passes (2026-09-10, defect tend-20260719-1). PersonDetail is a long scrolling form: 'I reached out' sits five controls down it (name field, log heading, kind chips, note field) and 'Reached out today' sits below the button again, and the seeded person is a list row on Today and again in the People directory. A bare waitFor/assert on any of them reads an off-screen element as missing and fails BEFORE the app is ever killed \u2014 a harness bug that reports as lost state. The rule, broader than 'assert needs a scroll': no waitFor and no assert may name an anchor a later step has to scroll to. Proven twice already \u2014 packing-list (52e1178) and tally (2077b22).",
     "steps": [
       {
         "waitFor": "@home-title",
         "timeout": 30000
+      },
+      {
+        "scrollUntilVisible": "@seeded-person"
       },
       {
         "waitFor": "@seeded-person",
@@ -68,6 +71,9 @@
       },
       {
         "tap": "@seeded-person"
+      },
+      {
+        "scrollUntilVisible": "@reached-out-btn"
       },
       {
         "waitFor": "@reached-out-btn",
@@ -78,6 +84,9 @@
       },
       {
         "tap": "@reached-out-btn"
+      },
+      {
+        "scrollUntilVisible": "@reached-out-confirm"
       },
       {
         "assert": "@reached-out-confirm"
@@ -99,6 +108,9 @@
         "tap": "@people-tab"
       },
       {
+        "scrollUntilVisible": "@seeded-person"
+      },
+      {
         "waitFor": "@seeded-person",
         "timeout": 10000
       },
@@ -106,8 +118,14 @@
         "tap": "@seeded-person"
       },
       {
+        "scrollUntilVisible": "@reached-out-btn"
+      },
+      {
         "waitFor": "@reached-out-btn",
         "timeout": 10000
+      },
+      {
+        "scrollUntilVisible": "@reached-out-confirm"
       },
       {
         "assert": "@reached-out-confirm"
