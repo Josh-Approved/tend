@@ -2,7 +2,7 @@
   "$comment": "Action-coverage registry (Uplevel-3 T3). Every user-facing action mapped to its proof: tier2-assert (a qa/journey.json waypoint) | rntl (a component test) | unit (a trust-core test) | none (a gap to backfill). Maintained by scripts/qa/action-coverage.mjs — it appends new-in-code actions + flags stale ones, never rewrites a proof by hand.",
   "actions": [
     {
-      "id": "components/AboutRow#pressable-56",
+      "id": "components/AboutRow#pressable-onpress",
       "label": "Pressable (dynamic label)",
       "where": "src/components/AboutRow.tsx:56",
       "proof": {
@@ -22,7 +22,7 @@
       "note": "Pressable · onPress — presses Back and asserts the screen hands control back"
     },
     {
-      "id": "components/Credits#pressable-66",
+      "id": "components/Credits#pressable-linking.openurl",
       "label": "Pressable (dynamic label)",
       "where": "src/components/Credits.tsx:66",
       "proof": {
@@ -52,7 +52,7 @@
       "note": "Pressable · onPress — presses Got it and asserts the full-screen intro closes"
     },
     {
-      "id": "components/LanguageSetting#pressable-95",
+      "id": "components/LanguageSetting#pressable-setopen",
       "label": "Pressable (dynamic label)",
       "where": "src/components/LanguageSetting.tsx:95",
       "proof": {
@@ -72,7 +72,7 @@
       "note": "Pressable · onPress — presses the scrim and asserts the sheet closes with the language unchanged"
     },
     {
-      "id": "components/LanguageSetting#pressable-114",
+      "id": "components/LanguageSetting#pressable-languagesetting-1",
       "label": "Pressable (dynamic label)",
       "where": "src/components/LanguageSetting.tsx:114",
       "proof": {
@@ -92,7 +92,7 @@
       "note": "Pressable · onPress — presses Done and asserts the sheet closes with the language unchanged"
     },
     {
-      "id": "components/LanguageSetting#pressable-135",
+      "id": "components/LanguageSetting#pressable-choose",
       "label": "Pressable (dynamic label)",
       "where": "src/components/LanguageSetting.tsx:135",
       "proof": {
@@ -192,7 +192,7 @@
       "note": "Pressable · onPress — presses Save and asserts it leaves the screen with what was written intact"
     },
     {
-      "id": "screens/HTCScreen#pressable-77",
+      "id": "screens/HTCScreen#pressable-navigation.navigate",
       "label": "Pressable (dynamic label)",
       "where": "src/screens/HTCScreen.tsx:77",
       "proof": {
@@ -372,7 +372,7 @@
       "note": "Pressable · onPress — the scrim closes the action menu without firing any option"
     },
     {
-      "id": "components/Dialogs#pressable-116",
+      "id": "components/Dialogs#pressable-e.stoppropagation",
       "label": "Pressable (dynamic label)",
       "where": "src/components/Dialogs.tsx:116",
       "proof": {
@@ -382,7 +382,7 @@
       "note": "Pressable · onPress · sheet body — a tap that lands on the sheet is swallowed, so the menu stays open"
     },
     {
-      "id": "components/Dialogs#pressable-123",
+      "id": "components/Dialogs#pressable-choose",
       "label": "Pressable (dynamic label)",
       "where": "src/components/Dialogs.tsx:123",
       "proof": {
@@ -412,7 +412,7 @@
       "note": "Pressable · onPress · prompt scrim — closes without submitting"
     },
     {
-      "id": "components/Dialogs#pressable-218",
+      "id": "components/Dialogs#pressable-e.stoppropagation-2",
       "label": "Pressable (dynamic label)",
       "where": "src/components/Dialogs.tsx:218",
       "proof": {
@@ -422,7 +422,7 @@
       "note": "Pressable · onPress · prompt card — a tap inside the card is swallowed, so the edit is not thrown away"
     },
     {
-      "id": "components/Dialogs#textinput-223",
+      "id": "components/Dialogs#textinput-submit",
       "label": "TextInput (dynamic label)",
       "where": "src/components/Dialogs.tsx:223",
       "proof": {
@@ -442,7 +442,7 @@
       "note": "Pressable · onPress · prompt ghost button — the Cancel a user aims at abandons the edit"
     },
     {
-      "id": "components/Dialogs#pressable-246",
+      "id": "components/Dialogs#pressable-submit",
       "label": "Pressable (dynamic label)",
       "where": "src/components/Dialogs.tsx:246",
       "proof": {
@@ -462,7 +462,7 @@
       "note": "Pressable · onPress · confirm scrim — closes without confirming"
     },
     {
-      "id": "components/Dialogs#pressable-317",
+      "id": "components/Dialogs#pressable-e.stoppropagation-3",
       "label": "Pressable (dynamic label)",
       "where": "src/components/Dialogs.tsx:317",
       "proof": {
@@ -482,7 +482,7 @@
       "note": "Pressable · onPress · confirm ghost button — the deliberate \"no\" on a destructive confirm"
     },
     {
-      "id": "components/Dialogs#pressable-331",
+      "id": "components/Dialogs#pressable-confirm",
       "label": "Pressable (dynamic label)",
       "where": "src/components/Dialogs.tsx:331",
       "proof": {
@@ -492,7 +492,7 @@
       "note": "Pressable · onPress — the confirm button fires onConfirm and closes (custom/destructive label honoured)"
     },
     {
-      "id": "components/DrilldownRow#pressable-35",
+      "id": "components/DrilldownRow#pressable-onpress",
       "label": "Pressable (dynamic label)",
       "where": "src/components/DrilldownRow.tsx:35",
       "proof": {
@@ -502,7 +502,7 @@
       "note": "Pressable · onPress · dynamic/child-text label — presses a hub row and asserts it opens that dimension's editor; the name carries label + current value"
     },
     {
-      "id": "components/OptionChips#pressable-41",
+      "id": "components/OptionChips#pressable-onpick",
       "label": "Pressable (dynamic label)",
       "where": "src/components/OptionChips.tsx:41",
       "proof": {
@@ -522,7 +522,7 @@
       "note": "Pressable · onPress — presses the X on a preference and asserts it is removed by id"
     },
     {
-      "id": "components/PrefsSheet#pressable-71",
+      "id": "components/PrefsSheet#pressable-setkind",
       "label": "Pressable (dynamic label)",
       "where": "src/components/PrefsSheet.tsx:71",
       "proof": {
@@ -582,7 +582,7 @@
       "note": "Pressable · onPress — presses the Trash on a non-birthday date and asserts it is removed by id, leaving the birthday alone"
     },
     {
-      "id": "screens/PersonDetailScreen#pressable-269",
+      "id": "screens/PersonDetailScreen#pressable-setlogkind",
       "label": "Pressable (dynamic label)",
       "where": "src/screens/PersonDetailScreen.tsx:269",
       "proof": {
@@ -592,7 +592,7 @@
       "note": "Pressable · onPress · dynamic/child-text label — picks an interaction-kind chip and asserts the catch-up is logged under THAT kind"
     },
     {
-      "id": "screens/PersonDetailScreen#pressable-369",
+      "id": "screens/PersonDetailScreen#pressable-navigation.navigate",
       "label": "Pressable (dynamic label)",
       "where": "src/screens/PersonDetailScreen.tsx:369",
       "proof": {
@@ -612,7 +612,7 @@
       "note": "Switch · onValueChange — asserts the toggle persists the choice AND re-syncs the armed OS reminders, and that the stored value is read back on arrival"
     },
     {
-      "id": "components/DrilldownSheet#pressable-164",
+      "id": "components/DrilldownSheet#pressable-onpress",
       "label": "Pressable (dynamic label)",
       "where": "src/components/DrilldownSheet.tsx:164",
       "proof": {
@@ -622,7 +622,7 @@
       "note": "Pressable · onPress · dynamic/child-text label — presses a SheetOption row and asserts it reports itself; the detail line stays out of the speakable name"
     },
     {
-      "id": "screens/PeopleScreen#pressable-167",
+      "id": "screens/PeopleScreen#pressable-navigation.navigate",
       "label": "Pressable (dynamic label)",
       "where": "src/screens/PeopleScreen.tsx:167",
       "proof": {
@@ -632,7 +632,7 @@
       "note": "Pressable · onPress · dynamic/child-text label — presses a directory row and asserts it opens that person"
     },
     {
-      "id": "components/ContactPicker#pressable-135",
+      "id": "components/ContactPicker#pressable-toggle",
       "label": "Pressable (dynamic label)",
       "where": "src/components/ContactPicker.tsx:135",
       "proof": {
@@ -642,7 +642,7 @@
       "note": "Pressable · onPress · dynamic/child-text label — ticks a contact row and asserts only that one is handed back"
     },
     {
-      "id": "components/ContactPicker#pressable-265",
+      "id": "components/ContactPicker#pressable-commit",
       "label": "Pressable (dynamic label)",
       "where": "src/components/ContactPicker.tsx:265",
       "proof": {
@@ -672,7 +672,7 @@
       "note": "Pressable · onPress — dismisses the launch card; asserts it is the ONLY action on the card and that showing it was counted"
     },
     {
-      "id": "components/PersonPicker#pressable-69",
+      "id": "components/PersonPicker#pressable-choose",
       "label": "Pressable (dynamic label)",
       "where": "src/components/PersonPicker.tsx:69",
       "proof": {
@@ -682,7 +682,7 @@
       "note": "Pressable · onPress · dynamic/child-text label — presses a person row and asserts that person id + name is handed back"
     },
     {
-      "id": "components/PersonalitySheet#pressable-63",
+      "id": "components/PersonalitySheet#pressable-onpick",
       "label": "Pressable (dynamic label)",
       "where": "src/components/PersonalitySheet.tsx:63",
       "proof": {
@@ -722,7 +722,7 @@
       "note": "Pressable · onPress — dismisses from the thank-you state; asserts Maybe later is gone once the tip landed"
     },
     {
-      "id": "components/TipJarSheet#pressable-166",
+      "id": "components/TipJarSheet#pressable-ontip",
       "label": "Pressable (dynamic label)",
       "where": "src/components/TipJarSheet.tsx:166",
       "proof": {
@@ -742,7 +742,7 @@
       "note": "Pressable · onPress — dismisses the tip sheet without buying anything"
     },
     {
-      "id": "screens/TodayScreen#pressable-108",
+      "id": "screens/TodayScreen#pressable-navigation.navigate",
       "label": "Pressable (dynamic label)",
       "where": "src/screens/TodayScreen.tsx:108",
       "proof": {
@@ -762,7 +762,7 @@
       "note": "Pressable · onPress — presses the pill and asserts the catch-up is logged without leaving Today"
     },
     {
-      "id": "screens/TodayScreen#pressable-148",
+      "id": "screens/TodayScreen#pressable-navigation.navigate-2",
       "label": "Pressable (dynamic label)",
       "where": "src/screens/TodayScreen.tsx:148",
       "proof": {
@@ -802,7 +802,7 @@
       "note": "Pressable · onPress — clears the search and asserts the full directory comes back, not just the box emptying"
     },
     {
-      "id": "components/MoreFromJA#pressable-61",
+      "id": "components/MoreFromJA#pressable-linking.openurl",
       "label": "Pressable (dynamic label)",
       "where": "src/components/MoreFromJA.tsx:61",
       "proof": {
@@ -812,7 +812,7 @@
       "note": "Pressable · onPress · dynamic/child-text label — presses a cross-promo row and asserts the catalog store URL is what opens"
     },
     {
-      "id": "screens/ConversationDetailScreen#pressable-168",
+      "id": "screens/ConversationDetailScreen#pressable-setpickervisible",
       "label": "Pressable (dynamic label)",
       "where": "src/screens/ConversationDetailScreen.tsx:168",
       "proof": {
@@ -822,7 +822,7 @@
       "note": "Pressable · onPress · dynamic/child-text label — presses the linked-person row (accessible name \"<person>, Change\") and asserts the picker reopens"
     },
     {
-      "id": "screens/ConversationDetailScreen#pressable-205",
+      "id": "screens/ConversationDetailScreen#pressable-setflavor",
       "label": "Pressable (dynamic label)",
       "where": "src/screens/ConversationDetailScreen.tsx:205",
       "proof": {
