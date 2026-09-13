@@ -11,7 +11,7 @@
  */
 
 import React, { useEffect, useMemo, useState } from 'react';
-import { Modal, View, Text, Pressable, TextInput, FlatList, ActivityIndicator, StyleSheet } from 'react-native';
+import { Modal, View, Text, Pressable, TextInput, FlatList, ActivityIndicator } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { X, Search, Check } from 'lucide-react-native';
 import { usePeopleStore } from '../store/people';
@@ -24,17 +24,8 @@ import {
 } from '../lib/contacts';
 import { useReducedMotion } from './Dialogs';
 import { t } from '../i18n';
-import {
-  useTheme,
-  fontFamily,
-  space,
-  target,
-  type as ty,
-  hairline,
-  radius,
-  boundedContent,
-  type Colors,
-} from '../theme';
+import { useTheme } from '../theme';
+import { makeStyles } from './contactPickerStyles';
 
 /** Below this many contacts, the list is short enough to skim — no search box. */
 const SEARCH_THRESHOLD = 8;
@@ -277,88 +268,4 @@ export function ContactPicker({ visible, onClose, onAdd }: Props) {
       </SafeAreaProvider>
     </Modal>
   );
-}
-
-function makeStyles(c: Colors) {
-  return StyleSheet.create({
-    safe: { flex: 1, backgroundColor: c.bg },
-    flex1: { flex: 1 },
-    pressed: { opacity: 0.6 },
-    header: {
-      ...boundedContent,
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-      paddingHorizontal: space.s5,
-      paddingVertical: space.s4,
-    },
-    title: { ...ty.md, fontFamily: fontFamily.sansSemibold, color: c.fg, flex: 1 },
-    iconBtn: { width: target.min, height: target.min, alignItems: 'center', justifyContent: 'center' },
-    listContent: { ...boundedContent, paddingHorizontal: space.s5, paddingBottom: space.s9 },
-    guide: { ...ty.base, fontFamily: fontFamily.sans, color: c.fgMuted, paddingBottom: space.s4 },
-    limitedNote: { ...ty.sm, fontFamily: fontFamily.sans, color: c.fgMuted, paddingBottom: space.s4 },
-    searchRow: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: space.s2,
-      marginBottom: space.s3,
-      paddingHorizontal: space.s4,
-      minHeight: target.min,
-      borderRadius: radius.md,
-      backgroundColor: c.bgSubtle,
-    },
-    searchInput: { flex: 1, ...ty.base, fontFamily: fontFamily.sans, color: c.fg, paddingVertical: space.s2 },
-    searchClear: { width: 28, height: 28, alignItems: 'center', justifyContent: 'center' },
-    row: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: space.s3,
-      minHeight: target.min + 6,
-      borderBottomWidth: hairline,
-      borderBottomColor: c.hairline,
-    },
-    rowDisabled: {},
-    checkbox: {
-      width: 24,
-      height: 24,
-      borderRadius: radius.pill,
-      borderWidth: 1.5,
-      borderColor: c.hairlineStrong,
-      alignItems: 'center',
-      justifyContent: 'center',
-    },
-    checkboxOn: { backgroundColor: c.inkButton, borderColor: c.inkButton },
-    checkboxAdded: { borderColor: c.hairline, backgroundColor: c.bgSubtle },
-    rowTitle: { flex: 1, ...ty.base, fontFamily: fontFamily.sans, color: c.fg, paddingVertical: space.s3 },
-    rowTitleAdded: { color: c.fgMuted },
-    addedTag: { ...ty.sm, fontFamily: fontFamily.sans, color: c.fgMuted },
-    noResults: {
-      ...ty.base,
-      fontFamily: fontFamily.sans,
-      color: c.fgMuted,
-      textAlign: 'center',
-      paddingTop: space.s6,
-    },
-    centered: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: space.s3, paddingHorizontal: space.s6 },
-    centeredText: { ...ty.base, fontFamily: fontFamily.sans, color: c.fgMuted, textAlign: 'center' },
-    footer: {
-      ...boundedContent,
-      paddingHorizontal: space.s5,
-      paddingTop: space.s3,
-      paddingBottom: space.s3,
-      borderTopWidth: hairline,
-      borderTopColor: c.hairline,
-      backgroundColor: c.bg,
-    },
-    addBtn: {
-      minHeight: target.min,
-      borderRadius: radius.md,
-      backgroundColor: c.inkButton,
-      alignItems: 'center',
-      justifyContent: 'center',
-      paddingHorizontal: space.s5,
-    },
-    addBtnDisabled: { opacity: 0.4 },
-    addBtnText: { ...ty.base, fontFamily: fontFamily.sansSemibold, color: c.inkButtonText },
-  });
 }

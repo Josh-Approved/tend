@@ -9,7 +9,7 @@
  */
 
 import React, { useEffect, useRef, useState } from 'react';
-import { View, Text, Pressable, TextInput, ScrollView, StyleSheet, Alert } from 'react-native';
+import { View, Text, Pressable, TextInput, ScrollView, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Check, Trash2, MessageCircleHeart, ChevronRight } from 'lucide-react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -24,9 +24,6 @@ import {
   daysUntil,
   sortedInteractions,
   personalityValue,
-  getBirthday,
-  otherImportantDates,
-  isBirthday,
   INTERACTION_KINDS,
   type InteractionKind,
 } from '../data/person';
@@ -34,25 +31,12 @@ import { PERSONALITY_CATALOG, optionShortKey } from '../data/personality';
 import { ScreenHeader } from '../components/ScreenHeader';
 import { DrilldownRow } from '../components/DrilldownRow';
 import { CadenceSheet, cadenceLabel } from '../components/CadenceSheet';
-import { PersonTextSheet } from '../components/PersonTextSheet';
-import { DatesSheet } from '../components/DatesSheet';
-import { PrefsSheet } from '../components/PrefsSheet';
-import { PersonalitySheet } from '../components/PersonalitySheet';
+import { PersonDetailSheets, type SheetId } from '../components/PersonDetailSheets';
 import { t } from '../i18n';
-import {
-  useTheme,
-  fontFamily,
-  space,
-  target,
-  type as ty,
-  hairline,
-  radius,
-  boundedContent,
-  type Colors,
-} from '../theme';
+import { useTheme } from '../theme';
+import { makeStyles } from './personDetailStyles';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'PersonDetail'>;
-type SheetId = 'cadence' | 'howWeMet' | 'notes' | 'dates' | 'prefs' | 'personality' | null;
 
 /** First line of a prose field, shortened for a summary-row value. */
 function preview(v: string | undefined): string {
@@ -72,15 +56,6 @@ export default function PersonDetailScreen({ route, navigation }: Props) {
   const renamePerson = usePeopleStore((st) => st.renamePerson);
   const setCadence = usePeopleStore((st) => st.setCadence);
   const logContact = usePeopleStore((st) => st.logContact);
-  const setNotes = usePeopleStore((st) => st.setNotes);
-  const setHowWeMet = usePeopleStore((st) => st.setHowWeMet);
-  const addImportantDate = usePeopleStore((st) => st.addImportantDate);
-  const removeImportantDate = usePeopleStore((st) => st.removeImportantDate);
-  const setBirthday = usePeopleStore((st) => st.setBirthday);
-  const clearBirthday = usePeopleStore((st) => st.clearBirthday);
-  const addPreference = usePeopleStore((st) => st.addPreference);
-  const removePreference = usePeopleStore((st) => st.removePreference);
-  const setPersonalityType = usePeopleStore((st) => st.setPersonalityType);
   const deletePerson = usePeopleStore((st) => st.deletePerson);
   const conversations = useConversationsStore((st) => st.conversations);
   const createConversation = useConversationsStore((st) => st.createConversation);
@@ -401,187 +376,7 @@ export default function PersonDetailScreen({ route, navigation }: Props) {
         </Pressable>
       </ScrollView>
 
-      <CadenceSheet
-        visible={sheet === 'cadence'}
-        value={person.cadenceDays}
-        onClose={() => setSheet(null)}
-        onPick={(days) => setCadence(person.id, days)}
-      />
-      <PersonTextSheet
-        visible={sheet === 'howWeMet'}
-        title={t('person.howWeMetLabel')}
-        value={person.howWeMet ?? ''}
-        placeholder={t('person.howWeMetPlaceholder')}
-        onClose={() => setSheet(null)}
-        onChange={(v) => setHowWeMet(person.id, v)}
-      />
-      <PersonTextSheet
-        visible={sheet === 'notes'}
-        title={t('person.notesLabel')}
-        value={person.notes}
-        placeholder={t('person.notesPlaceholder')}
-        multiline
-        onClose={() => setSheet(null)}
-        onChange={(v) => setNotes(person.id, v)}
-      />
-      <DatesSheet
-        visible={sheet === 'dates'}
-        birthday={getBirthday(person)}
-        otherDates={otherImportantDates(person)}
-        onClose={() => setSheet(null)}
-        onSetBirthday={(month, day) => setBirthday(person.id, month, day)}
-        onClearBirthday={() => clearBirthday(person.id)}
-        onAdd={(label, month, day) =>
-          // A "birthday" typed into the generic add is the canonical birthday, not
-          // a second date — route it so there's only ever one.
-          isBirthday({ id: '', label, month, day })
-            ? setBirthday(person.id, month, day)
-            : addImportantDate(person.id, label, month, day)
-        }
-        onRemove={(id) => removeImportantDate(person.id, id)}
-      />
-      <PrefsSheet
-        visible={sheet === 'prefs'}
-        preferences={person.preferences}
-        onClose={() => setSheet(null)}
-        onAdd={(kind, text) => addPreference(person.id, kind, text)}
-        onRemove={(id) => removePreference(person.id, id)}
-      />
-      <PersonalitySheet
-        visible={sheet === 'personality'}
-        person={person}
-        onClose={() => setSheet(null)}
-        onPick={(framework, value) => setPersonalityType(person.id, framework, value)}
-      />
+      <PersonDetailSheets person={person} sheet={sheet} onClose={() => setSheet(null)} />
     </SafeAreaView>
   );
-}
-
-function makeStyles(c: Colors) {
-  return StyleSheet.create({
-    safe: { flex: 1, backgroundColor: c.bg },
-    pressed: { opacity: 0.6 },
-    // Generous bottom padding so the last fields clear the keyboard on both OSes
-    // (and so the floating Save button never sits over the final input).
-    content: { ...boundedContent, paddingHorizontal: space.s5, paddingBottom: 120 },
-    nameInput: { ...ty.md, fontFamily: fontFamily.sansSemibold, color: c.fg, paddingVertical: space.s4 },
-    // The action group ("log a catch-up") — a subtle card that separates the one
-    // thing you DO here from the information about the person below it.
-    actionCard: {
-      backgroundColor: c.bgSubtle,
-      borderRadius: radius.md,
-      padding: space.s4,
-      marginTop: space.s2,
-    },
-    chips: { flexDirection: 'row', flexWrap: 'wrap', gap: space.s2, marginTop: space.s2 },
-    chip: {
-      paddingHorizontal: space.s4,
-      paddingVertical: space.s2,
-      borderRadius: radius.pill,
-      backgroundColor: c.bgSubtle,
-      borderWidth: hairline,
-      borderColor: c.hairline,
-    },
-    chipOn: { backgroundColor: c.fg, borderColor: c.fg },
-    chipText: { ...ty.sm, fontFamily: fontFamily.sans, color: c.fg },
-    chipTextOn: { color: c.bg, fontFamily: fontFamily.sansSemibold },
-    input: {
-      minHeight: target.min,
-      paddingHorizontal: space.s4,
-      borderRadius: radius.md,
-      backgroundColor: c.bgSubtle,
-      ...ty.base,
-      fontFamily: fontFamily.sans,
-      color: c.fg,
-    },
-    logNote: {
-      marginTop: space.s3,
-      minHeight: target.min * 1.6,
-      paddingTop: space.s3,
-      paddingBottom: space.s3,
-    },
-    primaryBtn: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'center',
-      gap: space.s2,
-      minHeight: target.min,
-      borderRadius: radius.md,
-      backgroundColor: c.inkButton,
-      paddingHorizontal: space.s5,
-      marginTop: space.s3,
-    },
-    primaryBtnText: { ...ty.base, fontFamily: fontFamily.sansSemibold, color: c.inkButtonText },
-    status: { ...ty.sm, fontFamily: fontFamily.sans, color: c.fgMuted, paddingTop: space.s3, textAlign: 'center' },
-    sectionLabel: {
-      ...ty.xs,
-      fontFamily: fontFamily.sansSemibold,
-      color: c.fgMuted,
-      textTransform: 'uppercase',
-      letterSpacing: 0.5,
-      paddingTop: space.s7,
-      paddingBottom: space.s3,
-    },
-    historyRow: {
-      flexDirection: 'row',
-      alignItems: 'baseline',
-      gap: space.s3,
-      paddingVertical: space.s2,
-      borderBottomWidth: hairline,
-      borderBottomColor: c.hairline,
-    },
-    // Quieter than sectionLabel — it lives INSIDE the action card, so no big
-    // top gap and no uppercase shout competing with the card's own header.
-    historyLabel: {
-      ...ty.xs,
-      fontFamily: fontFamily.sansSemibold,
-      color: c.fgMuted,
-      textTransform: 'uppercase',
-      letterSpacing: 0.5,
-      paddingTop: space.s5,
-      paddingBottom: space.s2,
-    },
-    historyDate: { ...ty.sm, fontFamily: fontFamily.sansSemibold, color: c.fgMuted, width: 56 },
-    historyText: { ...ty.sm, flex: 1, fontFamily: fontFamily.sans, color: c.fg },
-    listRow: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: space.s3,
-      minHeight: target.min,
-      borderBottomWidth: hairline,
-      borderBottomColor: c.hairline,
-    },
-    listRowText: { ...ty.base, flex: 1, fontFamily: fontFamily.sans, color: c.fg },
-    convBtn: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: space.s2,
-      minHeight: target.min,
-      paddingHorizontal: space.s4,
-      marginTop: space.s3,
-      borderRadius: radius.md,
-      borderWidth: hairline,
-      borderColor: c.hairlineStrong,
-    },
-    convBtnText: { ...ty.base, fontFamily: fontFamily.sans, color: c.fg },
-    deleteRow: { flexDirection: 'row', alignItems: 'center', gap: space.s2, marginTop: space.s8, paddingVertical: space.s3 },
-    deleteText: { ...ty.base, fontFamily: fontFamily.sans, color: c.fgMuted },
-    // Floating Save (new-person mode only) — ink-button pill, bottom-right, same
-    // visual language as PeopleScreen's fab but labeled.
-    saveFab: {
-      position: 'absolute',
-      right: space.s6,
-      bottom: space.s7,
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: space.s2,
-      height: 52,
-      paddingHorizontal: space.s6,
-      borderRadius: radius.pill,
-      backgroundColor: c.inkButton,
-    },
-    saveFabText: { ...ty.base, fontFamily: fontFamily.sansSemibold, color: c.inkButtonText },
-    saveFabDisabled: { opacity: 0.4 },
-    fabPressed: { opacity: 0.85 },
-  });
 }
