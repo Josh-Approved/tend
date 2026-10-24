@@ -294,6 +294,34 @@
   const crop    = (params.get('crop') || '').split(',').map(Number).filter((n) => !Number.isNaN(n));
   const vmode   = params.get('vmode') || '';   // '' | 'back' | 'front' — video-frame plates
 
+  // Device chrome proportions, as fractions of the rendered OUTER device width
+  // (band/bezel/rOuter/edge/btn) or of the screen width (island/punch), or of
+  // the device height (button top/height). Measured off current hardware:
+  //   iPhone 17 Pro Max — display corner radius ≈ 62pt of a 440pt-wide screen,
+  //     Dynamic Island ≈ 125×37pt sitting 11pt below the top edge, bezel ≈ 1.2mm
+  //     of a 78mm body, titanium band ≈ 0.5mm; action + volume left, side button
+  //     + camera control right.
+  //   Pixel-class Android — corner radius ≈ 11% of width, centred punch-hole
+  //     camera, power above the volume rocker on the right.
+  //   iPad Pro 13" / Android tablet — slim uniform bezel, small corner radius.
+  // Everything is a ratio, so the same table renders a 1080-wide Play phone and
+  // a 1320-wide App Store phone identically at their own scale.
+  const GEOM = {
+    iphone: {
+      band: 0.0055, bezel: 0.0165, rOuter: 0.157, edge: 0.0018,
+      island: { w: 0.283, h: 0.084, top: 0.0245 },
+      buttons: [['l', 0.168, 0.028], ['l', 0.226, 0.064], ['l', 0.305, 0.064], ['r', 0.247, 0.102], ['r', 0.560, 0.048]],
+    },
+    android: {
+      band: 0.0055, bezel: 0.016, rOuter: 0.118, edge: 0.0018,
+      punch: { d: 0.044, top: 0.021 },
+      buttons: [['r', 0.175, 0.052], ['r', 0.248, 0.098]],
+    },
+    ipad: { band: 0.004, bezel: 0.030, rOuter: 0.052, edge: 0.0012 },
+    'android-tablet': { band: 0.004, bezel: 0.030, rOuter: 0.048, edge: 0.0012 },
+  };
+
+
   if (vmode) document.body.dataset.vmode = vmode;
   document.body.dataset.surface = surface;
   document.body.dataset.theme = theme;
@@ -550,33 +578,6 @@
   // shot the aperture aspect = the capture's own pixels (so the whole screen
   // shows, never cropped). For layout=detail the aperture aspect = the CROP's
   // pixels and the capture is shown as a magnified background window.
-  // Device chrome proportions, as fractions of the rendered OUTER device width
-  // (band/bezel/rOuter/edge/btn) or of the screen width (island/punch), or of
-  // the device height (button top/height). Measured off current hardware:
-  //   iPhone 17 Pro Max — display corner radius ≈ 62pt of a 440pt-wide screen,
-  //     Dynamic Island ≈ 125×37pt sitting 11pt below the top edge, bezel ≈ 1.2mm
-  //     of a 78mm body, titanium band ≈ 0.5mm; action + volume left, side button
-  //     + camera control right.
-  //   Pixel-class Android — corner radius ≈ 11% of width, centred punch-hole
-  //     camera, power above the volume rocker on the right.
-  //   iPad Pro 13" / Android tablet — slim uniform bezel, small corner radius.
-  // Everything is a ratio, so the same table renders a 1080-wide Play phone and
-  // a 1320-wide App Store phone identically at their own scale.
-  const GEOM = {
-    iphone: {
-      band: 0.0055, bezel: 0.0165, rOuter: 0.157, edge: 0.0018,
-      island: { w: 0.283, h: 0.084, top: 0.0245 },
-      buttons: [['l', 0.168, 0.028], ['l', 0.226, 0.064], ['l', 0.305, 0.064], ['r', 0.247, 0.102], ['r', 0.560, 0.048]],
-    },
-    android: {
-      band: 0.0055, bezel: 0.016, rOuter: 0.118, edge: 0.0018,
-      punch: { d: 0.044, top: 0.021 },
-      buttons: [['r', 0.175, 0.052], ['r', 0.248, 0.098]],
-    },
-    ipad: { band: 0.004, bezel: 0.030, rOuter: 0.052, edge: 0.0012 },
-    'android-tablet': { band: 0.004, bezel: 0.030, rOuter: 0.048, edge: 0.0012 },
-  };
-
   function fitDevice(aspectRatioPx) {
     const device = document.querySelector('.device');
     const frameEl = document.getElementById('frame');
